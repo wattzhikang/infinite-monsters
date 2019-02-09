@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Volley</string>
+    <string name="string_request">String Request</string>
+    <string name="json_request">JSON Request</string>
+    <string name="image_request">Image Request</string>
+    <string name="response">Response:</string>
+    <string name="json_object_request">Json Object Request</string>
+    <string name="json_array_request">Json Array Request</string>
+</resources>
