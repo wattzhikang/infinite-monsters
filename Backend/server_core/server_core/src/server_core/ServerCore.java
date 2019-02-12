@@ -14,12 +14,31 @@ public class ServerCore {
 		socketListener.start();
 		game.start();
 		
-		//wait for user to exit the program
+		Runtime.getRuntime().addShutdownHook(new ShutdownHook(messageQueue, socketListener));
 		
-		//shut down gracefully
+		while(true) {
+			try {
+				System.out.println(messageQueue.take());
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private static class ShutdownHook extends Thread {
+		BlockingQueue<String> messageQueue;
+		ConnectionListener socketListener;
 		
-		socketListener.shutDown();
-		messageQueue.offer("PoisonPill");
+		public ShutdownHook(BlockingQueue<String> messageQueue, ConnectionListener socketListener) {
+			this.messageQueue = messageQueue;
+			this.socketListener = socketListener;
+		}
+		
+		public void run() {
+			messageQueue.offer("PoisonPill");
+			socketListener.shutDown();
+		}
 	}
 
 }
