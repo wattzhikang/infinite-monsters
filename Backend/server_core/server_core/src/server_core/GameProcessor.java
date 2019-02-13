@@ -10,10 +10,18 @@ public class GameProcessor extends Thread implements Killable {
 	}
 	
 	public void run() {
-		//meh
+		String message = null;
+		try {
+			while (!((message = messageQueue.take()).equals(ServerCore.POISONPILL))) {
+				System.out.print(message);
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void shutDown() {
-		//meh
+		messageQueue.offer(ServerCore.POISONPILL);
 	}
 }
