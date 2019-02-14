@@ -29,7 +29,7 @@ public class ServerCore {
 		}
 		
 		public void run() {
-			messageQueue.offer("PoisonPill");
+			messageQueue.offer(ServerCore.POISONPILL);
 			socketListener.shutDown();
 		}
 	}
