@@ -17,6 +17,7 @@ class GameProcessorTest {
 		
 		ObjectOutputStream out = null;
 		try {
+			Thread.sleep(5000);
 			Socket sendSocket = new Socket("localhost", ServerCore.PORT);
 			out = new ObjectOutputStream(sendSocket.getOutputStream());
 			out.writeObject("Message Test");
@@ -24,6 +25,9 @@ class GameProcessorTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			fail("failure");
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
