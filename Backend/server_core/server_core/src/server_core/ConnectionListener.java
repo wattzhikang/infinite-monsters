@@ -16,7 +16,7 @@ public class ConnectionListener extends Thread implements Killable {
 		super();
 		this.messageQueue = messageQueue;
 		try {
-			listener = new ServerSocket();
+			listener = new ServerSocket(ServerCore.PORT);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
