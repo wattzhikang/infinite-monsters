@@ -17,7 +17,7 @@ class GameProcessorTest {
 		
 		ObjectOutputStream out = null;
 		try {
-			Socket sendSocket = new Socket("127.0.0.1", ServerCore.PORT);
+			Socket sendSocket = new Socket("localhost", ServerCore.PORT);
 			out = new ObjectOutputStream(sendSocket.getOutputStream());
 			out.writeObject("Message Test");
 		} catch (IOException e) {
