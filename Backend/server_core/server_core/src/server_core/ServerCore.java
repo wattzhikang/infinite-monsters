@@ -9,7 +9,7 @@ public class ServerCore {
 	public static final int PORT = 10042;
 
 	public static void main(String[] args) {
-		BlockingQueue<String> messageQueue = new LinkedBlockingDeque<String>();
+		BlockingQueue<Message> messageQueue = new LinkedBlockingDeque<Message>();
 		
 		ConnectionListener socketListener = new ConnectionListener(messageQueue);
 		GameProcessor game = new GameProcessor(messageQueue);
@@ -21,16 +21,16 @@ public class ServerCore {
 	}
 	
 	private static class ShutdownHook extends Thread {
-		BlockingQueue<String> messageQueue;
+		BlockingQueue<Message> messageQueue;
 		ConnectionListener socketListener;
 		
-		public ShutdownHook(BlockingQueue<String> messageQueue, ConnectionListener socketListener) {
+		public ShutdownHook(BlockingQueue<Message> messageQueue, ConnectionListener socketListener) {
 			this.messageQueue = messageQueue;
 			this.socketListener = socketListener;
 		}
 		
 		public void run() {
-			messageQueue.offer(ServerCore.POISONPILL);
+			messageQueue.offer(new Message(ServerCore.POISONPILL, null));
 			socketListener.shutDown();
 		}
 	}

@@ -9,10 +9,10 @@ import java.util.concurrent.BlockingQueue;
 
 public class ConnectionListener extends Thread implements Killable {
 	private ServerSocket listener;
-	BlockingQueue<String> messageQueue;
+	BlockingQueue<Message> messageQueue;
 	List<SocketListener> clients = new LinkedList<SocketListener>();
 	
-	public ConnectionListener(BlockingQueue<String> messageQueue) {
+	public ConnectionListener(BlockingQueue<Message> messageQueue) {
 		super();
 		this.messageQueue = messageQueue;
 		try {

@@ -3,17 +3,17 @@ package server_core;
 import java.util.concurrent.BlockingQueue;
 
 public class GameProcessor extends Thread implements Killable {
-	private BlockingQueue<String> messageQueue;
+	private BlockingQueue<Message> messageQueue;
 	
-	public GameProcessor(BlockingQueue<String> inputQueue) {
+	public GameProcessor(BlockingQueue<Message> inputQueue) {
 		messageQueue = inputQueue;
 	}
 	
 	public void run() {
-		String message = null;
+		Message message = null;
 		try {
 			while (!((message = messageQueue.take()).equals(ServerCore.POISONPILL))) {
-				System.out.print(message);
+				message.getClient().enqueueMessage(message);
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -22,6 +22,6 @@ public class GameProcessor extends Thread implements Killable {
 	}
 	
 	public void shutDown() {
-		messageQueue.offer(ServerCore.POISONPILL);
+		messageQueue.offer(new Message(ServerCore.POISONPILL, null));
 	}
 }

@@ -2,26 +2,33 @@ package server_core;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 
 public class SocketListener extends Thread implements Killable {
 	private Socket socket;
 	private ObjectInputStream inputStream;
-	private BlockingQueue<String> messageQueue;
+	private ObjectOutputStream outputStream;
 	
-	public SocketListener(Socket connectionSocket, BlockingQueue<String> mainQueue) {
+	private BlockingQueue<Message> messageQueue;
+	
+	public SocketListener(Socket connectionSocket, BlockingQueue<Message> mainQueue) {
 		socket = connectionSocket;
-		messageQueue = mainQueue;
-	}
-	
-	public void run() {
 		try {
 			inputStream = new ObjectInputStream(socket.getInputStream());
+			outputStream = new ObjectOutputStream(socket.getOutputStream());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		messageQueue = mainQueue;
+	}
+	
+	public void run() {
 		while(!socket.isClosed()) {
 			String inputString = null;
 			try {
@@ -33,7 +40,16 @@ public class SocketListener extends Thread implements Killable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			messageQueue.offer(inputString);
+			messageQueue.offer(new Message(inputString, this));
+		}
+	}
+	
+	public synchronized void enqueueMessage(Message message) {
+		try {
+			outputStream.writeObject(message.toString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
