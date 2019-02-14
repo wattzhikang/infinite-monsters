@@ -3,6 +3,7 @@ package server_core;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.BindException;
 import java.net.Socket;
@@ -15,33 +16,42 @@ class GameProcessorTest {
 	void test() throws BindException, InterruptedException {
 		ServerTester server = new ServerTester();
 		server.start();
+		
 		Socket sendSocket = null;
 		int retryCounter = 0;
-		int threshold = 12;
-
+		final int threshold = 12;
+		
+		final String SENDMESSAGE = "Message Test";
+		
 		ObjectOutputStream out = null;
-		boolean success = false;
-		while (!success) {
-			while (retryCounter < threshold) {
-				try {
-					sendSocket = new Socket("localhost", ServerCore.PORT);
-					out = new ObjectOutputStream(sendSocket.getOutputStream());
-					out.writeObject("Message Test");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					fail("failure");
+		ObjectInputStream in = null;
+		
+		while (retryCounter < threshold) {
+			try {
+				sendSocket = new Socket("localhost", ServerCore.PORT);
+				out = new ObjectOutputStream(sendSocket.getOutputStream());
+				in = new ObjectInputStream(sendSocket.getInputStream());
+				
+				out.writeObject("Message Test");
+				
+				String message = in.readObject().toString();
+				
+				if (message.equals(SENDMESSAGE)) {
+					return;
+				} else {
+					fail("Message Received: " + message);
 				}
-			}
-			// socket failed to connect
-			if (sendSocket == null) {
-				retryCounter = 0;
-				Thread.sleep(5000);
+			} catch (IOException e) {
+				e.printStackTrace();
+				if (retryCounter <= threshold) {
+					retryCounter++;
+					Thread.sleep(1000);
+				}
 				continue;
-			}
-			// succeeded in connection
-			else {
-				success = true;
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				fail("Sent a totally different object than expected");
 			}
 		}
 	}
