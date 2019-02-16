@@ -9,11 +9,18 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+
 public class MainActivity extends AppCompatActivity
 {
-    Button b1, b2;
+    Button login, cancel;
     EditText username, password;
     TextView tx1;
+    String SERVER_IP = "192.168.56.1";
+    int SERVER_PORT = 10044;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -21,31 +28,36 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
-        b1 =  findViewById(R.id.Login);
-        b2 = findViewById(R.id.Cancel);
+        login =  findViewById(R.id.Login);
+        cancel = findViewById(R.id.Cancel);
         username = findViewById(R.id.Username);
         password = findViewById(R.id.Password);
         tx1 = findViewById(R.id.Intermon);
         
-        b1.setOnClickListener(new View.OnClickListener()
+        login.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                if(username.getText().toString().equals("admin") && password.getText().toString().equals("admin"))
+                String userID = username.getText().toString();
+                String pswd = password.getText().toString();
+                Login login = new Login();
+                login.execute(userID, pswd);
+                
+                if(userID.equals("Aaron") && pswd.equals("Colts"))
                 {
-                    Toast.makeText(MainActivity.this, "Redirectin...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Redirecting...", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
-                    Toast.makeText(MainActivity.this, "Wrong Credentials", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Wrong Credentials", Toast.LENGTH_LONG).show();
                     tx1.setVisibility(View.VISIBLE);
                     tx1.setBackgroundColor(Color.RED);
                 }
             }
         });
         
-        b2.setOnClickListener(new View.OnClickListener()
+        cancel.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -54,4 +66,5 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
+
 }
