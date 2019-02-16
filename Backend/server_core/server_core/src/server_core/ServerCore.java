@@ -6,6 +6,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class ServerCore {
 	
 	public static final String POISONPILL = "POISONPILL";
+	public static final int PORT = 10042;
 
 	public static void main(String[] args) {
 		BlockingQueue<String> messageQueue = new LinkedBlockingDeque<String>();
@@ -29,7 +30,7 @@ public class ServerCore {
 		}
 		
 		public void run() {
-			messageQueue.offer("PoisonPill");
+			messageQueue.offer(ServerCore.POISONPILL);
 			socketListener.shutDown();
 		}
 	}
