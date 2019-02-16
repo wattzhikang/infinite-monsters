@@ -1,5 +1,6 @@
 package server_core;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -21,7 +22,9 @@ public class Client extends Thread implements Killable {
 			assert socket != null;
 			while(!socket.isClosed()) {
 				String message = socket.readString();
-				socket.writeString(message);
+				if (message != null) {
+					socket.writeString(message);
+				}
 			}
 //		} catch (NullPointerException e) {
 //			assert (socket != null);
