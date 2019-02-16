@@ -17,10 +17,16 @@ public class Client extends Thread implements Killable {
 	}
 	
 	public void run() {
-		while(!socket.isClosed()) {
-			String message = socket.readString();
-			socket.writeString(message);
-		}
+//		try {
+			assert socket != null;
+			while(!socket.isClosed()) {
+				String message = socket.readString();
+				socket.writeString(message);
+			}
+//		} catch (NullPointerException e) {
+//			assert (socket != null);
+//			e.printStackTrace();
+//		}
 	}
 	
 	public void shutDown() {

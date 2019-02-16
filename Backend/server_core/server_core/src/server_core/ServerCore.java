@@ -30,6 +30,12 @@ public class ServerCore {
 		public void run() {
 			System.out.println("Shutting Down...");
 			socketListener.shutDown();
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 }

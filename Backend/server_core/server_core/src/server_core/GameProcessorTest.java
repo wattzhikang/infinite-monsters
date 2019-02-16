@@ -38,6 +38,11 @@ class GameProcessorTest {
 				
 				if (message.equals(SENDMESSAGE)) {
 					System.out.println(message);
+					/*
+					 * If program fails to shut down gracefully, this
+					 * will give the VM time to print its stack trace.
+					 */
+					Thread.sleep(1000);
 					return;
 				} else {
 					fail("Message Received: " + message);
