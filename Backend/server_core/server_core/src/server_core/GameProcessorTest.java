@@ -37,6 +37,7 @@ class GameProcessorTest {
 				String message = in.readObject().toString();
 				
 				if (message.equals(SENDMESSAGE)) {
+					System.out.println(message);
 					return;
 				} else {
 					fail("Message Received: " + message);
@@ -45,6 +46,7 @@ class GameProcessorTest {
 				e.printStackTrace();
 				if (retryCounter <= threshold) {
 					retryCounter++;
+					System.out.println("Retry " + retryCounter);
 					Thread.sleep(1000);
 				}
 				continue;
