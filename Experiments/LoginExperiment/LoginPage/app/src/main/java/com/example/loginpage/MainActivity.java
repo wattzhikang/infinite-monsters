@@ -8,11 +8,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -39,10 +36,20 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
+                JSONObject client = new JSONObject();
+                try
+                {
+                    client.put("username", username.getText().toString());
+                    client.put("password", password.getText().toString());
+                }
+                catch(JSONException e)
+                {
+                    e.printStackTrace();
+                }
                 String userID = username.getText().toString();
                 String pswd = password.getText().toString();
                 Login login = new Login();
-                login.execute(userID, pswd);
+                login.execute(client);
                 
                 if(userID.equals("Aaron") && pswd.equals("Colts"))
                 {
