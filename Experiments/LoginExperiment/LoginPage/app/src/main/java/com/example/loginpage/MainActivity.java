@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity
         tx1 = findViewById(R.id.Intermon);
         /*Thread clientThread = new Thread(new ServerThread());
         clientThread.start();*/
-        
+
         login.setOnClickListener(new View.OnClickListener()
         {
             @Override

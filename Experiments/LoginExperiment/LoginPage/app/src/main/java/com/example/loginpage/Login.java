@@ -9,18 +9,19 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.InetAddress;
 
 public class Login extends AsyncTask<JSONObject, Void, Void>
 {
     private static final int SERVER_PORT = 10044;
-    private static final String SERVER_IP = "192.168.1.2";
+    private static final String SERVER_IP = "192.168.56.1";
     String serverMessage = "false";
     
-    Login()
+    /*Login()
     {
         Thread clientThread = new Thread(new ServerThread());
         clientThread.start();
-    }
+    }*/
     
     @Override
     protected Void doInBackground(JSONObject... params)
@@ -55,7 +56,7 @@ public class Login extends AsyncTask<JSONObject, Void, Void>
     {
         return serverMessage;
     }
-    class ServerThread implements Runnable
+    /*class ServerThread implements Runnable
     {
         Socket server;
         public void run()
@@ -78,7 +79,7 @@ public class Login extends AsyncTask<JSONObject, Void, Void>
                 e.printStackTrace();
             }
         }
-    }
+    }*/
 }
 
 

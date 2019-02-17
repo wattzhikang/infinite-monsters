@@ -25,14 +25,13 @@ public class TestServerFrame extends javax.swing.JFrame {
     static InputStreamReader isr;
     static BufferedReader br;
     static String message;
-    static InetAddress ina;
     /**
      * Creates new form TestServerFrame
      */
     public TestServerFrame() {
         initComponents();
     }
-
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -136,6 +135,7 @@ public class TestServerFrame extends javax.swing.JFrame {
         try
         {
             ss = new ServerSocket(10044);
+
             while(true)
             {
                 s = ss.accept();
