@@ -2,53 +2,36 @@ package com.example.loginpage;
 
 import android.os.AsyncTask;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.PrintWriter;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.InetAddress;
 
 public class Login extends AsyncTask<JSONObject, Void, Void>
 {
-    Socket clientSocket;
-    ObjectInputStream in;
-    ObjectOutputStream out;
-    PrintWriter pw;
-    InetAddress ina;
     private static final int SERVER_PORT = 10044;
     private static final String SERVER_IP = "192.168.1.2";
+    String serverMessage = "false";
     
+    Login()
+    {
+        Thread clientThread = new Thread(new ServerThread());
+        clientThread.start();
+    }
     
     @Override
     protected Void doInBackground(JSONObject... params)
     {
-        JSONObject client = params[0];
-        String username = "";
-        String password = "";
+        String clientMessage = params[0].toString();
+        System.out.println(clientMessage);
         try
         {
-            username = client.getString("username");
-            password = client.getString("password");
-        }
-        catch(JSONException e)
-        {
-            e.printStackTrace();
-        }
-        System.out.println(username);
-        System.out.println(password);
-        try
-        {
-            ina = InetAddress.getLocalHost();
-            clientSocket = new Socket(SERVER_IP, 10044);
-            
-            //in = new ObjectInputStream(clientSocket.getInputStream());
-            out = new ObjectOutputStream(clientSocket.getOutputStream());
-            out.writeObject(username);
-            out.writeObject(password);
+            Socket clientSocket = new Socket(SERVER_IP, SERVER_PORT);
+            ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+            out.writeObject(clientMessage);
             out.flush();
             out.close();
         }
@@ -58,4 +41,44 @@ public class Login extends AsyncTask<JSONObject, Void, Void>
         }
         return null;
     }
+    
+    public Boolean getValidLogin()
+    {
+        if(serverMessage.equals("true"))
+        {
+            return true;
+        }
+        return false;
+    }
+    
+    public String getServerMessage()
+    {
+        return serverMessage;
+    }
+    class ServerThread implements Runnable
+    {
+        Socket server;
+        public void run()
+        {
+            try
+            {
+                ServerSocket serverSocket = new ServerSocket(10045);
+                while(true)
+                {
+                    server = serverSocket.accept();
+                    ObjectInputStream in = new ObjectInputStream(server.getInputStream());
+                    serverMessage = (String) in.readObject();
+                }
+            }
+            catch(IOException e1)
+            {
+                e1.printStackTrace();
+            } catch (ClassNotFoundException e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
 }
+
+

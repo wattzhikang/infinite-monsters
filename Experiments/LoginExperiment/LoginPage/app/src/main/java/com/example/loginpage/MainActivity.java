@@ -11,13 +11,17 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+
 public class MainActivity extends AppCompatActivity
 {
     Button login, cancel;
     EditText username, password;
     TextView tx1;
-    String SERVER_IP = "192.168.56.1";
-    int SERVER_PORT = 10044;
+    String serverMessage = "false";
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -30,6 +34,8 @@ public class MainActivity extends AppCompatActivity
         username = findViewById(R.id.Username);
         password = findViewById(R.id.Password);
         tx1 = findViewById(R.id.Intermon);
+        /*Thread clientThread = new Thread(new ServerThread());
+        clientThread.start();*/
         
         login.setOnClickListener(new View.OnClickListener()
         {
@@ -46,12 +52,12 @@ public class MainActivity extends AppCompatActivity
                 {
                     e.printStackTrace();
                 }
-                String userID = username.getText().toString();
-                String pswd = password.getText().toString();
                 Login login = new Login();
                 login.execute(client);
                 
-                if(userID.equals("Aaron") && pswd.equals("Colts"))
+                Toast.makeText(MainActivity.this, login.getServerMessage(), Toast.LENGTH_LONG).show();
+                
+                if(login.getValidLogin())
                 {
                     Toast.makeText(MainActivity.this, "Redirecting...", Toast.LENGTH_SHORT).show();
                 }
@@ -73,5 +79,29 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
-
+    
+    /*class ServerThread implements Runnable
+    {
+        Socket server;
+        public void run()
+        {
+            try
+            {
+                ServerSocket serverSocket = new ServerSocket(10045);
+                while(true)
+                {
+                    ObjectInputStream in = new ObjectInputStream(server.getInputStream());
+                    server = serverSocket.accept();
+                    serverMessage = (String) in.readObject();
+                }
+            }
+            catch(IOException e1)
+            {
+                e1.printStackTrace();
+            } catch (ClassNotFoundException e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }*/
 }
