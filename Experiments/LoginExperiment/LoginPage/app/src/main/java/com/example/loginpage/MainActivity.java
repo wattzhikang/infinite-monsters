@@ -11,6 +11,8 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.concurrent.ExecutionException;
+
 public class MainActivity extends AppCompatActivity
 {
     Button login, cancel;
@@ -45,12 +47,39 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
                 ClientSocket clientSocket = new ClientSocket();
-                clientSocket.execute(client);
-                System.out.println("Server message: " + clientSocket.getServerMessage());
+                try
+                {
+                    clientSocket.execute(client).get();
+                }
+                catch (ExecutionException e)
+                {
+                    e.printStackTrace();
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+
+                JSONObject validLogin = new JSONObject();
+                try
+                {
+                    validLogin.put("loginSuccess", clientSocket.getServerMessage());
+                }
+                catch(JSONException e)
+                {
+                    e.printStackTrace();
+                }
+
+                String message = clientSocket.getServerMessage();
+
+                String login = null;
+                login = message.split("\"")[3];
+
+                //tx2.setText("Server: " + clientSocket.getServerMessage());
                 
                 if(clientSocket.getValidLogin())
                 {
-                    Toast.makeText(MainActivity.this, "Redirecting...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "login success: " + login, Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
@@ -66,7 +95,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                
                 finish();
             }
         });

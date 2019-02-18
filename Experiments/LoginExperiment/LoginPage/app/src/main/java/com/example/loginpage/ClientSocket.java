@@ -14,29 +14,24 @@ public class ClientSocket extends AsyncTask<JSONObject, Void, Void>
     private Socket clientSocket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
-    private static final int SERVER_PORT = 10044;
+    private static final int SERVER_PORT = 10042;
     private static final String SERVER_URL = "cs309-yt-1.misc.iastate.edu";
     String serverMessage = "";
     private final String SERVER_IP = "10.24.226.77";
-    private  final String MY_IP = "192.168.1.2";
-    private boolean received = true;
-    
+    private  final String MY_IP = "192.168.56.1";
+
     @Override
     protected Void doInBackground(JSONObject... params)
     {
         String clientMessage = params[0].toString();
         try
         {
-            clientSocket = new Socket(MY_IP, SERVER_PORT);
-            //System.out.println("connected");
-            in = new ObjectInputStream(clientSocket.getInputStream());
+            clientSocket = new Socket(SERVER_URL, SERVER_PORT);
             out = new ObjectOutputStream(clientSocket.getOutputStream());
-            System.out.println("here");
+            out.flush();
+            in = new ObjectInputStream(clientSocket.getInputStream());
             sendMessage(clientMessage);
-            while(received != true)
-            {
-                serverMessage = readMessage();
-            }
+            serverMessage = readMessage();
         }
         catch(IOException e)
         {
@@ -46,17 +41,14 @@ public class ClientSocket extends AsyncTask<JSONObject, Void, Void>
     }
     public String readMessage()
     {
+        serverMessage = null;
         try
         {
-            serverMessage = (String) in.readObject();
+            serverMessage = in.readObject().toString();
         }
         catch(ClassNotFoundException | IOException e)
         {
             e.printStackTrace();
-        }
-        if(!serverMessage.isEmpty())
-        {
-            received = true;
         }
         return serverMessage;
     }
@@ -65,11 +57,8 @@ public class ClientSocket extends AsyncTask<JSONObject, Void, Void>
     {
         try
         {
-            System.out.println("connected");
-            System.out.println(clientSocket.isConnected());
             out.writeObject((Object)message);
             out.flush();
-            out.close();
         }
         catch(IOException e)
         {

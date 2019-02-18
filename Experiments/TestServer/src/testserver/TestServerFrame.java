@@ -9,6 +9,7 @@ package testserver;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -82,12 +83,16 @@ public class TestServerFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         try
         {
-            Socket s = new Socket("192.168.232.2", 10045);
-            PrintWriter pw = new PrintWriter(s.getOutputStream());
+            //Socket s = new Socket("192.168.232.2", 10045);
+            ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
+            out.writeObject((String)jTextField1.getText());
+            out.flush();
+            out.close();
+            /*PrintWriter pw = new PrintWriter(s.getOutputStream());
             pw.write(jTextField1.getText());
             pw.flush();
             pw.close();
-            s.close();
+            s.close();*/
             
         }
         catch(IOException e)
