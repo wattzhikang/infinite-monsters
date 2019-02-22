@@ -30,15 +30,18 @@ public class MainActivity extends AppCompatActivity
         username = findViewById(R.id.Username);
         password = findViewById(R.id.Password);
         tx1 = findViewById(R.id.Intermon);
-        
+        MapCreator map = new MapCreator();
+        map.createMap();
         login.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
+                ClientSocket clientSocket = new ClientSocket();
                 JSONObject client = new JSONObject();
                 try
                 {
+                    client.put("key", "login");
                     client.put("username", username.getText().toString());
                     client.put("password", password.getText().toString());
                 }
@@ -46,40 +49,21 @@ public class MainActivity extends AppCompatActivity
                 {
                     e.printStackTrace();
                 }
-                ClientSocket clientSocket = new ClientSocket();
                 try
                 {
                     clientSocket.execute(client).get();
                 }
-                catch (ExecutionException e)
-                {
-                    e.printStackTrace();
-                }
-                catch (InterruptedException e)
+                catch (InterruptedException | ExecutionException e)
                 {
                     e.printStackTrace();
                 }
 
-                JSONObject validLogin = new JSONObject();
-                try
-                {
-                    validLogin.put("loginSuccess", clientSocket.getServerMessage());
-                }
-                catch(JSONException e)
-                {
-                    e.printStackTrace();
-                }
-
-                String message = clientSocket.getServerMessage();
-
-                String login = null;
-                login = message.split("\"")[3];
-
-                //tx2.setText("Server: " + clientSocket.getServerMessage());
+                String message = serverCommunication.getServerMessage();
+                System.out.println(message);
                 
-                if(clientSocket.getValidLogin())
+                if(message.equals(("Aaron")))
                 {
-                    Toast.makeText(MainActivity.this, "login success: " + login, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "login success: " + message, Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
