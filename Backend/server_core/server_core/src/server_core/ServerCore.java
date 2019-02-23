@@ -3,36 +3,46 @@ package server_core;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
+import java.sql.*;
+
 public class ServerCore {
 	
-	public static final String POISONPILL = "POISONPILL";
+	public static final Client POISONPILL = new Client(null, null); //DO NOT START THIS CLIENT
 	public static final int PORT = 10042;
 
 	public static void main(String[] args) {
-		BlockingQueue<String> messageQueue = new LinkedBlockingDeque<String>();
+		DBAdapter db = new DBAdapter();
 		
-		ConnectionListener socketListener = new ConnectionListener(messageQueue);
-		GameProcessor game = new GameProcessor(messageQueue);
+		BlockingQueue<Client> clientQueue = new LinkedBlockingDeque<Client>();
+		
+		ConnectionListener socketListener = new ConnectionListener(clientQueue, db);
+		GameProcessor game = new GameProcessor(clientQueue);
 		
 		socketListener.start();
 		game.start();
 		
-		Runtime.getRuntime().addShutdownHook(new ShutdownHook(messageQueue, socketListener));
+		Runtime.getRuntime().addShutdownHook(new ShutdownHook(socketListener, db));
 	}
 	
 	private static class ShutdownHook extends Thread {
-		BlockingQueue<String> messageQueue;
 		ConnectionListener socketListener;
+		DBAdapter db;
 		
-		public ShutdownHook(BlockingQueue<String> messageQueue, ConnectionListener socketListener) {
-			this.messageQueue = messageQueue;
+		public ShutdownHook(ConnectionListener socketListener, DBAdapter db) {
 			this.socketListener = socketListener;
+			this.db = db;
 		}
 		
 		public void run() {
-			messageQueue.offer(ServerCore.POISONPILL);
+			System.out.println("Shutting Down...");
 			socketListener.shutDown();
+			db.close();
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
-
 }

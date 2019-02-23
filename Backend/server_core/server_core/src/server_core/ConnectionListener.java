@@ -3,18 +3,21 @@ package server_core;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 public class ConnectionListener extends Thread implements Killable {
 	private ServerSocket listener;
-	BlockingQueue<String> messageQueue;
-	List<SocketListener> clients = new LinkedList<SocketListener>();
+	BlockingQueue<Client> clientQueue;
 	
-	public ConnectionListener(BlockingQueue<String> messageQueue) {
+	DBAdapter db;
+	
+	public ConnectionListener(BlockingQueue<Client> clientQueue, DBAdapter db) {
 		super();
-		this.messageQueue = messageQueue;
+		this.clientQueue = clientQueue;
+		this.db = db;
 		try {
 			listener = new ServerSocket(ServerCore.PORT);
 		} catch (IOException e) {
@@ -28,16 +31,15 @@ public class ConnectionListener extends Thread implements Killable {
 			Socket newConnection = null;
 			try {
 				newConnection = listener.accept();
+			} catch (SocketException e) {
+				if (listener.isClosed()) {
+					break;
+				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			SocketListener newClient = new SocketListener(newConnection, messageQueue);
-			newClient.start();
-			clients.add(newClient);
-		}
-		for (SocketListener client : clients) {
-			client.shutDown();
+			clientQueue.offer(new Client(new SocketAdapter(newConnection), db));
 		}
 	}
 	
@@ -48,5 +50,6 @@ public class ConnectionListener extends Thread implements Killable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		clientQueue.offer(ServerCore.POISONPILL);
 	}
 }
