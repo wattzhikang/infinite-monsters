@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class DBAdapter {
+public class DBAdapter implements DBInterface {
 
 	private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
 	private static final String DB_URL = "jdbc:mysql://localhost/intermondb";
@@ -63,7 +63,8 @@ public class DBAdapter {
 		}
 		
 	}
-	
+
+	@Override
 	public synchronized boolean login(String username, String password) {
 		Statement statement = null;
 		ResultSet results = null;

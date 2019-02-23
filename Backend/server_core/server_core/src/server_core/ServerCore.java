@@ -11,8 +11,13 @@ public class ServerCore {
 	public static final int PORT = 10042;
 
 	public static void main(String[] args) {
-		DBAdapter db = new DBAdapter();
-		
+		DBInterface db = null;
+		if (args.length > 1 && args[1].equals("debug")) {
+			db = new DBAdapter();
+		} else {
+			db = new DBDummy();
+		}
+				
 		BlockingQueue<Client> clientQueue = new LinkedBlockingDeque<Client>();
 		
 		ConnectionListener socketListener = new ConnectionListener(clientQueue, db);
@@ -26,9 +31,9 @@ public class ServerCore {
 	
 	private static class ShutdownHook extends Thread {
 		ConnectionListener socketListener;
-		DBAdapter db;
+		DBInterface db;
 		
-		public ShutdownHook(ConnectionListener socketListener, DBAdapter db) {
+		public ShutdownHook(ConnectionListener socketListener, DBInterface db) {
 			this.socketListener = socketListener;
 			this.db = db;
 		}

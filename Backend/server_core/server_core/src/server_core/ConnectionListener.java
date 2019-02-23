@@ -12,9 +12,9 @@ public class ConnectionListener extends Thread implements Killable {
 	private ServerSocket listener;
 	BlockingQueue<Client> clientQueue;
 	
-	DBAdapter db;
+	DBInterface db;
 	
-	public ConnectionListener(BlockingQueue<Client> clientQueue, DBAdapter db) {
+	public ConnectionListener(BlockingQueue<Client> clientQueue, DBInterface db) {
 		super();
 		this.clientQueue = clientQueue;
 		this.db = db;

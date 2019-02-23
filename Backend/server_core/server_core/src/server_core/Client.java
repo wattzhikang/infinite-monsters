@@ -12,9 +12,9 @@ package server_core;
 
 public class Client extends Thread implements Killable {
 	private SocketAdapter socket;
-	private DBAdapter db;
+	private DBInterface db;
 	
-	public Client(SocketAdapter socket, DBAdapter db) {
+	public Client(SocketAdapter socket, DBInterface db) {
 		this.socket = socket;
 		this.db = db;
 	}
