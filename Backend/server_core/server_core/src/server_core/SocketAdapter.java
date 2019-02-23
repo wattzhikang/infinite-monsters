@@ -3,6 +3,7 @@ package server_core;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 
 public class SocketAdapter {
@@ -13,12 +14,22 @@ public class SocketAdapter {
 	public SocketAdapter(Socket socket) {
 		this.socket = socket;
 		try {
-			in = new ObjectInputStream(socket.getInputStream());
 			out = new ObjectOutputStream(socket.getOutputStream());
+			out.flush();
+			System.out.println("output flushed for " + socket.getInetAddress().toString());
+			in = new ObjectInputStream(socket.getInputStream());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public InetAddress getInetAddress() {
+		return socket.getInetAddress();
+	}
+	
+	public String getHost() {
+		return (socket.getInetAddress() != null) ? socket.getInetAddress().toString() : null;
 	}
 	
 	public String readString() {
@@ -41,6 +52,7 @@ public class SocketAdapter {
 	public void writeString(String toWrite) {
 		try {
 			out.writeObject((Object)toWrite);
+			out.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

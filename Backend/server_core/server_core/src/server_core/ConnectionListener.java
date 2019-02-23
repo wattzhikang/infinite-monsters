@@ -12,9 +12,12 @@ public class ConnectionListener extends Thread implements Killable {
 	private ServerSocket listener;
 	BlockingQueue<Client> clientQueue;
 	
-	public ConnectionListener(BlockingQueue<Client> clientQueue) {
+	DBAdapter db;
+	
+	public ConnectionListener(BlockingQueue<Client> clientQueue, DBAdapter db) {
 		super();
 		this.clientQueue = clientQueue;
+		this.db = db;
 		try {
 			listener = new ServerSocket(ServerCore.PORT);
 		} catch (IOException e) {
@@ -36,7 +39,7 @@ public class ConnectionListener extends Thread implements Killable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			clientQueue.offer(new Client(new SocketAdapter(newConnection)));
+			clientQueue.offer(new Client(new SocketAdapter(newConnection), db));
 		}
 	}
 	
