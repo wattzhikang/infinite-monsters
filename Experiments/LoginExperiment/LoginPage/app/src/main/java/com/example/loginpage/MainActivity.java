@@ -1,8 +1,10 @@
 package com.example.loginpage;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,6 +13,7 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.Socket;
 import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity
@@ -18,6 +21,7 @@ public class MainActivity extends AppCompatActivity
     Button login, cancel;
     EditText username, password;
     TextView tx1;
+    ClientSocket clientSocket;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -32,12 +36,13 @@ public class MainActivity extends AppCompatActivity
         tx1 = findViewById(R.id.Intermon);
         MapCreator map = new MapCreator();
         map.createMap();
+        
         login.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                ClientSocket clientSocket = new ClientSocket();
+                clientSocket = new ClientSocket();
                 JSONObject client = new JSONObject();
                 try
                 {
@@ -57,13 +62,16 @@ public class MainActivity extends AppCompatActivity
                 {
                     e.printStackTrace();
                 }
-
-                String message = serverCommunication.getServerMessage();
-                System.out.println(message);
+                
+                String message = clientSocket.getServerMessage();
                 
                 if(message.equals(("Aaron")))
                 {
                     Toast.makeText(MainActivity.this, "login success: " + message, Toast.LENGTH_SHORT).show();
+                    Intent i = new Intent(MainActivity.this, Game.class);
+                    i.putExtra("clientSocket", clientSocket);
+                    startActivity(i);
+                    finish();
                 }
                 else
                 {
@@ -79,6 +87,10 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
+                if(!clientSocket.isClosed())
+                {
+                    clientSocket.close();
+                }
                 finish();
             }
         });
