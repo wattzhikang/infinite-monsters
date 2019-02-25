@@ -31,24 +31,44 @@ public class Client extends Thread implements Killable {
 					String username = null;
 					String password = null;
 					
-					//{"username":"user1","password":"password"}
-					//{ username : user1 , password : password }
-					//0 1        2 3     4 5        6 7        8 length=9
+					//{"requestType":"registration","username":"user1","password":"sunshine","privileges":"player"}
+					//{ requestType : registration , username : user1 , password : sunshine , privileges : player }
+					//0 1           2 3            4 5        6 7     8 9       10 11      12 13        14 15     16
+					
+					//{"requestType":"authentication","username":"user1","password":"sunshine"}
+					//{ requestType : authentication , username : user1 , password : sunshine }
+					//0 1           2 3              4 5        6 7     8 9       10 11       12
 					
 					String[] JSONParse = message.split("\"");
 					
-					if (JSONParse.length == 9) {
-						username = JSONParse[3];
-						password = JSONParse[7];
-						if (db.login(username, password)) {
-							String success = "{\"loginSuccess\":\"true\"}";
-							socket.writeString(success);
-							System.out.println("Response sent to " + socket.getHost() + ": " + success);
+					String response = null;
+					
+					if (JSONParse.length >= 12) {
+						username = JSONParse[7];
+						password = JSONParse[11];
+						if (JSONParse[3].equals("registration")) {
+							if (db.register(username, password)) {
+								response = "{\"registrationSuccess\":\"true\"}";
+							} else {
+								response = "{\"registrationSuccess\":\"false\"}";
+							}
+						} else if (JSONParse[3].equals("authentication")) {
+							if (db.login(username, password)) {
+								response = "{\"loginSuccess\":\"true\"}";
+							} else {
+								response = "{\"loginSuccess\":\"false\"}";
+							}
 						} else {
-							String fail = "{\"loginSuccess\":\"false\"}";
-							socket.writeString(fail);
-							System.out.println("Response sent to " + socket.getHost() + ": " + fail);
+							//malformed input
 						}
+					}
+					
+					if (response != null) {
+						socket.writeString(response);
+						System.out.println("Response sent to " + socket.getHost() + ": " + response);
+					} else {
+						System.out.println("Malformed input");
+						socket.close();
 					}
 				}
 			}

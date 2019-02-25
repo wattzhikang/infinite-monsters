@@ -47,10 +47,13 @@ class FullyLocalTest {
 			
 			ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 			
-			out.writeObject("{\"username\":\"user\",\"pasword\":\"password\"}");
+			out.writeObject("{\"requestType\":\"registration\",\"username\":\"user1\",\"password\":\"sunshine\",\"privileges\":\"player\"}");
 			
-			System.out.println(in.readObject().toString());
+			System.out.println("Testing Thread: Received " + in.readObject().toString());
 			
+			out.writeObject("{\"requestType\":\"authentication\",\"username\":\"user1\",\"password\":\"sunshine\"}");
+			
+			System.out.println("Testing Thread: Received " + in.readObject().toString());
 			
 			socket.close();
 		} catch (IOException e) {
@@ -65,7 +68,7 @@ class FullyLocalTest {
 private class ServerThread extends Thread {
 	@Override
 	public void run() {
-		String[] args = {null, "debug"};
+		String[] args = {null, ServerCore.DEBUG};
 		ServerCore.main(args);
 	}
 }

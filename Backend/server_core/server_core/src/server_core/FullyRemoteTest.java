@@ -6,65 +6,60 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 import org.junit.jupiter.api.Test;
 
 class FullyRemoteTest {
+	
+	public final String SERVERURL = "cs309-yt-1.misc.iastate.edu";
 
 	@Test
 	void test() {
-		int retryCounter = 0;
-		final int retryLimit = 10;
-		
-		Socket sendSocket = null;
-		
-		final String SENDMESSAGE = "Message Test";
-		
-		for (; retryCounter < retryLimit; retryCounter++) {
+		Socket socket = null;
+		for (int i = 0; i < 5; i++) {
 			try {
-				sendSocket = new Socket("cs309-yt-1.misc.iastate.edu", ServerCore.PORT);
-				ObjectOutputStream out = new ObjectOutputStream(sendSocket.getOutputStream());
-				ObjectInputStream in = new ObjectInputStream(sendSocket.getInputStream());
-				
-				out.writeObject("Message Test");
-				
-				String message = in.readObject().toString();
-				
-				if (message.equals(SENDMESSAGE)) {
-					System.out.println(message);
-					sendSocket.close();
-					/*
-					 * If program fails to shut down gracefully, this
-					 * will give the VM time to print its stack trace.
-					 */
-					Thread.sleep(1000);
-					return;
-				} else {
-					fail("Message Received: " + message);
-				}
-				
+				Thread.sleep(1000);
+				socket = new Socket(SERVERURL, ServerCore.PORT);
+				break;
+			} catch (UnknownHostException e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+				fail("Unknown host");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				fail("IOException");
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				fail("Interrupted for some reason");
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-				fail("Sent a totally different object than expected");
+				fail("Interrupted");
 			}
 		}
-
+		if (socket == null) {
+			fail("Failed to initiate connection");
+		}
 		
-		
-		fail("Not yet implemented");
+		try {
+			ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+			out.flush();
+			
+			ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+			
+			out.writeObject("{\"requestType\":\"registration\",\"username\":\"user1\",\"password\":\"sunshine\",\"privileges\":\"player\"}");
+			System.out.println("Testing Thread: Received " + in.readObject().toString());
+			
+			out.writeObject("{\"requestType\":\"authentication\",\"username\":\"user1\",\"password\":\"sunshine\"}");
+			System.out.println("Testing Thread: Received " + in.readObject().toString());
+			
+			socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			fail("Got a totally different object");
+		}
 	}
 
 }

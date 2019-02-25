@@ -9,13 +9,14 @@ public class ServerCore {
 	
 	public static final Client POISONPILL = new Client(null, null); //DO NOT START THIS CLIENT
 	public static final int PORT = 10042;
+	public static final String DEBUG = "debug";
 
 	public static void main(String[] args) {
 		DBInterface db = null;
-		if (args.length > 1 && args[1].equals("debug")) {
-			db = new DBAdapter();
-		} else {
+		if (args.length > 1 && args[1].equals(DEBUG)) {
 			db = new DBDummy();
+		} else {
+			db = new DBAdapter();
 		}
 				
 		BlockingQueue<Client> clientQueue = new LinkedBlockingDeque<Client>();

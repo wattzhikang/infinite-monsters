@@ -12,6 +12,8 @@ public class DBAdapter implements DBInterface {
 	private static final String DB_URL = "jdbc:mysql://localhost/intermondb";
 	private static final String USER = "root";
 	private static final String PASSWORD = "Abundant space 421 points!";
+	
+	private static final String USER_TABLE = "intermondb.user";
 
 	Connection connection = null;
 	
@@ -70,7 +72,7 @@ public class DBAdapter implements DBInterface {
 		ResultSet results = null;
 		try {
 			statement = connection.createStatement();
-			String sql = "SELECT UserName, Password FROM intermondb.user WHERE UserName='"
+			String sql = "SELECT UserName, Password FROM " + USER_TABLE + " WHERE UserName='"
 					+ username + "' AND Password='" + password + "';";
 			results = statement.executeQuery(sql);
 			
@@ -81,14 +83,12 @@ public class DBAdapter implements DBInterface {
 			}
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			if (statement != null) {
 				try {
 					statement.close();
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -96,7 +96,47 @@ public class DBAdapter implements DBInterface {
 				try {
 					results.close();
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return true;
+	}
+	
+	public synchronized boolean register(String username, String password) {
+		Statement statement = null;
+		ResultSet results = null;
+		try {
+			//first check that user is not already in database
+			statement = connection.createStatement();
+			String sql = "SELECT UserName FROM " + USER_TABLE + " WHERE UserName='" + username + "';";
+			results = statement.executeQuery(sql);
+			
+			if (results.next()) {
+				return false;
+			}
+			
+			//if user is not in database, create an entry
+			statement.close();
+			
+			statement = connection.createStatement();
+			sql = "INSERT INTO " + USER_TABLE + " VALUES ('" + username + "', '" + password + "');";
+			statement.executeUpdate(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (statement != null) {
+				try {
+					statement.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (results != null) {
+				try {
+					results.close();
+				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 			}
