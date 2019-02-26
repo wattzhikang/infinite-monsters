@@ -17,7 +17,7 @@ public class ClientSocket extends AsyncTask<JSONObject, Void, Void> implements S
     private static Socket clientSocket;
     private static ObjectInputStream in;
     private static ObjectOutputStream out;
-    private  final String MY_IP = "192.168.1.2";
+    private  final String MY_IP = "192.168.56.1";
     String serverMessage = "";
     
     @Override

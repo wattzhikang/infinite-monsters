@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity
                 
                 String message = clientSocket.getServerMessage();
                 
-                if(message.equals(("Aaron")))
+                if(message.equals(("Lance")))
                 {
                     Toast.makeText(MainActivity.this, "login success: " + message, Toast.LENGTH_SHORT).show();
                     Intent i = new Intent(MainActivity.this, Game.class);
