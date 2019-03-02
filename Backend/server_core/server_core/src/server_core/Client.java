@@ -1,64 +1,74 @@
 package server_core;
 
-//import java.io.EOFException;
-//import java.io.IOException;
-//import java.io.ObjectInputStream;
-//import java.io.ObjectOutputStream;
-//import java.net.Socket;
-//import java.util.LinkedList;
-//import java.util.Queue;
-//import java.util.concurrent.BlockingQueue;
+import java.io.IOException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
+import com.mysql.cj.protocol.Message;
 
 public class Client extends Thread implements Killable {
 	private SocketAdapter socket;
 	private DBInterface db;
+	private BlockingQueue<SocketMessage> queue;
+	private ClientListener in;
+//	private Game game;
 	
-	private enum RequestType {REGISTRATION, AUTHENTICATION, SUBSCRIPTION, MODIFICATION, MALFORMED};
+	private enum RequestType { REGISTRATION, AUTHENTICATION, SUBSCRIPTION, MODIFICATION, MALFORMED };
 	
 	public Client(SocketAdapter socket, DBInterface db) {
 		this.socket = socket;
 		this.db = db;
+		queue = new LinkedBlockingQueue<SocketMessage>();
+		in = new ClientListener(socket, queue);
+//		this.game = game;
 	}
 	
 	public void run() {
-		assert socket != null;
-		while(!socket.isClosed()) {
-			String message = socket.readString();
-			if (message != null) {
-				System.out.println("Message Received From " + socket.getHost() + ":" + message);
+		
+		in.start();
+		
+		SocketMessage message;
+		
+		String username = null;
+		String password = null;
+		String response = null;
+		
+		try {
+			while (true) {
+				message = queue.take();
 				
-				String username = null;
-				String password = null;
-				
-				String response = null;
-				
-				switch (getRequestType(message)) {
-					case AUTHENTICATION:
-						username = getAuthUser(message);
-						password = getAuthPassword(message);
-						if (db.login(username, password)) {
-							response = "{\"loginSuccess\":\"true\"}";
-						} else {
-							response = "{\"loginSuccess\":\"false\"}";
+				switch (message.getOrigin()) {
+					case CLIENT:
+						switch (getRequestType(message.getMessage())) {
+							case AUTHENTICATION:
+								username = getAuthUser(message.getMessage());
+								password = getAuthPassword(message.getMessage());
+								if (db.login(username, password)) {
+									response = "{\"loginSuccess\":\"true\"}";
+								} else {
+									response = "{\"loginSuccess\":\"false\"}";
+								}
+								break;
+							case MALFORMED:
+								break;
+							case MODIFICATION:
+								break;
+							case REGISTRATION:
+								username = getRegUser(message.getMessage());
+								password = getRegPassword(message.getMessage());
+								if (db.register(username, password)) {
+									response = "{\"registrationSuccess\":\"true\"}";
+								} else {
+									response = "{\"registrationSuccess\":\"false\"}";
+								}
+								break;
+							case SUBSCRIPTION:
+								break;
+							default:
+								break;
 						}
 						break;
-					case MALFORMED:
-						break;
-					case MODIFICATION:
-						break;
-					case REGISTRATION:
-						username = getRegUser(message);
-						password = getRegPassword(message);
-						if (db.register(username, password)) {
-							response = "{\"registrationSuccess\":\"true\"}";
-						} else {
-							response = "{\"registrationSuccess\":\"false\"}";
-						}
-						break;
-					case SUBSCRIPTION:
-						break;
-					default:
+					case SERVER:
 						break;
 				}
 				
@@ -69,6 +79,43 @@ public class Client extends Thread implements Killable {
 					System.out.println("Malformed input");
 					socket.close();
 				}
+				
+				response = null; //garbage collection is wonderful
+			}
+		} catch (InterruptedException e) {
+			
+		} finally {
+			
+		}
+	}
+	
+	public void shutDown() {
+		//TODO
+	}
+	
+	private class ClientListener extends Thread {
+		private BlockingQueue<SocketMessage> queue;
+		private SocketAdapter socket;
+		
+		public ClientListener(SocketAdapter socket, BlockingQueue<SocketMessage> queue) {
+			this.socket = socket;
+			this.queue = queue;
+		}
+		
+		public void run() {
+			String clientMessage;
+			SocketMessage message;
+			try {
+			while (true) {
+				clientMessage = socket.readString();
+				
+				System.out.println(clientMessage);
+				
+				message = new SocketMessage(SocketMessage.MessageOrigin.CLIENT, clientMessage);
+				queue.offer(message);
+			}
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -81,6 +128,10 @@ public class Client extends Thread implements Killable {
 	//{ requestType : authentication , username : user1 , password : sunshine }
 	//0 1           2 3              4 5        6 7     8 9       10 11       12
 	
+	/*
+	 * The following methods are a hacked-together means of reading the client's
+	 * JSON strings until such time as Gson is integrated into the project
+	 */
 	private RequestType getRequestType(String JSON) {
 		String[] JSONParse = JSON.split("\"");
 		
@@ -143,9 +194,5 @@ public class Client extends Thread implements Killable {
 	
 	private String getPassword(String[] parse) {
 		return parse[9];
-	}
-	
-	public void shutDown() {
-		socket.close();
 	}
 }

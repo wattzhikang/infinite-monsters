@@ -32,19 +32,16 @@ public class SocketAdapter {
 		return (socket.getInetAddress() != null) ? socket.getInetAddress().toString() : null;
 	}
 	
-	public String readString() {
+	public String readString() throws IOException {
 		String read = null;
 		try {
 			read = (String) in.readObject();
-		} catch (ClassNotFoundException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			try {
-				socket.close();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+		} catch (ClassNotFoundException e) {
+			//malformed input
+			return null;
+		} catch (IOException e) {
+			//TODO check to see if it's because the connection was dropped
+			throw e;
 		}
 		return read;
 	}
