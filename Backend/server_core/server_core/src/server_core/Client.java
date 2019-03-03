@@ -1,5 +1,6 @@
 package server_core;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -13,7 +14,7 @@ public class Client extends Thread implements Killable {
 	private ClientListener in;
 //	private Game game;
 	
-	private enum RequestType { REGISTRATION, AUTHENTICATION, SUBSCRIPTION, MODIFICATION, MALFORMED };
+	private enum RequestType { REGISTRATION, AUTHENTICATION, SUBSCRIPTION, MODIFICATION, LOGOUT, MALFORMED };
 	
 	public Client(SocketAdapter socket, DBInterface db) {
 		this.socket = socket;
@@ -22,75 +23,78 @@ public class Client extends Thread implements Killable {
 		in = new ClientListener(socket, queue);
 //		this.game = game;
 	}
-	
+
 	public void run() {
-		
+		/*
+		 * I bet this could be made a lot less ugly with the Strategy Pattern
+		 * and maybe the Abstract Factory pattern
+		 */
 		in.start();
 		
-		SocketMessage message;
-		
-		String username = null;
-		String password = null;
-		String response = null;
-		
 		try {
-			while (true) {
+			
+			SocketMessage message;
+			
+			String response = null;
+			
+			boolean active = true;
+			
+			while (active) {
 				message = queue.take();
 				
 				switch (message.getOrigin()) {
 					case CLIENT:
+						
 						switch (getRequestType(message.getMessage())) {
 							case AUTHENTICATION:
-								username = getAuthUser(message.getMessage());
-								password = getAuthPassword(message.getMessage());
-								if (db.login(username, password)) {
-									response = "{\"loginSuccess\":\"true\"}";
-								} else {
-									response = "{\"loginSuccess\":\"false\"}";
-								}
+								response = login(message, db);
 								break;
 							case MALFORMED:
 								break;
 							case MODIFICATION:
 								break;
 							case REGISTRATION:
-								username = getRegUser(message.getMessage());
-								password = getRegPassword(message.getMessage());
-								if (db.register(username, password)) {
-									response = "{\"registrationSuccess\":\"true\"}";
-								} else {
-									response = "{\"registrationSuccess\":\"false\"}";
-								}
+								response = register(message, db);
 								break;
 							case SUBSCRIPTION:
 								break;
+							case LOGOUT:
+								//TODO send acknowledgement
+								/*
+								 * ISSUE: sending an acknowledgement here would mean two places
+								 * where writeString() is called, and thus two places for problems
+								 * with the socket to occur. How to send the acknowledgement,
+								 * then call shutdown()?
+								 */
 							default:
 								break;
 						}
+						if (response != null) {
+							socket.writeString(response);
+							System.out.println("Response sent to " + socket.getHost() + ": " + response);
+						} else {
+							System.out.println("Malformed input from " + socket.getHost());
+						}
 						break;
+					
 					case SERVER:
 						break;
-				}
-				
-				if (response != null) {
-					socket.writeString(response);
-					System.out.println("Response sent to " + socket.getHost() + ": " + response);
-				} else {
-					System.out.println("Malformed input");
-					socket.close();
+					case POISON:
+						//TODO save player information here
+						active = false;
+						break;
 				}
 				
 				response = null; //garbage collection is wonderful
 			}
+			
 		} catch (InterruptedException e) {
-			
-		} finally {
-			
+			//TODO make sure the whole program doesn't break over this
 		}
 	}
 	
 	public void shutDown() {
-		//TODO
+		in.shutDown();
 	}
 	
 	private class ClientListener extends Thread {
@@ -106,18 +110,57 @@ public class Client extends Thread implements Killable {
 			String clientMessage;
 			SocketMessage message;
 			try {
-			while (true) {
-				clientMessage = socket.readString();
-				
-				System.out.println(clientMessage);
-				
-				message = new SocketMessage(SocketMessage.MessageOrigin.CLIENT, clientMessage);
-				queue.offer(message);
-			}
+				while (true) {
+					clientMessage = socket.readString();
+					
+					System.out.println(clientMessage);
+					
+					message = new SocketMessage(SocketMessage.MessageOrigin.CLIENT, clientMessage);
+					queue.offer(message);
+				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				if (e instanceof EOFException) {
+					if (!socket.isClosed()) {
+						this.shutDown();
+					}
+					queue.offer(new SocketMessage(SocketMessage.MessageOrigin.POISON, null));
+				} else {
+					e.printStackTrace();
+				}
 			}
 		}
+		
+		public void shutDown() {
+			socket.close();
+		}
+	}
+	
+	private String login(SocketMessage message, DBInterface db) {
+		String response = null;
+		
+		String username = getAuthUser(message.getMessage());
+		String password = getAuthPassword(message.getMessage());
+		if (db.login(username, password)) {
+			response = "{\"loginSuccess\":\"true\"}";
+		} else {
+			response = "{\"loginSuccess\":\"false\"}";
+		}
+		
+		return response;
+	}
+	
+	private String register(SocketMessage message, DBInterface db) {
+		String response = null;
+		
+		String username = getRegUser(message.getMessage());
+		String password = getRegPassword(message.getMessage());
+		if (db.register(username, password)) {
+			response = "{\"registrationSuccess\":\"true\"}";
+		} else {
+			response = "{\"registrationSuccess\":\"false\"}";
+		}
+		
+		return response;
 	}
 	
 	//{"requestType":"registration","username":"user1","password":"sunshine","privileges":"player"}

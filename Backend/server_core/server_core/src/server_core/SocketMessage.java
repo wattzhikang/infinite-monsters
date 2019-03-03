@@ -2,7 +2,7 @@ package server_core;
 
 public class SocketMessage {
 	
-	public enum MessageOrigin { CLIENT, SERVER };
+	public enum MessageOrigin { CLIENT, SERVER, POISON };
 	
 	private SocketMessage.MessageOrigin origin;
 	private String JSONMessage;

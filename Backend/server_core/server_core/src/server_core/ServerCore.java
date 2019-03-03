@@ -18,14 +18,10 @@ public class ServerCore {
 		} else {
 			db = new DBAdapter();
 		}
-				
-		BlockingQueue<Client> clientQueue = new LinkedBlockingDeque<Client>();
 		
-		ConnectionListener socketListener = new ConnectionListener(clientQueue, db);
-		GameProcessor game = new GameProcessor(clientQueue);
+		ConnectionListener socketListener = new ConnectionListener(db);
 		
 		socketListener.start();
-		game.start();
 		
 		Runtime.getRuntime().addShutdownHook(new ShutdownHook(socketListener, db));
 	}
