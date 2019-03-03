@@ -1,76 +1,164 @@
 package server_core;
 
-//import java.io.EOFException;
-//import java.io.IOException;
-//import java.io.ObjectInputStream;
-//import java.io.ObjectOutputStream;
-//import java.net.Socket;
-//import java.util.LinkedList;
-//import java.util.Queue;
-//import java.util.concurrent.BlockingQueue;
+import java.io.EOFException;
+import java.io.IOException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
+import com.mysql.cj.protocol.Message;
 
-public class Client extends Thread implements Killable {
+public class Client extends Thread {
 	private SocketAdapter socket;
 	private DBInterface db;
+	private BlockingQueue<SocketMessage> queue;
+	private ClientListener in;
+//	private Game game;
 	
-	private enum RequestType {REGISTRATION, AUTHENTICATION, SUBSCRIPTION, MODIFICATION, MALFORMED};
+	private enum RequestType { REGISTRATION, AUTHENTICATION, SUBSCRIPTION, MODIFICATION, LOGOUT, MALFORMED };
 	
 	public Client(SocketAdapter socket, DBInterface db) {
 		this.socket = socket;
 		this.db = db;
+		queue = new LinkedBlockingQueue<SocketMessage>();
+		in = new ClientListener(socket, queue);
+//		this.game = game;
 	}
-	
+
 	public void run() {
-		assert socket != null;
-		while(!socket.isClosed()) {
-			String message = socket.readString();
-			if (message != null) {
-				System.out.println("Message Received From " + socket.getHost() + ":" + message);
+		/*
+		 * I bet this could be made a lot less ugly with the Strategy Pattern
+		 * and maybe the Abstract Factory pattern
+		 */
+		in.start();
+		
+		try {
+			
+			SocketMessage message;
+			
+			String response = null;
+			
+			boolean active = true;
+			
+			while (active) {
+				message = queue.take();
 				
-				String username = null;
-				String password = null;
-				
-				String response = null;
-				
-				switch (getRequestType(message)) {
-					case AUTHENTICATION:
-						username = getAuthUser(message);
-						password = getAuthPassword(message);
-						if (db.login(username, password)) {
-							response = "{\"loginSuccess\":\"true\"}";
+				switch (message.getOrigin()) {
+					case CLIENT:
+						
+						switch (getRequestType(message.getMessage())) {
+							case AUTHENTICATION:
+								response = login(message, db);
+								break;
+							case MALFORMED:
+								break;
+							case MODIFICATION:
+								break;
+							case REGISTRATION:
+								response = register(message, db);
+								break;
+							case SUBSCRIPTION:
+								break;
+							case LOGOUT:
+								//TODO send acknowledgement
+								/*
+								 * ISSUE: sending an acknowledgement here would mean two places
+								 * where writeString() is called, and thus two places for problems
+								 * with the socket to occur. How to send the acknowledgement,
+								 * then call shutdown()?
+								 */
+							default:
+								break;
+						}
+						if (response != null) {
+							socket.writeString(response);
+							System.out.println("Response sent to " + socket.getHost() + ": " + response);
 						} else {
-							response = "{\"loginSuccess\":\"false\"}";
+							System.out.println("Malformed input from " + socket.getHost());
 						}
 						break;
-					case MALFORMED:
+					
+					case SERVER:
 						break;
-					case MODIFICATION:
-						break;
-					case REGISTRATION:
-						username = getRegUser(message);
-						password = getRegPassword(message);
-						if (db.register(username, password)) {
-							response = "{\"registrationSuccess\":\"true\"}";
-						} else {
-							response = "{\"registrationSuccess\":\"false\"}";
-						}
-						break;
-					case SUBSCRIPTION:
-						break;
-					default:
+					case POISON:
+						//TODO save player information here
+						active = false;
 						break;
 				}
 				
-				if (response != null) {
-					socket.writeString(response);
-					System.out.println("Response sent to " + socket.getHost() + ": " + response);
+				response = null; //garbage collection is wonderful
+			}
+			
+		} catch (InterruptedException e) {
+			//TODO make sure the whole program doesn't break over this
+		}
+	}
+	
+	public void shutDown() throws InterruptedException {
+		in.shutDown();
+		in.join();
+	}
+	
+	private class ClientListener extends Thread {
+		private BlockingQueue<SocketMessage> queue;
+		private SocketAdapter socket;
+		
+		public ClientListener(SocketAdapter socket, BlockingQueue<SocketMessage> queue) {
+			this.socket = socket;
+			this.queue = queue;
+		}
+		
+		public void run() {
+			String clientMessage;
+			SocketMessage message;
+			try {
+				while (true) {
+					clientMessage = socket.readString();
+					message = new SocketMessage(SocketMessage.MessageOrigin.CLIENT, clientMessage);
+					queue.offer(message);
+				}
+			} catch (IOException e) {
+				if (e instanceof EOFException) {
+					if (!socket.isClosed()) {
+						this.shutDown();
+					}
+					queue.offer(new SocketMessage(SocketMessage.MessageOrigin.POISON, null));
 				} else {
-					System.out.println("Malformed input");
-					socket.close();
+					e.printStackTrace();
 				}
 			}
 		}
+		
+		public void shutDown() {
+			socket.close();
+		}
+	}
+	
+	private String login(SocketMessage message, DBInterface db) {
+		String response = null;
+		
+		String username = getAuthUser(message.getMessage());
+		String password = getAuthPassword(message.getMessage());
+		if (db.login(username, password)) {
+			response = "{\"loginSuccess\":\"true\"}";
+		} else {
+			response = "{\"loginSuccess\":\"false\"}";
+		}
+		
+		return response;
+	}
+	
+	private String register(SocketMessage message, DBInterface db) {
+		String response = null;
+		
+		String username = getRegUser(message.getMessage());
+		String password = getRegPassword(message.getMessage());
+		if (db.register(username, password)) {
+			response = "{\"registrationSuccess\":\"true\"}";
+		} else {
+			response = "{\"registrationSuccess\":\"false\"}";
+		}
+		
+		return response;
 	}
 	
 	//{"requestType":"registration","username":"user1","password":"sunshine","privileges":"player"}
@@ -81,6 +169,10 @@ public class Client extends Thread implements Killable {
 	//{ requestType : authentication , username : user1 , password : sunshine }
 	//0 1           2 3              4 5        6 7     8 9       10 11       12
 	
+	/*
+	 * The following methods are a hacked-together means of reading the client's
+	 * JSON strings until such time as Gson is integrated into the project
+	 */
 	private RequestType getRequestType(String JSON) {
 		String[] JSONParse = JSON.split("\"");
 		
@@ -143,9 +235,5 @@ public class Client extends Thread implements Killable {
 	
 	private String getPassword(String[] parse) {
 		return parse[9];
-	}
-	
-	public void shutDown() {
-		socket.close();
 	}
 }

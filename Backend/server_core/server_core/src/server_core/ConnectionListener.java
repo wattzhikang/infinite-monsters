@@ -8,15 +8,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
-public class ConnectionListener extends Thread implements Killable {
+public class ConnectionListener extends Thread{
 	private ServerSocket listener;
-	BlockingQueue<Client> clientQueue;
+	List<Client> clientList;
 	
 	DBInterface db;
 	
-	public ConnectionListener(BlockingQueue<Client> clientQueue, DBInterface db) {
+	public ConnectionListener(DBInterface db) {
 		super();
-		this.clientQueue = clientQueue;
+		this.clientList = new LinkedList<Client>();
 		this.db = db;
 		try {
 			listener = new ServerSocket(ServerCore.PORT);
@@ -29,6 +29,7 @@ public class ConnectionListener extends Thread implements Killable {
 	public void run() {
 		while(!listener.isClosed()) {
 			Socket newConnection = null;
+			//TODO expand this try-catch block
 			try {
 				newConnection = listener.accept();
 			} catch (SocketException e) {
@@ -39,17 +40,22 @@ public class ConnectionListener extends Thread implements Killable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			clientQueue.offer(new Client(new SocketAdapter(newConnection), db));
+			Client newClient = new Client(new SocketAdapter(newConnection), db);
+			clientList.add(newClient);
+			newClient.start();
 		}
 	}
 	
-	public void shutDown() {
+	public void shutDown() throws InterruptedException {
 		try {
 			listener.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		clientQueue.offer(ServerCore.POISONPILL);
+		for (Client client : clientList) {
+			client.shutDown();
+			client.join();
+		}
 	}
 }
