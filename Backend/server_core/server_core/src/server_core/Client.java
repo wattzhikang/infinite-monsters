@@ -9,18 +9,17 @@ import com.mysql.cj.protocol.Message;
 
 public class Client extends Thread {
 	private SocketAdapter socket;
-	private DBInterface db;
 	private Game game;
 	
 	private BlockingQueue<SocketMessage> queue;
 	private ClientListener in;
-//	private Game game;
+	
+	private ClientKey key;
 	
 	private enum RequestType { REGISTRATION, AUTHENTICATION, SUBSCRIPTION, MODIFICATION, LOGOUT, MALFORMED };
 	
-	public Client(SocketAdapter socket, DBInterface db, Game game) {
+	public Client(SocketAdapter socket, Game game) {
 		this.socket = socket;
-		this.db = db;
 		this.game = game;
 		
 		queue = new LinkedBlockingQueue<SocketMessage>();
@@ -50,14 +49,14 @@ public class Client extends Thread {
 						
 						switch (getRequestType(message.getMessage())) {
 							case AUTHENTICATION:
-								response = login(message, db);
+								response = login(message);
 								break;
 							case MALFORMED:
 								break;
 							case MODIFICATION:
 								break;
 							case REGISTRATION:
-								response = register(message, db);
+								response = register(message);
 								break;
 							case SUBSCRIPTION:
 								break;
@@ -136,12 +135,12 @@ public class Client extends Thread {
 		}
 	}
 	
-	private String login(SocketMessage message, DBInterface db) {
+	private String login(SocketMessage message) {
 		String response = null;
 		
 		String username = getAuthUser(message.getMessage());
 		String password = getAuthPassword(message.getMessage());
-		if (db.login(username, password)) {
+		if ((key = game.authenticate(username, password)) != null) {
 			response = "{\"loginSuccess\":\"true\"}";
 		} else {
 			response = "{\"loginSuccess\":\"false\"}";
@@ -150,12 +149,12 @@ public class Client extends Thread {
 		return response;
 	}
 	
-	private String register(SocketMessage message, DBInterface db) {
+	private String register(SocketMessage message) {
 		String response = null;
 		
 		String username = getRegUser(message.getMessage());
 		String password = getRegPassword(message.getMessage());
-		if (db.register(username, password)) {
+		if (game.register(username, password)) {
 			response = "{\"registrationSuccess\":\"true\"}";
 		} else {
 			response = "{\"registrationSuccess\":\"false\"}";

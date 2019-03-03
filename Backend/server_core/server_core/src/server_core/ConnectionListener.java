@@ -43,7 +43,7 @@ public class ConnectionListener extends Thread{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			Client newClient = new Client(new SocketAdapter(newConnection), db, game);
+			Client newClient = new Client(new SocketAdapter(newConnection), game);
 			clientList.add(newClient);
 			newClient.start();
 		}

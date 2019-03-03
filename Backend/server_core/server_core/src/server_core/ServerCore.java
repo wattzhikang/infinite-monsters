@@ -40,7 +40,11 @@ public class ServerCore {
 			System.out.println("Shutting Down...");
 			try {
 				socketListener.shutDown();
-				game.shutDown();
+				if (game != null) {
+					game.shutDown();
+				} else {
+					System.err.println("Game object prematurely culled");
+				}
 			} catch (InterruptedException e) {
 				System.out.println("Unable to shut down gracefully - Interrupted during shutdown process");
 			} finally {
