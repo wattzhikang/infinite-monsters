@@ -10,14 +10,17 @@ import java.util.concurrent.BlockingQueue;
 
 public class ConnectionListener extends Thread{
 	private ServerSocket listener;
-	List<Client> clientList;
 	
-	DBInterface db;
+	private List<Client> clientList;
 	
-	public ConnectionListener(DBInterface db) {
+	private DBInterface db;
+	private Game game;
+	
+	public ConnectionListener(DBInterface db, Game game) {
 		super();
 		this.clientList = new LinkedList<Client>();
 		this.db = db;
+		this.game = game;
 		try {
 			listener = new ServerSocket(ServerCore.PORT);
 		} catch (IOException e) {
@@ -40,7 +43,7 @@ public class ConnectionListener extends Thread{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			Client newClient = new Client(new SocketAdapter(newConnection), db);
+			Client newClient = new Client(new SocketAdapter(newConnection), db, game);
 			clientList.add(newClient);
 			newClient.start();
 		}

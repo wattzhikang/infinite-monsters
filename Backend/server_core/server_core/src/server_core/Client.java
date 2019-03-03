@@ -10,18 +10,21 @@ import com.mysql.cj.protocol.Message;
 public class Client extends Thread {
 	private SocketAdapter socket;
 	private DBInterface db;
+	private Game game;
+	
 	private BlockingQueue<SocketMessage> queue;
 	private ClientListener in;
 //	private Game game;
 	
 	private enum RequestType { REGISTRATION, AUTHENTICATION, SUBSCRIPTION, MODIFICATION, LOGOUT, MALFORMED };
 	
-	public Client(SocketAdapter socket, DBInterface db) {
+	public Client(SocketAdapter socket, DBInterface db, Game game) {
 		this.socket = socket;
 		this.db = db;
+		this.game = game;
+		
 		queue = new LinkedBlockingQueue<SocketMessage>();
 		in = new ClientListener(socket, queue);
-//		this.game = game;
 	}
 
 	public void run() {
