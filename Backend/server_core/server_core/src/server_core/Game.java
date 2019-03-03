@@ -1,6 +1,7 @@
 package server_core;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Game {
@@ -11,6 +12,8 @@ public class Game {
 	 * this is the master record of all users who have actually logged in
 	 */
 	private Set<ClientKey> keys;
+	private Map<Coordinates, SubscriptionThread> subscriptions;
+	
 
 	public Game(DBInterface db) {
 		this.db = db;
@@ -45,5 +48,9 @@ public class Game {
 	 */
 	public void shutDown() {
 		return;
+	}
+	
+	private class SubscriptionThread extends Thread {
+		
 	}
 }
