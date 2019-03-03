@@ -17,7 +17,6 @@ public class SocketAdapter {
 		try {
 			out = new ObjectOutputStream(socket.getOutputStream());
 			out.flush();
-			System.out.println("output flushed for " + socket.getInetAddress().toString());
 			in = new ObjectInputStream(socket.getInputStream());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

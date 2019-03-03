@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
-public class ConnectionListener extends Thread implements Killable {
+public class ConnectionListener extends Thread{
 	private ServerSocket listener;
 	List<Client> clientList;
 	
@@ -46,7 +46,7 @@ public class ConnectionListener extends Thread implements Killable {
 		}
 	}
 	
-	public void shutDown() {
+	public void shutDown() throws InterruptedException {
 		try {
 			listener.close();
 		} catch (IOException e) {
@@ -55,6 +55,7 @@ public class ConnectionListener extends Thread implements Killable {
 		}
 		for (Client client : clientList) {
 			client.shutDown();
+			client.join();
 		}
 	}
 }

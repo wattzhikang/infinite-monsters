@@ -37,14 +37,14 @@ public class ServerCore {
 		
 		public void run() {
 			System.out.println("Shutting Down...");
-			socketListener.shutDown();
-			db.close();
 			try {
-				Thread.sleep(500);
+				socketListener.shutDown();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.out.println("Unable to shut down gracefully - Interrupted during shutdown process");
+			} finally {
+				db.close();
 			}
+			System.out.println("Graceful shutdown complete");
 		}
 	}
 }

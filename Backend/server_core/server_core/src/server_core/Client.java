@@ -7,7 +7,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import com.mysql.cj.protocol.Message;
 
-public class Client extends Thread implements Killable {
+public class Client extends Thread {
 	private SocketAdapter socket;
 	private DBInterface db;
 	private BlockingQueue<SocketMessage> queue;
@@ -93,8 +93,9 @@ public class Client extends Thread implements Killable {
 		}
 	}
 	
-	public void shutDown() {
+	public void shutDown() throws InterruptedException {
 		in.shutDown();
+		in.join();
 	}
 	
 	private class ClientListener extends Thread {
@@ -112,9 +113,6 @@ public class Client extends Thread implements Killable {
 			try {
 				while (true) {
 					clientMessage = socket.readString();
-					
-					System.out.println(clientMessage);
-					
 					message = new SocketMessage(SocketMessage.MessageOrigin.CLIENT, clientMessage);
 					queue.offer(message);
 				}
