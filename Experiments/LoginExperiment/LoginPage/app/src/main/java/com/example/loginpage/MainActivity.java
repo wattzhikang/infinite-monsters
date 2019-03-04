@@ -1,7 +1,12 @@
 package com.example.loginpage;
 
+import android.app.ActivityManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Color;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,8 +18,6 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.Socket;
-import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -22,6 +25,10 @@ public class MainActivity extends AppCompatActivity
     EditText username, password;
     TextView tx1;
     ClientSocket clientSocket;
+    Intent clientIntent;
+    boolean isBound = false;
+    String serverMessage = "";
+    boolean messageReceived = false;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -34,15 +41,19 @@ public class MainActivity extends AppCompatActivity
         username = findViewById(R.id.Username);
         password = findViewById(R.id.Password);
         tx1 = findViewById(R.id.Intermon);
-        MapCreator map = new MapCreator();
-        map.createMap();
+        clientIntent = new Intent(MainActivity.this, ClientSocket.class);
+        startService(clientIntent);
+        /*MapCreator map = new MapCreator();
+        map.createMap();*/
+        
         
         login.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                clientSocket = new ClientSocket();
+                messageReceived = false;
+                //clientSocket = new ClientSocket();
                 JSONObject client = new JSONObject();
                 try
                 {
@@ -54,22 +65,35 @@ public class MainActivity extends AppCompatActivity
                 {
                     e.printStackTrace();
                 }
-                try
+                clientIntent.putExtra("client", client.toString());
+                bindService(clientIntent, clientConnection, Context.BIND_AUTO_CREATE);
+                
+                //clientSocket.setMessage(client.toString());
+                //String message = clientSocket.readMessage();
+                /*try
                 {
                     clientSocket.execute(client).get();
                 }
                 catch (InterruptedException | ExecutionException e)
                 {
                     e.printStackTrace();
-                }
-                
-                String message = clientSocket.getServerMessage();
-                
-                if(message.equals(("Aaron")))
+                }*/
+                while(!messageReceived)
                 {
-                    Toast.makeText(MainActivity.this, "login success: " + message, Toast.LENGTH_SHORT).show();
+                    if(clientSocket.getServerMessage() != null)
+                    {
+                        serverMessage = clientSocket.getServerMessage();
+                        messageReceived = true;
+                    }
+                    
+                }
+                serverMessage = clientSocket.getServerMessage();
+                Log.i("message", serverMessage);
+                
+                if(serverMessage.equals(("response")))
+                {
+                    Toast.makeText(MainActivity.this, "login success: " + serverMessage, Toast.LENGTH_SHORT).show();
                     Intent i = new Intent(MainActivity.this, Game.class);
-                    i.putExtra("clientSocket", clientSocket);
                     startActivity(i);
                     finish();
                 }
@@ -94,5 +118,45 @@ public class MainActivity extends AppCompatActivity
                 finish();
             }
         });
+    }
+    
+    private ServiceConnection clientConnection = new ServiceConnection()
+    {
+        
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service)
+        {
+            ClientSocket.ServiceBinder clientService = (ClientSocket.ServiceBinder) service;
+            clientSocket = clientService.getService();
+            isBound = true;
+        }
+        
+        @Override
+        public void onServiceDisconnected(ComponentName name)
+        {
+            isBound = false;
+        }
+    };
+    
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+        if(isBound)
+        {
+            unbindService(clientConnection);
+            //clientMessenger = null;
+            isBound = false;
+        }
+    }
+    
+    private String isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return "true";
+            }
+        }
+        return "false";
     }
 }
