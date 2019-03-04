@@ -18,14 +18,10 @@ public class ServerCore {
 		} else {
 			db = new DBAdapter();
 		}
-				
-		BlockingQueue<Client> clientQueue = new LinkedBlockingDeque<Client>();
 		
-		ConnectionListener socketListener = new ConnectionListener(clientQueue, db);
-		GameProcessor game = new GameProcessor(clientQueue);
+		ConnectionListener socketListener = new ConnectionListener(db);
 		
 		socketListener.start();
-		game.start();
 		
 		Runtime.getRuntime().addShutdownHook(new ShutdownHook(socketListener, db));
 	}
@@ -41,14 +37,14 @@ public class ServerCore {
 		
 		public void run() {
 			System.out.println("Shutting Down...");
-			socketListener.shutDown();
-			db.close();
 			try {
-				Thread.sleep(500);
+				socketListener.shutDown();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.out.println("Unable to shut down gracefully - Interrupted during shutdown process");
+			} finally {
+				db.close();
 			}
+			System.out.println("Graceful shutdown complete");
 		}
 	}
 }

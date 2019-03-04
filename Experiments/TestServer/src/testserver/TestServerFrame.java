@@ -8,12 +8,10 @@ package testserver;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.InetAddress;
 
 /**
  *
@@ -23,7 +21,8 @@ public class TestServerFrame extends javax.swing.JFrame {
 
     static Socket s;
     static ServerSocket ss;
-    static InputStreamReader isr;
+    static ObjectInputStream in;
+    static ObjectOutputStream out;
     static BufferedReader br;
     static String message;
     /**
@@ -39,8 +38,6 @@ public class TestServerFrame extends javax.swing.JFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
-        jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -48,59 +45,19 @@ public class TestServerFrame extends javax.swing.JFrame {
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
 
-        jButton1.setText("Send To Android");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jButton1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
-            .addComponent(jTextField1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jButton1)
-                .addContainerGap(41, Short.MAX_VALUE))
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        try
-        {
-            //Socket s = new Socket("192.168.232.2", 10045);
-            ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
-            out.writeObject((String)jTextField1.getText());
-            out.flush();
-            out.close();
-            /*PrintWriter pw = new PrintWriter(s.getOutputStream());
-            pw.write(jTextField1.getText());
-            pw.flush();
-            pw.close();
-            s.close();*/
-            
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
-        
-    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -144,30 +101,24 @@ public class TestServerFrame extends javax.swing.JFrame {
             while(true)
             {
                 s = ss.accept();
-                isr = new InputStreamReader(s.getInputStream());
-                br = new BufferedReader(isr);
-                message = br.readLine();
+                out = new ObjectOutputStream(s.getOutputStream());
+                out.flush();
+                in = new ObjectInputStream(s.getInputStream());
+                message = in.readObject().toString();
                 System.out.println(message);
-                if(jTextArea1.getText().toString().equals(""))
-                {
-                    jTextArea1.setText("Android: " + message);
-                }
-                else
-                {
-                    jTextArea1.setText(jTextArea1.getText() + "\n" + message);
-                }
+                jTextArea1.setText(jTextArea1.getText() + "\n" + message);
+                out.writeObject(message);
+                out.flush();
             }
         }
-        catch(IOException e)
+        catch(ClassNotFoundException | IOException e)
         {
             e.printStackTrace();
         }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
     public javax.swing.JScrollPane jScrollPane1;
     public static javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }

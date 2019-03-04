@@ -17,6 +17,7 @@ import java.net.Socket;
 
 public class ClientSocket extends Service /*AsyncTask<JSONObject, Void, Void>*/
 {
+<<<<<<< HEAD
     private Socket clientSocket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
@@ -35,6 +36,13 @@ public class ClientSocket extends Service /*AsyncTask<JSONObject, Void, Void>*/
         Log.i("service", "service started");
         return START_STICKY;
     }
+=======
+    private static Socket clientSocket;
+    private static ObjectInputStream in;
+    private static ObjectOutputStream out;
+    private  final String MY_IP = "192.168.56.1";
+    String serverMessage = "";
+>>>>>>> fb15ca538c53b793f746374cc99e374715985ae2
     
     @Override
     public void onCreate()
