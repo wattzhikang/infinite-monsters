@@ -48,9 +48,6 @@ public class ClientSocket extends Service /*AsyncTask<JSONObject, Void, Void>*/
     public IBinder onBind(Intent intent)
     {
         Log.i("service", "service binding");
-        Bundle b;
-        b = intent.getExtras();
-        clientMessage = b.getString("client");
         return clientBinder;
     }
     
@@ -87,9 +84,12 @@ public class ClientSocket extends Service /*AsyncTask<JSONObject, Void, Void>*/
         return clientSocket;
     }*/
     
+    public void setClientMessage(String message)
+    {
+        clientMessage = message;
+    }
     public String getServerMessage()
     {
-        serverMessage = clientMessage;
         return serverMessage;
     }
     
@@ -112,6 +112,7 @@ public class ClientSocket extends Service /*AsyncTask<JSONObject, Void, Void>*/
     
     public class ClientSocketThread extends Thread
     {
+        
         public void run()
         {
             try
@@ -127,17 +128,21 @@ public class ClientSocket extends Service /*AsyncTask<JSONObject, Void, Void>*/
                 Log.i("server", "out stream connected");
                 in = new ObjectInputStream(clientSocket.getInputStream());
                 Log.i("server", "in stream connected");
-                /*Log.i("message", "sending message");
-                sendMessage(clientMessage);
-                Log.i("message", "reading message");
-                serverMessage = readMessage();
-                ClientSocket.this.notify();*/
             }
             catch (IOException e)
             {
                 e.printStackTrace();
             }
-            
+            while(true)
+            {
+                if(clientMessage != null)
+                {
+                    Log.i("message", "sending message");
+                    sendMessage(clientMessage);
+                    Log.i("message", "reading message");
+                    serverMessage = readMessage();
+                }
+            }
         }
         public String readMessage()
         {

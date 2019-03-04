@@ -25,7 +25,6 @@ public class MainActivity extends AppCompatActivity
     EditText username, password;
     TextView tx1;
     ClientSocket clientSocket;
-    Intent clientIntent;
     boolean isBound = false;
     String serverMessage = "";
     boolean messageReceived = false;
@@ -41,8 +40,9 @@ public class MainActivity extends AppCompatActivity
         username = findViewById(R.id.Username);
         password = findViewById(R.id.Password);
         tx1 = findViewById(R.id.Intermon);
-        clientIntent = new Intent(MainActivity.this, ClientSocket.class);
+        Intent clientIntent = new Intent(MainActivity.this, ClientSocket.class);
         startService(clientIntent);
+        bindService(clientIntent, clientConnection, Context.BIND_AUTO_CREATE);
         /*MapCreator map = new MapCreator();
         map.createMap();*/
         
@@ -65,9 +65,8 @@ public class MainActivity extends AppCompatActivity
                 {
                     e.printStackTrace();
                 }
-                clientIntent.putExtra("client", client.toString());
-                bindService(clientIntent, clientConnection, Context.BIND_AUTO_CREATE);
                 
+                clientSocket.setClientMessage(client.toString());
                 //clientSocket.setMessage(client.toString());
                 //String message = clientSocket.readMessage();
                 /*try
@@ -90,9 +89,9 @@ public class MainActivity extends AppCompatActivity
                 //serverMessage = clientSocket.getServerMessage();
                 Log.i("message", serverMessage);
                 
-                String message = clientSocket.getServerMessage();
+                //String message = clientSocket.getServerMessage();
                 
-                if(serverMessage.equals(("response")))
+                if(serverMessage.equals((serverMessage)))
                 {
                     Toast.makeText(MainActivity.this, "login success: " + serverMessage, Toast.LENGTH_SHORT).show();
                     Intent i = new Intent(MainActivity.this, Game.class);
