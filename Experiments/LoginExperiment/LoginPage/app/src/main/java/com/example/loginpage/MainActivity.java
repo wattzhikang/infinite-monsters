@@ -87,16 +87,12 @@ public class MainActivity extends AppCompatActivity
                     }
                     
                 }
-                serverMessage = clientSocket.getServerMessage();
+                //serverMessage = clientSocket.getServerMessage();
                 Log.i("message", serverMessage);
                 
-<<<<<<< HEAD
-                if(serverMessage.equals(("response")))
-=======
                 String message = clientSocket.getServerMessage();
                 
-                if(message.equals(("Lance")))
->>>>>>> fb15ca538c53b793f746374cc99e374715985ae2
+                if(serverMessage.equals(("response")))
                 {
                     Toast.makeText(MainActivity.this, "login success: " + serverMessage, Toast.LENGTH_SHORT).show();
                     Intent i = new Intent(MainActivity.this, Game.class);
