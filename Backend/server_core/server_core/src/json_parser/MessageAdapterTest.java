@@ -34,7 +34,7 @@ public class MessageAdapterTest {
 	public void test() {
 //		server_core.SocketMessage.MessageOrigin origin = CLIENT;
 		
-		String JSON = "{\"requestType\":\"registration\", \"username\": user1\":\"password\":\"sunshine\", \"privileges\":\"player\"}";
+		String JSON = "{\"requestType\":\"registration\",\"username\":\"user1\",\"password\":\"sunshine\",\"privileges\":\"player\"}";
 		SocketMessage message = new SocketMessage(server_core.SocketMessage.MessageOrigin.CLIENT, JSON);
 		JsonParser parser = new JsonParser();
 		System.out.println(parser.parse(JSON).toString());
@@ -47,7 +47,7 @@ public class MessageAdapterTest {
 
 		adapt = new MessageAdapter(message);
 		adapt.run();
-		System.out.println(adapt.toString());
+		System.out.println(adapt);
 		
 		System.out.println("3");
 

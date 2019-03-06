@@ -18,22 +18,22 @@ public class MessageAdapter implements ParserInterface {
 	public JsonParser parser;
 	public Gson gson;
 	SocketMessage message;
-	private ArrayList<JsonElement> credentials;
+	private ArrayList<JsonElement> credentials = new ArrayList<JsonElement>();
 
 	public MessageAdapter(SocketMessage message) {
-		
-		this.message=message;
+
+		this.message = message;
 		parser = new JsonParser();
 		String json = message.getMessage();
 		System.out.println(json);
-		
+
 		/*
-		 * Its breaking right here at line 33 presumably because of incorrect format. Still trying to figure this out
+		 * Its breaking right here at line 33 presumably because of incorrect format.
+		 * Still trying to figure this out
 		 */
 		JsonElement jsonTree = parser.parse(json);
 		System.out.println(json);
-		
-		
+
 		if (jsonTree.isJsonObject()) {
 			JsonObject request = jsonTree.getAsJsonObject();
 
@@ -41,12 +41,12 @@ public class MessageAdapter implements ParserInterface {
 			this.pass = request.get("password");
 			this.request = request.get("requestType");
 			this.privileges = request.get("privileges");
-		// Registration reg = gson.fromJson(jsonTree, Registration.class);
+			// Registration reg = gson.fromJson(jsonTree, Registration.class);
 
 		}
-	
+
 	}
-	
+
 	public void run() {
 		String json = message.getMessage();
 		JsonElement jsonTree = parser.parse(json);
@@ -55,7 +55,7 @@ public class MessageAdapter implements ParserInterface {
 		case CLIENT:
 			if (jsonTree.isJsonObject()) {
 
-//				JsonObject request = jsonTree.getAsJsonObject();
+				// JsonObject request = jsonTree.getAsJsonObject();
 
 				/*
 				 * Subscription : Authentication : Registration
@@ -71,7 +71,7 @@ public class MessageAdapter implements ParserInterface {
 					String response = gson.toJson(credentials, Authentication.class);
 					respond(response);
 
-				} else if (json.length() == 17) {
+				} else if (json.length() == 93) {
 
 					credentials = addCredentials(4);
 					String response = gson.toJson(credentials, Registration.class);
