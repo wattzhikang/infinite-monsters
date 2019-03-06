@@ -11,6 +11,7 @@ import java.net.UnknownHostException;
 import org.junit.jupiter.api.Test;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParser;
 
 import server_core.SocketMessage;
 
@@ -19,7 +20,6 @@ public class MessageAdapterTest {
 		CLIENT, SERVER, POISON
 	}
 
-	private server_core.SocketMessage.MessageOrigin CLIENT;
 	private MessageAdapter adapt;
 
 //	private static final server_core.SocketMessage.MessageOrigin CLIENT = null;;
@@ -32,21 +32,22 @@ public class MessageAdapterTest {
 	// {"requestType":"registration","username":"user1","password":"sunshine","privileges":"player"}
 	@Test
 	public void test() {
-		server_core.SocketMessage.MessageOrigin origin = CLIENT;
+//		server_core.SocketMessage.MessageOrigin origin = CLIENT;
 		
 		String JSON = "{\"requestType\":\"registration\", \"username\": user1\":\"password\":\"sunshine\", \"privileges\":\"player\"}";
-		SocketMessage message = new SocketMessage(origin, JSON);
-		message.origin = CLIENT;
-		message.JSONMessage=JSON;
+		SocketMessage message = new SocketMessage(server_core.SocketMessage.MessageOrigin.CLIENT, JSON);
+		JsonParser parser = new JsonParser();
+		System.out.println(parser.parse(JSON).toString());
+//		message.JSONMessage=JSON;
 		
 		System.out.println("1");
 //		JSON = JSON.trim();
-		Gson gson = new Gson();
+//		Gson gson = new Gson();
 		System.out.println("2");
 
 		adapt = new MessageAdapter(message);
 		adapt.run();
-		
+		System.out.println(adapt.toString());
 		
 		System.out.println("3");
 

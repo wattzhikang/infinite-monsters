@@ -25,7 +25,13 @@ public class MessageAdapter implements ParserInterface {
 		this.message=message;
 		parser = new JsonParser();
 		String json = message.getMessage();
+		System.out.println(json);
+		
+		/*
+		 * Its breaking right here at line 33 presumably because of incorrect format. Still trying to figure this out
+		 */
 		JsonElement jsonTree = parser.parse(json);
+		System.out.println(json);
 		
 		
 		if (jsonTree.isJsonObject()) {
