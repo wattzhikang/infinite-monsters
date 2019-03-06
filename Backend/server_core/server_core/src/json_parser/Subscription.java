@@ -1,5 +1,7 @@
 package json_parser;
 
+import com.google.gson.JsonElement;
+
 public class Subscription {
-	public String request = null;
+	public JsonElement request = null;
 }

@@ -1,5 +1,6 @@
 package json_parser;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
@@ -33,23 +34,20 @@ public class MessageAdapterTest {
 	@Test
 	public void test() {
 //		server_core.SocketMessage.MessageOrigin origin = CLIENT;
-		
+
 		String JSON = "{\"requestType\":\"registration\",\"username\":\"user1\",\"password\":\"sunshine\",\"privileges\":\"player\"}";
 		SocketMessage message = new SocketMessage(server_core.SocketMessage.MessageOrigin.CLIENT, JSON);
 		JsonParser parser = new JsonParser();
 		System.out.println(parser.parse(JSON).toString());
 //		message.JSONMessage=JSON;
-		
-		System.out.println("1");
-//		JSON = JSON.trim();
-//		Gson gson = new Gson();
-		System.out.println("2");
 
-		adapt = new MessageAdapter(message);
-		adapt.run();
-		System.out.println(adapt);
 		
-		System.out.println("3");
+		adapt = new MessageAdapter(message);
+//		String response = adapt.run();
+		
+		assertEquals(
+				"{\"request\":\"registration\",\"username\":\"user1\",\"pass\":\"sunshine\",\"privileges\":\"player\"}",
+				adapt.run());
 
 	}
 }

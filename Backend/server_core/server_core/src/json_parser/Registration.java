@@ -1,12 +1,13 @@
 package json_parser;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 
 public class Registration {
-	public String request = null;
-	public String username = null;
-	public String pass = null;
-	public String privileges = null;
+	public JsonElement request = null;
+	public JsonElement username = null;
+	public JsonElement pass = null;
+	public JsonElement privileges = null;
 	
 	public String toString (Registration reg) {
 		Gson gson = new Gson();

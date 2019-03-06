@@ -28,7 +28,7 @@ public interface ParserInterface {
 		public JsonElement getRequestType(String JSON);
 		public JsonElement getUsername(String JSON);
 		public JsonElement getPassword(String JSON);
-		public ArrayList<JsonElement> addCredentials(int num);
+//		public ArrayList<JsonElement> addCredentials(int num);
 //		public Registration register(SocketMessage message);
 //		public Authentication login(SocketMessage message);
 		//public String request(SocketMessage message);
