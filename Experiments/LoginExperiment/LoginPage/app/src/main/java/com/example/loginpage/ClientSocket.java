@@ -64,26 +64,6 @@ public class ClientSocket extends Service /*AsyncTask<JSONObject, Void, Void>*/
         }
     }
     
-    /*@Override
-    protected Socket doInBackground(JSONObject... params)
-    {
-        String clientMessage = params[0].toString();
-        try
-        {
-            clientSocket = new Socket(MY_IP, Constants.SERVER_PORT);
-            out = new ObjectOutputStream(clientSocket.getOutputStream());
-            out.flush();
-            in = new ObjectInputStream(clientSocket.getInputStream());
-            sendMessage(clientMessage);
-            serverMessage = readMessage();
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
-        return clientSocket;
-    }*/
-    
     public void setClientMessage(String message)
     {
         clientMessage = message;
