@@ -7,6 +7,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import com.mysql.cj.protocol.Message;
 
+import game.ClientKey;
+import game.Game;
+
 public class Client extends Thread {
 	private SocketAdapter socket;
 	private Game game;
@@ -23,7 +26,8 @@ public class Client extends Thread {
 		this.game = game;
 		
 		queue = new LinkedBlockingQueue<SocketMessage>();
-		in = new ClientListener(socket, queue);
+		in = (socket != null) ? 
+				new ClientListener(socket, queue) : null;
 	}
 
 	public void run() {
@@ -100,6 +104,11 @@ public class Client extends Thread {
 		in.join();
 	}
 	
+	public void enqueueDeltaFrame(DeltaFrame frame) {
+		//queue.offer(new SocketMessage(SocketMessage.MessageOrigin.SERVER, frame.toString()));
+		System.out.println(frame);
+	}
+	
 	private class ClientListener extends Thread {
 		private BlockingQueue<SocketMessage> queue;
 		private SocketAdapter socket;
@@ -140,7 +149,7 @@ public class Client extends Thread {
 		
 		String username = getAuthUser(message.getMessage());
 		String password = getAuthPassword(message.getMessage());
-		if ((key = game.authenticate(username, password)) != null) {
+		if ((key = game.authenticate(username, password, this)) != null) {
 			response = "{\"loginSuccess\":\"true\"}";
 		} else {
 			response = "{\"loginSuccess\":\"false\"}";

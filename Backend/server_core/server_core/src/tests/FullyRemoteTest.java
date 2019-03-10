@@ -1,4 +1,4 @@
-package server_core;
+package tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -9,6 +9,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import org.junit.jupiter.api.Test;
+
+import server_core.ServerCore;
 
 class FullyRemoteTest {
 	

@@ -3,6 +3,11 @@ package server_core;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
+import game.DBAdapter;
+import game.DBDummy;
+import game.DBInterface;
+import game.Game;
+
 import java.sql.*;
 
 public class ServerCore {

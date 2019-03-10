@@ -1,10 +1,11 @@
-package server_core;
+package game;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 
 public class DBAdapter implements DBInterface {
 
@@ -152,5 +153,29 @@ public class DBAdapter implements DBInterface {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public Collection<Tile> getTiles(Collection<Coordinates> locations) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void updateTiles(Collection<Tile> tiles) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public RectangleBoundary lastSubscriptionBounds(ClientKey key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void updateSubscriptionBounds(ClientKey key, RectangleBoundary bounds) {
+		// TODO Auto-generated method stub
+		
 	}
 }

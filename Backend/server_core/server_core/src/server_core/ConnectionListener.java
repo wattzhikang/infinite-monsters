@@ -8,6 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
+import game.DBInterface;
+import game.Game;
+
 public class ConnectionListener extends Thread{
 	private ServerSocket listener;
 	
