@@ -15,11 +15,6 @@ public class ClientSocket
     private String clientMessage = null;
     private String serverMessage = null;
     
-    /*public ClientSocket()
-    {
-        ClientThread ct = new ClientThread();
-        ct.start();
-    }*/
     void connectSocket()
     {
         try
@@ -47,19 +42,8 @@ public class ClientSocket
         }
     }
     
-    public void setMessage(String message)
-    {
-        clientMessage = message;
-    }
-    
-    public String getMessage()
-    {
-        return serverMessage;
-    }
-    
     public void sendMessage(String message) throws IOException
     {
-        System.out.println("client: " + message);
         byte[] bytes = message.getBytes(StandardCharsets.US_ASCII);
         out.writeObject(Arrays.toString(bytes));
         out.flush();

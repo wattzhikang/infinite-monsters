@@ -12,13 +12,14 @@ public class Player
     public Player(int x, int y, String name)
     {
         position = new Vector3(x, y, 0);
-        player = new Texture("pokemon_player.jpg");
+        player = new Texture("intermon_player.jpg");
         this.name = name;
     }
     
-    public void update(float dt)
+    public void updatePosition(int x, int y)
     {
-        position.add(0, 0, 0);
+        position.x = x;
+        position.y = y;
     }
     
     public Vector3 getPosition()

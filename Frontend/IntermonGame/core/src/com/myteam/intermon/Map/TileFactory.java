@@ -1,4 +1,4 @@
-package com.myteam.intermon;
+package com.myteam.intermon.Map;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonValue;
@@ -26,32 +26,32 @@ public class TileFactory
     public Array<Tile> createTiles()
     {
         int size = tiles.size;
-        for(int i = 0; i < size; i++)
+        if(newDungeon)
         {
-    
-            Tile t = new Tile(tiles.get(i), player);
-            map.add(t);
+            if(map.isEmpty())
+            {
+                for(int i = 0; i < size; i++)
+                {
+                    Tile t = new Tile(tiles.get(i), player);
+                    map.add(t);
+                }
+            }
+            else
+            {
+                map.clear();
+                for(int i = 0; i < size; i++)
+                {
+                    Tile t = new Tile(tiles.get(i), player);
+                    map.add(t);
+                }
+            }
         }
+        else
+        {
+            Array<Tile> temp = new Array<Tile>();
+            
+        }
+        
         return map;
-    }
-    
-    public int getxLeft()
-    {
-        return xLeft;
-    }
-    
-    public int getxRight()
-    {
-        return xRight;
-    }
-    
-    public int getyLower()
-    {
-        return yLower;
-    }
-    
-    public int getyUpper()
-    {
-        return yUpper;
     }
 }

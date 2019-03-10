@@ -5,9 +5,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.Json;
-import com.myteam.intermon.Communication.Client;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import com.myteam.intermon.ClientSocket;
+import com.myteam.intermon.Communication.MessageConverter;
 
 import java.io.IOException;
 
@@ -16,10 +17,10 @@ public class LoginState extends State
     private ClientSocket clientSocket;
     private Texture loginBtn;
     private Texture exitBtn;
-    private boolean loginBtnPushed = false;
     private String username = "";
     private String password = "";
     private String serverMessage;
+    private MessageConverter mc;
     private UsernameTextInputListener usernameListener = new UsernameTextInputListener();
     private PasswordTextInputListener passwordListener = new PasswordTextInputListener();
     
@@ -29,6 +30,7 @@ public class LoginState extends State
         clientSocket = cs;
         loginBtn = new Texture("login_button.jpg");
         exitBtn = new Texture("exit_button.jpg");
+        mc = new MessageConverter();
     }
     
     @Override
@@ -44,19 +46,18 @@ public class LoginState extends State
         
         if(Gdx.input.justTouched())
         {
-            if((x >= 0 && x <= 300) && (y >= 775 && y <= 1075))
+            boolean loginBtnPushed = false;
+            if((x >= 0 && x <= 300) && (y >= 775 && y <= 1075) && username != null && password != null)
             {
                 System.out.println("login button pushed");
                 loginBtnPushed = true;
-                Client client = new Client(username, password);
-                Json json = new Json();
-                String c = json.toJson(client);
-                /*json.setOutputType(JsonWriter.OutputType.json);
-                json.setElementType(Client.class, "password", Client.class);
-                System.out.println(json.prettyPrint(client));*/
+                JsonValue clientInfo = new JsonValue(username);
+                clientInfo.setName("username");
+                clientInfo.addChild("password", new JsonValue(password));
+                String client = mc.setMessage(clientInfo);
                 try
                 {
-                    clientSocket.sendMessage(c);
+                    clientSocket.sendMessage(client);
                     serverMessage = clientSocket.readMessage();
                 }
                 catch (IOException e)
@@ -67,22 +68,19 @@ public class LoginState extends State
                 {
                     e.printStackTrace();
                 }
-                System.out.println("server message: " + serverMessage);
-                if(serverMessage.equals(serverMessage))
+                JsonReader reader = new JsonReader();
+                JsonValue subscription = reader.parse(serverMessage);
+                boolean validLogin = subscription.getBoolean("loginSuccess");
+                if(validLogin)
                 {
                     gsm.set(new PlayState(gsm, clientSocket, username));
                     dispose();
                 }
-                
             }
             else if((x >= 1475 && x <= 1800) && (y >= 775 && y <= 1075))
             {
                 System.out.println("exit button pushed");
-                loginBtnPushed = false;
-            }
-            else
-            {
-                loginBtnPushed = false;
+                dispose();
             }
             if(!loginBtnPushed)
             {

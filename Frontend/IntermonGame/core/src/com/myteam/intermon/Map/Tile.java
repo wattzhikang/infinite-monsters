@@ -1,4 +1,4 @@
-package com.myteam.intermon;
+package com.myteam.intermon.Map;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.JsonValue;
@@ -26,7 +26,7 @@ public class Tile
     {
         if(terrainType.equals("genericGrass1"))
         {
-            this.terrainType = new Texture("pokemon_grass_01.png");
+            this.terrainType = new Texture("intermon_grass_01.png");
         }
     }
     
@@ -34,15 +34,15 @@ public class Tile
     {
         if(object.equals("genericBarrier1"))
         {
-            this.object = new Texture("pokemon_barrier_01.png");
+            this.object = new Texture("intermon_barrier_01.png");
         }
         else if(object.equals("genericTallGrass01"))
         {
-            this.object = new Texture("pokemon_tallgrass_01.png");
+            this.object = new Texture("intermon_tallgrass_01.png");
         }
         else if(object.equals("genericPath1"))
         {
-            this.object = new Texture("pokemon_path_01.png");
+            this.object = new Texture("intermon_path_01.png");
         }
     }
     
@@ -51,11 +51,8 @@ public class Tile
         if(character.equals(player.getName()))
         {
             this.character = player.getTexture();
+            player.updatePosition(x, y);
         }
-        /*else if(character == null)
-        {
-            this.character = "none";
-        }*/
     }
     
     public int getX()
@@ -66,11 +63,6 @@ public class Tile
     public int getY()
     {
         return y;
-    }
-    
-    public boolean isWalkable()
-    {
-        return walkable;
     }
     
     public Texture getTerrainType()
