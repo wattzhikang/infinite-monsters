@@ -7,11 +7,13 @@ public class Player
 {
     private Vector3 position;
     private Texture player;
+    private String name;
     
-    public Player(int x, int y)
+    public Player(int x, int y, String name)
     {
         position = new Vector3(x, y, 0);
         player = new Texture("pokemon_player.jpg");
+        this.name = name;
     }
     
     public void update(float dt)
@@ -27,5 +29,10 @@ public class Player
     public Texture getTexture()
     {
         return player;
+    }
+    
+    public String getName()
+    {
+        return name;
     }
 }

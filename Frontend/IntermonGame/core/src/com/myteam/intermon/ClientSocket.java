@@ -9,12 +9,18 @@ import java.util.Arrays;
 
 public class ClientSocket
 {
-    Socket clientSocket;
-    ObjectInputStream in;
-    ObjectOutputStream out;
-    String serverMessage = "";
+    private Socket clientSocket;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
+    private String clientMessage = null;
+    private String serverMessage = null;
     
-    public void connectSocket()
+    /*public ClientSocket()
+    {
+        ClientThread ct = new ClientThread();
+        ct.start();
+    }*/
+    void connectSocket()
     {
         try
         {
@@ -27,7 +33,7 @@ public class ClientSocket
         }
     }
     
-    public void connectStreams()
+    void connectStreams()
     {
         try
         {
@@ -41,8 +47,19 @@ public class ClientSocket
         }
     }
     
+    public void setMessage(String message)
+    {
+        clientMessage = message;
+    }
+    
+    public String getMessage()
+    {
+        return serverMessage;
+    }
+    
     public void sendMessage(String message) throws IOException
     {
+        System.out.println("client: " + message);
         byte[] bytes = message.getBytes(StandardCharsets.US_ASCII);
         out.writeObject(Arrays.toString(bytes));
         out.flush();
@@ -52,14 +69,14 @@ public class ClientSocket
     {
         String message = (String) in.readObject();
         String temp = message.replaceAll("[\\[\\]\\s*]", "");
-        System.out.println("temp: " + temp);
         String[] ascii = temp.split(",");
         int[] asciiValues = new int[ascii.length];
+        String tempMessage = "";
         for(int i = 0; i < asciiValues.length; i++)
         {
             asciiValues[i] = Integer.parseInt(ascii[i]);
-            serverMessage += (char) asciiValues[i];
+            tempMessage += (char) asciiValues[i];
         }
-        return serverMessage;
+        return tempMessage;
     }
 }

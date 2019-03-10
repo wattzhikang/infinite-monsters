@@ -13,8 +13,8 @@ public class Intermon extends Game
 	public static final int height = 800;
 	public static final String TITLE = "INTERMON";
 	private GameStateManager gsm;
-	SpriteBatch batch;
-	ClientSocket cs = new ClientSocket();
+	private SpriteBatch batch;
+	private ClientSocket cs = new ClientSocket();
 	
 	@Override
 	public void create () {

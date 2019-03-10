@@ -5,21 +5,23 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Json;
+import com.myteam.intermon.Communication.Client;
 import com.myteam.intermon.ClientSocket;
 
 import java.io.IOException;
 
 public class LoginState extends State
 {
-    ClientSocket clientSocket;
+    private ClientSocket clientSocket;
     private Texture loginBtn;
     private Texture exitBtn;
-    boolean loginBtnPushed = false;
-    String username = "";
-    String password = "";
-    String serverMessage;
-    UsernameTextInputListener usernameListener = new UsernameTextInputListener();
-    PasswordTextInputListener passwordListener = new PasswordTextInputListener();
+    private boolean loginBtnPushed = false;
+    private String username = "";
+    private String password = "";
+    private String serverMessage;
+    private UsernameTextInputListener usernameListener = new UsernameTextInputListener();
+    private PasswordTextInputListener passwordListener = new PasswordTextInputListener();
     
     public LoginState(GameStateManager gsm, ClientSocket cs)
     {
@@ -30,7 +32,7 @@ public class LoginState extends State
     }
     
     @Override
-    public void handleIntput()
+    public void handleInput()
     {
         //login button x min: 0, x max: 300
         //login button y min: 775, y max: 1075
@@ -46,12 +48,16 @@ public class LoginState extends State
             {
                 System.out.println("login button pushed");
                 loginBtnPushed = true;
-                String client = "{username: " + username + ", password: " + password + "}";
+                Client client = new Client(username, password);
+                Json json = new Json();
+                String c = json.toJson(client);
+                /*json.setOutputType(JsonWriter.OutputType.json);
+                json.setElementType(Client.class, "password", Client.class);
+                System.out.println(json.prettyPrint(client));*/
                 try
                 {
-                    clientSocket.sendMessage(client);
+                    clientSocket.sendMessage(c);
                     serverMessage = clientSocket.readMessage();
-                    System.out.println("server message: " + serverMessage);
                 }
                 catch (IOException e)
                 {
@@ -61,9 +67,10 @@ public class LoginState extends State
                 {
                     e.printStackTrace();
                 }
+                System.out.println("server message: " + serverMessage);
                 if(serverMessage.equals(serverMessage))
                 {
-                    gsm.set(new PlayState(gsm, clientSocket));
+                    gsm.set(new PlayState(gsm, clientSocket, username));
                     dispose();
                 }
                 
@@ -90,7 +97,7 @@ public class LoginState extends State
     @Override
     public void update(float dt)
     {
-        handleIntput();
+        handleInput();
     }
     
     @Override
