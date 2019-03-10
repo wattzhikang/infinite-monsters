@@ -2,6 +2,10 @@ package server_core;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -9,6 +13,7 @@ import com.mysql.cj.protocol.Message;
 
 import game.ClientKey;
 import game.Game;
+import game.Watcher;
 
 public class Client extends Thread {
 	private SocketAdapter socket;
@@ -18,8 +23,9 @@ public class Client extends Thread {
 	private ClientListener in;
 	
 	private ClientKey key;
+	private Map<Integer, Watcher> subscriptions;
 	
-	private enum RequestType { REGISTRATION, AUTHENTICATION, SUBSCRIPTION, MODIFICATION, LOGOUT, MALFORMED };
+	boolean active = true;
 	
 	public Client(SocketAdapter socket, Game game) {
 		this.socket = socket;
@@ -28,6 +34,8 @@ public class Client extends Thread {
 		queue = new LinkedBlockingQueue<SocketMessage>();
 		in = (socket != null) ? 
 				new ClientListener(socket, queue) : null;
+				
+		subscriptions = new HashMap<Integer, Watcher>();
 	}
 
 	public void run() {
@@ -40,63 +48,30 @@ public class Client extends Thread {
 		try {
 			
 			SocketMessage message;
-			
-			String response = null;
-			
-			boolean active = true;
-			
 			while (active) {
 				message = queue.take();
-				
-				switch (message.getOrigin()) {
-					case CLIENT:
-						
-						switch (getRequestType(message.getMessage())) {
-							case AUTHENTICATION:
-								response = login(message);
-								break;
-							case MALFORMED:
-								break;
-							case MODIFICATION:
-								break;
-							case REGISTRATION:
-								response = register(message);
-								break;
-							case SUBSCRIPTION:
-								break;
-							case LOGOUT:
-								//TODO send acknowledgement
-								/*
-								 * ISSUE: sending an acknowledgement here would mean two places
-								 * where writeString() is called, and thus two places for problems
-								 * with the socket to occur. How to send the acknowledgement,
-								 * then call shutdown()?
-								 */
-							default:
-								break;
-						}
-						if (response != null) {
-							socket.writeString(response);
-							System.out.println("Response sent to " + socket.getHost() + ": " + response);
-						} else {
-							System.out.println("Malformed input from " + socket.getHost());
-						}
-						break;
-					
-					case SERVER:
-						break;
-					case POISON:
-						//TODO save player information here
-						active = false;
-						break;
-				}
-				
-				response = null; //garbage collection is wonderful
+				message.getStrategy().takeAction(game, socket, this);
 			}
 			
 		} catch (InterruptedException e) {
 			//TODO make sure the whole program doesn't break over this
 		}
+	}
+	
+	public void setKey(ClientKey key) {
+		this.key = key;
+	}
+	
+	public ClientKey getKey() {
+		return key;
+	}
+	
+	public void addSubscription(Watcher subscription) {
+		subscriptions.put(new Integer(subscription.getId()), subscription);
+	}
+	
+	public Watcher getSubscription(int id) {
+		return subscriptions.get(new Integer(id));
 	}
 	
 	public void shutDown() throws InterruptedException {
@@ -124,7 +99,7 @@ public class Client extends Thread {
 			try {
 				while (true) {
 					clientMessage = socket.readString();
-					message = new SocketMessage(SocketMessage.MessageOrigin.CLIENT, clientMessage);
+					message = new SocketMessage(clientMessage);
 					queue.offer(message);
 				}
 			} catch (IOException e) {
@@ -132,7 +107,7 @@ public class Client extends Thread {
 					if (!socket.isClosed()) {
 						this.shutDown();
 					}
-					queue.offer(new SocketMessage(SocketMessage.MessageOrigin.POISON, null));
+					queue.offer(new SocketMessage());
 				} else {
 					e.printStackTrace();
 				}
@@ -141,37 +116,10 @@ public class Client extends Thread {
 		
 		public void shutDown() {
 			socket.close();
+			active = false;
 		}
 	}
-	
-	private String login(SocketMessage message) {
-		String response = null;
-		
-		String username = getAuthUser(message.getMessage());
-		String password = getAuthPassword(message.getMessage());
-		if ((key = game.authenticate(username, password, this)) != null) {
-			response = "{\"loginSuccess\":\"true\"}";
-		} else {
-			response = "{\"loginSuccess\":\"false\"}";
-		}
-		
-		return response;
-	}
-	
-	private String register(SocketMessage message) {
-		String response = null;
-		
-		String username = getRegUser(message.getMessage());
-		String password = getRegPassword(message.getMessage());
-		if (game.register(username, password)) {
-			response = "{\"registrationSuccess\":\"true\"}";
-		} else {
-			response = "{\"registrationSuccess\":\"false\"}";
-		}
-		
-		return response;
-	}
-	
+
 	//{"requestType":"registration","username":"user1","password":"sunshine","privileges":"player"}
 	//{ requestType : registration , username : user1 , password : sunshine , privileges : player }
 	//0 1           2 3            4 5        6 7     8 9       10 11      12 13        14 15     16
@@ -179,72 +127,4 @@ public class Client extends Thread {
 	//{"requestType":"authentication","username":"user1","password":"sunshine"}
 	//{ requestType : authentication , username : user1 , password : sunshine }
 	//0 1           2 3              4 5        6 7     8 9       10 11       12
-	
-	/*
-	 * The following methods are a hacked-together means of reading the client's
-	 * JSON strings until such time as Gson is integrated into the project
-	 */
-	private RequestType getRequestType(String JSON) {
-		String[] JSONParse = JSON.split("\"");
-		
-		if (JSONParse[3].equals("registration")) {
-			return RequestType.REGISTRATION;
-		} else if (JSONParse[3].equals("authentication")) {
-			return RequestType.AUTHENTICATION;
-		} else if (JSONParse[3].equals("subscription")) {
-			return RequestType.SUBSCRIPTION;
-		} else if (JSONParse[3].equals("modification")) {
-			return RequestType.MODIFICATION;
-		} else {
-			return RequestType.MALFORMED;
-		}
-	}
-	
-	private String getAuthUser(String message) {
-		String[] parse = message.split("\"");
-		
-		if (parse.length == 13) {
-			return getUser(parse);
-		} else {
-			return null;
-		}
-	}
-	
-	private String getRegUser(String message) {
-		String[] parse = message.split("\"");
-		
-		if (parse.length == 17) {
-			return getUser(parse);
-		} else {
-			return null;
-		}
-	}
-	
-	private String getUser(String[] parse) {
-		return parse[5];
-	}
-	
-	private String getAuthPassword(String message) {
-		String[] parse = message.split("\"");
-		
-		if (parse.length == 13) {
-			return getPassword(parse);
-		} else {
-			return null;
-		}
-	}
-	
-	private String getRegPassword(String message) {
-		String[] parse = message.split("\"");
-		
-		if (parse.length == 17) {
-			return getPassword(parse);
-		} else {
-			return null;
-		}
-	}
-	
-	private String getPassword(String[] parse) {
-		return parse[9];
-	}
 }

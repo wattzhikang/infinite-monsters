@@ -18,7 +18,7 @@ class WatcherTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		client = new Client(null, null);
-		watcher = new Watcher(client);
+		watcher = new Watcher(client, 0);
 	}
 
 	@Test

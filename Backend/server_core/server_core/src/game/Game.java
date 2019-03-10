@@ -54,7 +54,7 @@ public class Game {
 	public Watcher getSubscription(ClientKey key) {
 		Watcher subscription = null;
 		if (keys.containsKey(key)) {
-			subscription = new Watcher(key.getUserLink());
+			subscription = new Watcher(key.getUserLink(), key.getNumSubscriptions());
 			key.addSubscription(subscription);
 			
 			RectangleBoundary corners = db.lastSubscriptionBounds(key);

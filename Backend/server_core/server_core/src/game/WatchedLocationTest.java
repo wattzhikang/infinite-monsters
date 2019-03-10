@@ -19,8 +19,8 @@ class WatchedLocationTest {
 		watched = new WatchedLocation(
 				new Tile(new Coordinates(0,0), false, null, null));
 		
-		eye1 = new Watcher(new Client(null, null));
-		eye2 = new Watcher(new Client(null, null));
+		eye1 = new Watcher(new Client(null, null), 0);
+		eye2 = new Watcher(new Client(null, null), 0);
 	}
 
 	@Test

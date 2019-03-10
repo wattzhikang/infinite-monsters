@@ -30,7 +30,7 @@ class ClientKeyTest {
 	
 	@Test
 	void managesSubscriptions() {
-		Watcher subscription = new Watcher(null);
+		Watcher subscription = new Watcher(null, 0);
 		
 		assert subscription != null;
 		

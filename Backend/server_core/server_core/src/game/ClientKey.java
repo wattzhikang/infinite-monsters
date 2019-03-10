@@ -38,4 +38,8 @@ public class ClientKey {
 	Collection<Watcher> getSubscriptions() {
 		return subscriptions;
 	}
+	
+	public int getNumSubscriptions() {
+		return subscriptions.size();
+	}
 }
