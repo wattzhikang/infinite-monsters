@@ -5,7 +5,7 @@
 	<string name = "enter_name">Enter Name</string>
 	<string name = "password">Password</string>
 	<string name = "cancel">Cancel</string>
-
+	<string name = "description">Network Service</string>
 	<string name = "title_activity_fullscreen">FullscreenActivity</string>
 	<string name = "dummy_button">Dummy Button</string>
 	<string name = "dummy_content">DUMMY\nCONTENT</string>

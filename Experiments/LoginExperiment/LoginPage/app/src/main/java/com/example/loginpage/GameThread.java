@@ -3,10 +3,16 @@ package com.example.loginpage;
 import android.graphics.Canvas;
 import android.view.SurfaceHolder;
 
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 public class GameThread extends Thread
 {
     private SurfaceHolder surfaceHolder;
     private GameView gameView;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
+    private ClientSocket clientSocket;
     private boolean running;
     public static Canvas canvas;
     
@@ -15,6 +21,9 @@ public class GameThread extends Thread
        super();
        this.surfaceHolder = holder;
        this.gameView = gameView;
+       clientSocket = new ClientSocket();
+       /*in = clientSocket.getObjectInputStream();
+       out = clientSocket.getObjectOutputStream();*/
     }
     
     public void setRunning(boolean isRunning)
