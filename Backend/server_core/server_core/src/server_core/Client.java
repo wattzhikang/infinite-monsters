@@ -2,6 +2,7 @@ package server_core;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -105,7 +106,7 @@ public class Client extends Thread {
 					queue.offer(message);
 				}
 			} catch (IOException e) {
-				if (e instanceof EOFException) {
+				if (e instanceof EOFException || e instanceof SocketException) {
 					if (!socket.isClosed()) {
 						this.shutDown();
 					}

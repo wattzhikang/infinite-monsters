@@ -71,6 +71,7 @@ public class Game {
 					subscriptions.put(tile.getLocation(), watched);
 				}
 				watched.addWatcher(subscription);
+				watched.sendDeltas();
 			}
 		}
 		return subscription;
@@ -84,6 +85,7 @@ public class Game {
 				if (sub.getBounds().getUnitChange(bounds) <= 1) {
 					sub.setBounds(bounds);
 					
+					/*
 					Collection<Coordinates> oldLocations = sub.getBounds().getDifference(bounds);
 					for (Coordinates location : oldLocations) {
 						subscriptions.get(location).removeWatcher(sub);
@@ -100,6 +102,7 @@ public class Game {
 						}
 						watched.addWatcher(sub);
 					}
+					*/
 					
 					WatchedLocation oldCharacter = subscriptions.get(oldLocation);
 					WatchedLocation newCharacter = subscriptions.get(newLocation);
@@ -118,6 +121,11 @@ public class Game {
 							oldCharacter.getTile().getObject(),
 							null
 					));
+					
+					Collection<WatchedLocation> places = subscriptions.values();
+					for (WatchedLocation place : places) {
+						place.sendDeltas();
+					}
 				}
 				success = true;
 				break;

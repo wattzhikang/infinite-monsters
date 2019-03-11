@@ -19,14 +19,14 @@ class WatchedLocation {
 		clients.add(client);
 		Collection<Tile> tiles = new ArrayList<Tile>();
 		tiles.add(tile);
-		client.sendDelta(tiles);
+		//client.sendDelta(tiles);
 	}
 	
 	public void removeWatcher(Watcher client) {
 		clients.remove(client);
 	}
 	
-	private void sendDeltas() {
+	public void sendDeltas() {
 		Collection<Tile> tiles = new ArrayList<Tile>();
 		tiles.add(tile);
 		for (Watcher client : clients) {
@@ -43,6 +43,6 @@ class WatchedLocation {
 	 */
 	public void setTile(Tile tile) {
 		this.tile = tile;
-		sendDeltas();
+		//sendDeltas();
 	}
 }
