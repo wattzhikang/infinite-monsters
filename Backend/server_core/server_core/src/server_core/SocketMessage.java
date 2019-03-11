@@ -1,10 +1,16 @@
 package server_core;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+
+import game.Tile;
 
 public class SocketMessage {
 	
@@ -15,14 +21,19 @@ public class SocketMessage {
 	
 	private Strategy strategy;
 	
-	public SocketMessage(String JSONMessage) {
-		String requestType =
-				(new JsonParser())
-				.parse(JSONMessage)
-				.getAsJsonObject()
-				.get("requestType")
-				.getAsString()
-		;
+	public SocketMessage(String JSONMessage) throws Exception {
+		String requestType = null;
+		try {
+			requestType =
+					(new JsonParser())
+					.parse(JSONMessage)
+					.getAsJsonObject()
+					.get("requestType")
+					.getAsString()
+			;
+		} catch (Exception e) {
+			throw e;
+		}
 		
 		switch (requestType) {
 		case REQUEST_REGISTRATION:
@@ -50,11 +61,36 @@ public class SocketMessage {
 	}
 	
 	public SocketMessage(DeltaFrame message) {
+		Collection<Tile> tiles = message.getTiles();
+		List<TileInfo> tileInfos = new ArrayList<TileInfo>();
+		for (Tile tile : tiles) {
+			tileInfos.add(
+					new TileInfo(
+							tile.getLocation().getX(),
+							tile.getLocation().getY(),
+							tile.isWalkable(),
+							tile.getTerrain(),
+							tile.getObject(),
+							tile.getCharacter()
+					)
+			);
+		}
 		
+		strategy = new StrategyDeltaFrame(
+				new DeltaFrameInfo(
+					message.getSubscriptionID(),
+					message.isDungeonChange(),
+					message.getBounds().getLowerLeft().getX(),
+					message.getBounds().getUpperRight().getX(),
+					message.getBounds().getUpperRight().getY(),
+					message.getBounds().getLowerLeft().getY(),
+					(Collection<TileInfo>)tileInfos
+				)
+		);
 	}
 	
 	public SocketMessage() {
-		strategy = new StrategyPoison();
+		strategy = new StrategySeppuku();
 	}
 
 	public Strategy getStrategy() {

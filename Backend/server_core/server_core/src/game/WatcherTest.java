@@ -24,7 +24,7 @@ class WatcherTest {
 	@Test
 	void sendDeltaWorks() {
 		Collection<Tile> tiles = new ArrayList<Tile>();
-		tiles.add(new Tile(new Coordinates(0,0), false, "greenGrass1", "genericBarrier1"));
+		tiles.add(new Tile(new Coordinates(0,0), false, "greenGrass1", "genericBarrier1", null));
 		
 		watcher.sendDelta(tiles);
 	}

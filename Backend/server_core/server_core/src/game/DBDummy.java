@@ -21,40 +21,40 @@ public class DBDummy implements DBInterface {
 		Coordinates tmp;
 		
 		tmp = new Coordinates(0,0);
-		database.put(tmp, new Tile(tmp, false, grass, barrier));
+		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
 		tmp = new Coordinates(1,0);
-		database.put(tmp, new Tile(tmp, false, grass, barrier));
+		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
 		tmp = new Coordinates(2,0);
-		database.put(tmp, new Tile(tmp, false, grass, barrier));
+		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
 		tmp = new Coordinates(3,0);
-		database.put(tmp, new Tile(tmp, false, grass, barrier));
+		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
 		tmp = new Coordinates(0,1);
-		database.put(tmp, new Tile(tmp, false, grass, barrier));
+		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
 		tmp = new Coordinates(1,1);
-		database.put(tmp, new Tile(tmp, false, grass, null));
+		database.put(tmp, new Tile(tmp, false, grass, null, "lance"));
 		
 		tmp = new Coordinates(2,1);
-		database.put(tmp, new Tile(tmp, false, grass, null));
+		database.put(tmp, new Tile(tmp, false, grass, null, null));
 		
 		tmp = new Coordinates(3,1);
-		database.put(tmp, new Tile(tmp, false, grass, barrier));
+		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
 		tmp = new Coordinates(0,2);
-		database.put(tmp, new Tile(tmp, false, grass, barrier));
+		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
 		tmp = new Coordinates(1,2);
-		database.put(tmp, new Tile(tmp, false, grass, barrier));
+		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
 		tmp = new Coordinates(2,2);
-		database.put(tmp, new Tile(tmp, false, grass, barrier));
+		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
 		tmp = new Coordinates(3,2);
-		database.put(tmp, new Tile(tmp, false, grass, barrier));
+		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 	}
 
 	@Override

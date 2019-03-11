@@ -10,11 +10,29 @@ public class DeltaFrame {
 	RectangleBoundary bounds;
 	Collection<Tile> tiles;
 	boolean dungeonChange;
+	private int subscriptionID;
 	
-	public DeltaFrame(RectangleBoundary bounds, Collection<Tile> tiles, boolean dungeonChange) {
+	public RectangleBoundary getBounds() {
+		return bounds;
+	}
+
+	public Collection<Tile> getTiles() {
+		return tiles;
+	}
+
+	public boolean isDungeonChange() {
+		return dungeonChange;
+	}
+	
+	public int getSubscriptionID() {
+		return subscriptionID;
+	}
+
+	public DeltaFrame(RectangleBoundary bounds, Collection<Tile> tiles, boolean dungeonChange, int subscriptionID) {
 		this.bounds = bounds;
 		this.tiles = tiles;
 		this.dungeonChange = dungeonChange;
+		this.subscriptionID = subscriptionID;
 	}
 	
 	@Override

@@ -32,7 +32,7 @@ class GameTest {
 		);
 		
 		
-		game.moveSubscription(key, watcher, movedBound);
+		game.moveSubscription(key, watcher, movedBound, null, null);
 	}
 
 }

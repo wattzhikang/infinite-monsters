@@ -17,7 +17,7 @@ class WatchedLocationTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		watched = new WatchedLocation(
-				new Tile(new Coordinates(0,0), false, null, null));
+				new Tile(new Coordinates(0,0), false, null, null, null));
 		
 		eye1 = new Watcher(new Client(null, null), 0);
 		eye2 = new Watcher(new Client(null, null), 0);
@@ -26,7 +26,7 @@ class WatchedLocationTest {
 	@Test
 	void sendsDeltasOnCreation() {
 		watched = new WatchedLocation(
-				new Tile(new Coordinates(0,0), false, null, null));
+				new Tile(new Coordinates(0,0), false, null, null, null));
 	}
 	
 	@Test
@@ -34,7 +34,7 @@ class WatchedLocationTest {
 		watched.addWatcher(eye1);
 		watched.addWatcher(eye2);
 		
-		watched.setTile(new Tile(new Coordinates(0,0), true, null, null));
+		watched.setTile(new Tile(new Coordinates(0,0), true, null, null, null));
 	}
 
 }

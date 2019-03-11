@@ -22,7 +22,7 @@ public class StrategyModificationMS implements Strategy {
 		
 		StrategyModificationMSSuccess success = null;
 		
-		if (game.moveSubscription(client.getKey(), client.getSubscription(info.getSubscriptionID()), bounds) == true) {
+		if (game.moveSubscription(client.getKey(), client.getSubscription(info.getSubscriptionID()), bounds, new Coordinates(info.getOldPlayerX(), info.getOldPlayerY()), new Coordinates(info.getNewPlayerX(), info.getNewPlayerY())) == true) {
 			success = new StrategyModificationMSSuccess(true);
 		} else {
 			success = new StrategyModificationMSSuccess(false);

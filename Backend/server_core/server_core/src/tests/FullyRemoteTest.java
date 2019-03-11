@@ -49,10 +49,38 @@ class FullyRemoteTest {
 			ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 			
 			out.writeObject("{\"requestType\":\"registration\",\"username\":\"user1\",\"password\":\"sunshine\",\"privileges\":\"player\"}");
+			
 			System.out.println("Testing Thread: Received " + in.readObject().toString());
 			
 			out.writeObject("{\"requestType\":\"authentication\",\"username\":\"user1\",\"password\":\"sunshine\"}");
+			
 			System.out.println("Testing Thread: Received " + in.readObject().toString());
+			
+			out.writeObject("{\"requestType\":\"subscription\"}");
+			
+			for (int i = 0; i < 12; i++) {
+				System.out.println("Testing Thread: Received " + in.readObject().toString());
+			}
+			
+			out.writeObject("{"
+					+ "\"requestType\":\"mod_move_subscription\","
+					+ "\"subscriptionID\":0,"
+					+ "\"xL\":1,"
+					+ "\"xR\":4,"
+					+ "\"yU\":2,"
+					+ "\"yL\":0,"
+					+ "\"oldPlayerX\":1,"
+					+ "\"oldPlayerY\":1,"
+					+ "\"newPlayerX\":2,"
+					+ "\"newPlayerY\":1"
+					+ "}"
+			);
+			
+			
+			System.out.println("Testing Thread: Received " + in.readObject().toString());
+			System.out.println("Testing Thread: Received " + in.readObject().toString());
+			
+			//Thread.sleep(100);
 			
 			socket.close();
 		} catch (IOException e) {

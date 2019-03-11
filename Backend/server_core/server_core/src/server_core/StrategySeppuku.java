@@ -2,7 +2,7 @@ package server_core;
 
 import game.Game;
 
-public class StrategyPoison implements Strategy {
+public class StrategySeppuku implements Strategy {
 
 	@Override
 	public void takeAction(Game game, SocketAdapter socket, Client client) {

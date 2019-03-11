@@ -6,10 +6,6 @@ public class StrategyModificationMSInfo {
 	private int xL;
 	private int xR;
 	private int yU;
-	public int getSubscriptionID() {
-		return subscriptionID;
-	}
-
 	private int yL;
 	private int oldPlayerX;
 	private int oldPlayerY;
@@ -28,6 +24,10 @@ public class StrategyModificationMSInfo {
 		this.oldPlayerY = oldPlayerY;
 		this.newPlayerX = newPlayerX;
 		this.newPlayerY = newPlayerY;
+	}
+	
+	public int getSubscriptionID() {
+		return subscriptionID;
 	}
 
 	public String getRequestType() {

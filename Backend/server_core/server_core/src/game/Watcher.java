@@ -19,7 +19,7 @@ public class Watcher {
 	}
 
 	void sendDelta(Collection<Tile> tiles) {
-		client.enqueueDeltaFrame(new DeltaFrame(bounds, tiles, false));
+		client.enqueueDeltaFrame(new DeltaFrame(bounds, tiles, false, id));
 	}
 	
 	void unsubscribe() {

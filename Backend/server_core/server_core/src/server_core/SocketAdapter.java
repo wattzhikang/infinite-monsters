@@ -37,6 +37,7 @@ public class SocketAdapter {
 			String read = null;
 			try {
 				read = (String) in.readObject();
+				System.out.println(read);
 			} catch (ClassNotFoundException e) {
 				//malformed input
 				return null;
@@ -51,6 +52,7 @@ public class SocketAdapter {
 	public void writeString(String toWrite) {
 //		synchronized (socket) {
 			try {
+				System.out.println(toWrite);
 				out.writeObject((Object)toWrite);
 				out.flush();
 			} catch (IOException e) {

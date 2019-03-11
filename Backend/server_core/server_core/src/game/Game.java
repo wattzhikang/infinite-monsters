@@ -76,12 +76,12 @@ public class Game {
 		return subscription;
 	}
 	
-	public boolean moveSubscription(ClientKey key, Watcher sub, RectangleBoundary bounds) {
+	public boolean moveSubscription(ClientKey key, Watcher sub, RectangleBoundary bounds, Coordinates oldLocation, Coordinates newLocation) {
 		boolean success = false;
 		if (keys.containsKey(key)) {
 			switch (key.getPriveleges()) {
 			case PLAYER:
-				if (sub.getBounds().getUnitChange(bounds) == 1) {
+				if (sub.getBounds().getUnitChange(bounds) <= 1) {
 					sub.setBounds(bounds);
 					
 					Collection<Coordinates> oldLocations = sub.getBounds().getDifference(bounds);
@@ -100,7 +100,26 @@ public class Game {
 						}
 						watched.addWatcher(sub);
 					}
+					
+					WatchedLocation oldCharacter = subscriptions.get(oldLocation);
+					WatchedLocation newCharacter = subscriptions.get(newLocation);
+					
+					newCharacter.setTile(new Tile(
+							newCharacter.getTile().getLocation(),
+							newCharacter.getTile().isWalkable(),
+							newCharacter.getTile().getTerrain(),
+							newCharacter.getTile().getObject(),
+							oldCharacter.getTile().getCharacter()
+					));
+					oldCharacter.setTile(new Tile(
+							oldCharacter.getTile().getLocation(),
+							oldCharacter.getTile().isWalkable(),
+							oldCharacter.getTile().getTerrain(),
+							oldCharacter.getTile().getObject(),
+							null
+					));
 				}
+				success = true;
 				break;
 			case SPECTATOR:
 			case DESIGNER:

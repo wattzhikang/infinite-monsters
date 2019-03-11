@@ -5,12 +5,18 @@ public class Tile {
 	private boolean walkable;
 	private String terrain;
 	private String object;
+	private String character;
 	
-	public Tile(Coordinates location, boolean walkable, String terrain, String object) {
+	public String getCharacter() {
+		return character;
+	}
+
+	public Tile(Coordinates location, boolean walkable, String terrain, String object, String character) {
 		this.location = location;
 		this.walkable = walkable;
 		this.terrain = terrain;
 		this.object = object;
+		this.character = character;
 	}
 	
 	public Tile(Coordinates location) {

@@ -68,7 +68,7 @@ class DBDummyTest {
 	@Test
 	void updateTilesWorks() {
 		Collection<Tile> tile = new ArrayList<Tile>();
-		tile.add(new Tile(new Coordinates(0,0), true, null, null));
+		tile.add(new Tile(new Coordinates(0,0), true, null, null, null));
 		
 		db.updateTiles(tile);
 		

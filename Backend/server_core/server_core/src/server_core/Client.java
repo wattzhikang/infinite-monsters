@@ -39,10 +39,6 @@ public class Client extends Thread {
 	}
 
 	public void run() {
-		/*
-		 * I bet this could be made a lot less ugly with the Strategy Pattern
-		 * and maybe the Abstract Factory pattern
-		 */
 		in.start();
 		
 		try {
@@ -76,12 +72,13 @@ public class Client extends Thread {
 	
 	public void shutDown() throws InterruptedException {
 		in.shutDown();
-		in.join();
+		in.join(500);
 	}
 	
 	public void enqueueDeltaFrame(DeltaFrame frame) {
 		//queue.offer(new SocketMessage(SocketMessage.MessageOrigin.SERVER, frame.toString()));
-		System.out.println(frame);
+		queue.add(new SocketMessage(frame));
+		//System.out.println(frame);
 	}
 	
 	private class ClientListener extends Thread {
@@ -99,7 +96,12 @@ public class Client extends Thread {
 			try {
 				while (true) {
 					clientMessage = socket.readString();
-					message = new SocketMessage(clientMessage);
+					try {
+						message = new SocketMessage(clientMessage);
+					} catch (Exception e) {
+						System.out.println("Malformed input");
+						continue;
+					}
 					queue.offer(message);
 				}
 			} catch (IOException e) {

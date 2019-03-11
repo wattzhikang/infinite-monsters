@@ -15,6 +15,9 @@ public class ServerCore {
 	public static final String DEBUG = "debug";
 
 	public static void main(String[] args) {
+		for (String string : args) {
+			System.out.println(string);
+		}
 		DBInterface db = null;
 		if (args.length > 1 && args[1].equals(DEBUG)) {
 			db = new DBDummy();
