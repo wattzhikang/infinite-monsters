@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.2" orientation="orthogonal" renderorder="left-down" width="20" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="1">
+ <tileset firstgid="1" source="../../../../../../../../../Program Files/Tiled/pokemon_tileset.tsx"/>
+ <layer id="1" name="Tile Layer 1" width="20" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjZGBgYAJiRirREkAsSUWaWu4add+o+0bdN+q+UfdR130A3BQUUQ==
+  </data>
+ </layer>
+ <layer id="2" name="Tile Layer 2" width="20" height="20">
+  <data encoding="base64" compression="zlib">
+   eJytlEcOwjAQRW3KEegcgc4R6CzhBJQNnICyysWBZymRLCtOxiEjPSW2Z/4UK1GqHDvAsSQtYze4W+u6haSOPF9zFgn8kjokejZ585D0Yvu683D1Q/Vc883btbS+JHl9em7exNc3P+n9unppeez8oXpSsjROWqkzXOCq5fl9eg80nvCCd6z3ga9xYK2hAlWomXMd3mODmCa0oA0d6EIP+hl6tm4Uv5vngJghjGAME5jCDOYF9BbELGEFa9jAFnawL9DvP/dblmX9U0L37LrTvonQvR86VB4x
+  </data>
+ </layer>
+</map>

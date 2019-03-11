@@ -43,9 +43,6 @@ public class MainActivity extends AppCompatActivity
         Intent clientIntent = new Intent(MainActivity.this, ClientSocket.class);
         startService(clientIntent);
         bindService(clientIntent, clientConnection, Context.BIND_AUTO_CREATE);
-        /*MapCreator map = new MapCreator();
-        map.createMap();*/
-        
         
         login.setOnClickListener(new View.OnClickListener()
         {
@@ -53,7 +50,6 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v)
             {
                 messageReceived = false;
-                //clientSocket = new ClientSocket();
                 JSONObject client = new JSONObject();
                 try
                 {
@@ -67,16 +63,6 @@ public class MainActivity extends AppCompatActivity
                 }
                 
                 clientSocket.setClientMessage(client.toString());
-                //clientSocket.setMessage(client.toString());
-                //String message = clientSocket.readMessage();
-                /*try
-                {
-                    clientSocket.execute(client).get();
-                }
-                catch (InterruptedException | ExecutionException e)
-                {
-                    e.printStackTrace();
-                }*/
                 while(!messageReceived)
                 {
                     if(clientSocket.getServerMessage() != null)
@@ -86,12 +72,9 @@ public class MainActivity extends AppCompatActivity
                     }
                     
                 }
-                //serverMessage = clientSocket.getServerMessage();
                 Log.i("message", serverMessage);
                 
-                //String message = clientSocket.getServerMessage();
-                
-                if(serverMessage.equals((serverMessage)))
+                if(serverMessage.equals(("Aaron")))
                 {
                     Toast.makeText(MainActivity.this, "login success: " + serverMessage, Toast.LENGTH_SHORT).show();
                     Intent i = new Intent(MainActivity.this, Game.class);
@@ -103,6 +86,7 @@ public class MainActivity extends AppCompatActivity
                     Toast.makeText(MainActivity.this, "Wrong Credentials", Toast.LENGTH_LONG).show();
                     tx1.setVisibility(View.VISIBLE);
                     tx1.setBackgroundColor(Color.RED);
+                    messageReceived = false;
                 }
             }
         });
@@ -146,7 +130,6 @@ public class MainActivity extends AppCompatActivity
         if(isBound)
         {
             unbindService(clientConnection);
-            //clientMessenger = null;
             isBound = false;
         }
     }

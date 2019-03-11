@@ -1,0 +1,4 @@
+#Thu Mar 07 20:31:54 CST 2019
+base.0=B\:\\Intermon Project\\team_38\\Experiments\\IntermonGame\\android\\build\\intermediates\\transforms\\dexMerger\\debug\\10
+path.0=classes.dex
+renamed.0=classes.dex
