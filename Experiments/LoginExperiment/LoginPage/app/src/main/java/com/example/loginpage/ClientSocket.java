@@ -3,8 +3,6 @@ package com.example.loginpage;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import org.json.JSONException;
@@ -124,7 +122,7 @@ public class ClientSocket extends Service /*AsyncTask<JSONObject, Void, Void>*/
                 }
             }
         }
-        public String readMessage()
+        private String readMessage()
         {
             String tmp = null;
             String message = null;
@@ -165,7 +163,7 @@ public class ClientSocket extends Service /*AsyncTask<JSONObject, Void, Void>*/
             return message;
         }
     
-        public void sendMessage(String message)
+        private void sendMessage(String message)
         {
         
             try

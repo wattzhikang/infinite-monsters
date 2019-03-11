@@ -21,37 +21,29 @@ public class TileFactory
         yUpper = yU;
         this.player = player;
         this.tiles = tiles;
+        createTile();
     }
     
-    public Array<Tile> createTiles()
+    public void createTile()
     {
         int size = tiles.size;
-        if(newDungeon)
+        int mapSize = map.size;
+        for(JsonValue tile : tiles)
         {
-            if(map.isEmpty())
+            Tile t = new Tile(tile, xLeft, yLower, player);
+            for(int j = 0; j < mapSize; j++)
             {
-                for(int i = 0; i < size; i++)
+                if(t.getX() == map.get(j).getX() && t.getY() == map.get(j).getY())
                 {
-                    Tile t = new Tile(tiles.get(i), player);
-                    map.add(t);
+                    map.removeIndex(j);
                 }
             }
-            else
-            {
-                map.clear();
-                for(int i = 0; i < size; i++)
-                {
-                    Tile t = new Tile(tiles.get(i), player);
-                    map.add(t);
-                }
-            }
+            map.add(t);
         }
-        else
-        {
-            Array<Tile> temp = new Array<Tile>();
-            
-        }
-        
+    }
+
+    public Array<Tile> getMap()
+    {
         return map;
     }
 }

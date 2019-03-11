@@ -11,11 +11,11 @@ public class Tile
     private Texture terrainType, object, character;
     private Player player;
     
-    public Tile(JsonValue tile, Player player)
+    public Tile(JsonValue tile, int xLeft, int yLower, Player player)
     {
         this.player = player;
-        x = tile.getInt("x");
-        y = tile.getInt("y");
+        x = tile.getInt("x") - xLeft;
+        y = tile.getInt("y") - yLower;
         walkable = tile.getBoolean("walkable");
         setTerrainType(tile.getString("terrainType"));
         setObject(tile.getString("object"));
@@ -24,34 +24,43 @@ public class Tile
     
     private void setTerrainType(String terrainType)
     {
-        if(terrainType.equals("genericGrass1"))
+        if(terrainType != null)
         {
-            this.terrainType = new Texture("intermon_grass_01.png");
+            if(terrainType.equals("greenGrass1"))
+            {
+                this.terrainType = new Texture("intermon_grass_01.png");
+            }
         }
     }
     
     private void setObject(String object)
     {
-        if(object.equals("genericBarrier1"))
+        if(object != null)
         {
-            this.object = new Texture("intermon_barrier_01.png");
-        }
-        else if(object.equals("genericTallGrass01"))
-        {
-            this.object = new Texture("intermon_tallgrass_01.png");
-        }
-        else if(object.equals("genericPath1"))
-        {
-            this.object = new Texture("intermon_path_01.png");
+            if(object.equals("genericBarrier1"))
+            {
+                this.object = new Texture("intermon_barrier_01.png");
+            }
+            else if(object.equals("genericTallGrass01"))
+            {
+                this.object = new Texture("intermon_tallgrass_01.png");
+            }
+            else if(object.equals("genericPath1"))
+            {
+                this.object = new Texture("intermon_path_01.png");
+            }
         }
     }
     
     private void setCharacter(String character)
     {
-        if(character.equals(player.getName()))
+        if(character != null)
         {
-            this.character = player.getTexture();
-            player.updatePosition(x, y);
+            if(character.equals(player.getName()))
+            {
+                this.character = player.getTexture();
+                player.updatePosition(x, y);
+            }
         }
     }
     

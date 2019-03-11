@@ -1,5 +1,7 @@
 package com.myteam.intermon;
 
+import com.myteam.intermon.states.PlayState;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,12 +16,15 @@ public class ClientSocket
     private ObjectOutputStream out;
     private String clientMessage = null;
     private String serverMessage = null;
+    private String SERVER_IP = "cs309-yt-1.misc.iastate.edu";
+    private String PHONE_IP = "100.115.52.40";
+    private String LAPTOP_IP = "192.168.56.1";
     
     void connectSocket()
     {
         try
         {
-            clientSocket = new Socket("192.168.1.2", 10044);
+            clientSocket = new Socket(SERVER_IP, 10042);
             System.out.println("socket connected: " + clientSocket.isConnected());
         }
         catch (Exception e)
@@ -44,15 +49,16 @@ public class ClientSocket
     
     public void sendMessage(String message) throws IOException
     {
-        byte[] bytes = message.getBytes(StandardCharsets.US_ASCII);
-        out.writeObject(Arrays.toString(bytes));
+        //byte[] bytes = message.getBytes(StandardCharsets.US_ASCII);
+        //out.writeObject(Arrays.toString(bytes));
+        out.writeObject(message);
         out.flush();
     }
     
     public String readMessage() throws IOException, ClassNotFoundException
     {
         String message = (String) in.readObject();
-        String temp = message.replaceAll("[\\[\\]\\s*]", "");
+        /*String temp = message.replaceAll("[\\[\\]\\s*]", "");
         String[] ascii = temp.split(",");
         int[] asciiValues = new int[ascii.length];
         String tempMessage = "";
@@ -60,7 +66,7 @@ public class ClientSocket
         {
             asciiValues[i] = Integer.parseInt(ascii[i]);
             tempMessage += (char) asciiValues[i];
-        }
-        return tempMessage;
+        }*/
+        return message;
     }
 }

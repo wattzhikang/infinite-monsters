@@ -42,8 +42,6 @@ public class LoginState extends State
         //exit button y min: 775, y max: 1075
         int x = Gdx.input.getX();
         int y = Gdx.input.getY();
-        
-        
         if(Gdx.input.justTouched())
         {
             boolean loginBtnPushed = false;
@@ -54,6 +52,7 @@ public class LoginState extends State
                 JsonValue clientInfo = new JsonValue(username);
                 clientInfo.setName("username");
                 clientInfo.addChild("password", new JsonValue(password));
+                clientInfo.addChild("requestType", new JsonValue("authentication"));
                 String client = mc.setMessage(clientInfo);
                 try
                 {

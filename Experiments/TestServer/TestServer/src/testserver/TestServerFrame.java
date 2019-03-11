@@ -19,6 +19,8 @@ import org.json.JSONObject;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.json.JSONArray;
 
 /**
@@ -689,57 +691,51 @@ public class TestServerFrame extends javax.swing.JFrame {
         {
         }
         JSONArray tiles = new JSONArray();
-        try
-        {
-            tiles.put(tile0);
-            tiles.put(tile1);
-            tiles.put(tile2);
-            tiles.put(tile3);
-            tiles.put(tile4);
-            tiles.put(tile5);
-            tiles.put(tile6);
-            tiles.put(tile7);
-            tiles.put(tile8);
-            tiles.put(tile9);
-            tiles.put(tile10);
-            tiles.put(tile11);
-            tiles.put(tile12);
-            tiles.put(tile13);
-            tiles.put(tile14);
-            tiles.put(tile15);
-            tiles.put(tile16);
-            tiles.put(tile17);
-            tiles.put(tile18);
-            tiles.put(tile19);
-            tiles.put(tile20);
-            tiles.put(tile21);
-            tiles.put(tile22);
-            tiles.put(tile23);
-            tiles.put(tile24);
-            tiles.put(tile25);
-            tiles.put(tile26);
-            tiles.put(tile27);
-            tiles.put(tile28);
-            tiles.put(tile29);
-            tiles.put(tile30);
-            tiles.put(tile31);
-            tiles.put(tile32);
-            tiles.put(tile33);
-            tiles.put(tile34);
-            tiles.put(tile35);
-            tiles.put(tile36);
-            tiles.put(tile37);
-            tiles.put(tile38);
-            tiles.put(tile39);
-            tiles.put(tile40);
-            tiles.put(tile41);
-            tiles.put(tile42);
-            tiles.put(tile43);
-            tiles.put(tile44);
-        }
-        catch(JSONException e)
-        {
-        }
+        tiles.put(tile0);
+        tiles.put(tile1);
+        tiles.put(tile2);
+        tiles.put(tile3);
+        tiles.put(tile4);
+        tiles.put(tile5);
+        tiles.put(tile6);
+        tiles.put(tile7);
+        tiles.put(tile8);
+        tiles.put(tile9);
+        tiles.put(tile10);
+        tiles.put(tile11);
+        tiles.put(tile12);
+        tiles.put(tile13);
+        tiles.put(tile14);
+        tiles.put(tile15);
+        tiles.put(tile16);
+        tiles.put(tile17);
+        tiles.put(tile18);
+        tiles.put(tile19);
+        tiles.put(tile20);
+        tiles.put(tile21);
+        tiles.put(tile22);
+        tiles.put(tile23);
+        tiles.put(tile24);
+        tiles.put(tile25);
+        tiles.put(tile26);
+        tiles.put(tile27);
+        tiles.put(tile28);
+        tiles.put(tile29);
+        tiles.put(tile30);
+        tiles.put(tile31);
+        tiles.put(tile32);
+        tiles.put(tile33);
+        tiles.put(tile34);
+        tiles.put(tile35);
+        tiles.put(tile36);
+        tiles.put(tile37);
+        tiles.put(tile38);
+        tiles.put(tile39);
+        tiles.put(tile40);
+        tiles.put(tile41);
+        tiles.put(tile42);
+        tiles.put(tile43);
+        tiles.put(tile44);
         try
         {
             ss = new ServerSocket(10044);  
@@ -794,6 +790,8 @@ public class TestServerFrame extends javax.swing.JFrame {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
             LocalTime time =  LocalTime.now();
             System.out.println(dtf.format(time));
+        } catch (JSONException ex) {
+            Logger.getLogger(TestServerFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }    
     public static String readMessage() throws IOException, ClassNotFoundException
