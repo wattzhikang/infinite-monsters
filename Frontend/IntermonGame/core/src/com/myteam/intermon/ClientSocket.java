@@ -19,12 +19,13 @@ public class ClientSocket
     private String SERVER_IP = "cs309-yt-1.misc.iastate.edu";
     private String PHONE_IP = "100.115.52.40";
     private String LAPTOP_IP = "192.168.56.1";
+    private String COMPUTER_IP = "192.168.1.3";
     
     void connectSocket()
     {
         try
         {
-            clientSocket = new Socket(SERVER_IP, 10042);
+            clientSocket = new Socket(COMPUTER_IP, 10044);
             System.out.println("socket connected: " + clientSocket.isConnected());
         }
         catch (Exception e)

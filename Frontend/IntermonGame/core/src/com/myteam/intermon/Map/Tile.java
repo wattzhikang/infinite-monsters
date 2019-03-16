@@ -8,7 +8,7 @@ public class Tile
 {
     private int x, y;
     private boolean walkable;
-    private Texture terrainType, object, character;
+    private String character, object, terrainType;
     private Player player;
     
     public Tile(JsonValue tile, int xLeft, int yLower, Player player)
@@ -28,7 +28,7 @@ public class Tile
         {
             if(terrainType.equals("greenGrass1"))
             {
-                this.terrainType = new Texture("intermon_grass_01.png");
+                this.terrainType = "grass01";
             }
         }
     }
@@ -39,15 +39,15 @@ public class Tile
         {
             if(object.equals("genericBarrier1"))
             {
-                this.object = new Texture("intermon_barrier_01.png");
+                this.object = "barrier01";
             }
             else if(object.equals("genericTallGrass01"))
             {
-                this.object = new Texture("intermon_tallgrass_01.png");
+                this.object = "tallgrass01";
             }
             else if(object.equals("genericPath1"))
             {
-                this.object = new Texture("intermon_path_01.png");
+                this.object = "path01";
             }
         }
     }
@@ -58,7 +58,7 @@ public class Tile
         {
             if(character.equals(player.getName()))
             {
-                this.character = player.getTexture();
+                this.character = player.getName();
                 player.updatePosition(x, y);
             }
         }
@@ -74,17 +74,17 @@ public class Tile
         return y;
     }
     
-    public Texture getTerrainType()
+    public String getTerrainType()
     {
         return terrainType;
     }
     
-    public Texture getObject()
+    public String getObject()
     {
         return object;
     }
     
-    public Texture getCharacter()
+    public String getCharacter()
     {
         return character;
     }
