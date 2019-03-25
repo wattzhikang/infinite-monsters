@@ -21,11 +21,65 @@ public class Game {
 	private Map<ClientKey, Object> keys;
 	private Map<Coordinates, WatchedLocation> subscriptions;
 	
+	//problem: the map within the map will probably be locked
+	private Map<Long, Map<Coordinates, Plot>> dungeons;
+	
 
 	public Game(DBInterface db) {
 		this.db = db;
 		keys = new ConcurrentHashMap<ClientKey, Object>();
 		subscriptions = new ConcurrentHashMap<Coordinates, WatchedLocation>();
+		
+		dungeons = new ConcurrentHashMap<Long, Map<Coordinates, Plot>>();
+	}
+	
+	void flushTiles(Collection<Tile> tiles) {
+		//assume that tiles exist in the map
+		for (Tile tile : tiles) {
+			dungeons.get(new Long(tile.getLocation().getDungeon()))
+				.get(tile.getLocation())
+				.setPlot(tile)
+			;
+		}
+	}
+	
+	void adjustBounds(Subscription subscription, RectangleBoundary oldBounds, RectangleBoundary newBounds) {
+		/*
+		 * Plant new stakes and dig up old ones. If any overlap is detected, create a new subscriptionLock
+		 * and reset the locks for both subscriptions
+		 */
+		
+		Collection<Coordinates> nTiles = oldBounds.getDifference(newBounds);
+		
+		getTiles(nTiles); //load tiles if they aren't already loaded
+		
+		//plant new stakes
+		for (Coordinates position : nTiles) {
+			Plot plot = dungeons.get(new Long(position.getDungeon())).get(position);
+			if (plot.getStake() != null && plot.getStake() == subscription.getLock()) {
+				overlapDetected(subscription, plot.getStake().getSubscribers(), plot.getStake());
+			} else {
+				plot.setStake(subscription.getLock());
+			}
+		}
+		
+		//remove old stakes, deal with the possibility that you aren't the only subscriber
+		
+	}
+	
+	private void overlapDetected(Subscription sub1, Collection<Subscription> sub2, SubscriptionLock otherLock) {
+		synchronized (otherLock) {
+			for (Subscription subscription : sub2) {
+				subscription.updateLock(sub1.getLock());
+			}
+		}
+	}
+	
+	/**
+	 * Returns tiles at the desired locations, pulling from the database if necessary
+	 */
+	Collection<Tile> getTiles(Collection<Coordinates> locations) {
+		return null;
 	}
 	
 	public boolean register(String username, String password) {

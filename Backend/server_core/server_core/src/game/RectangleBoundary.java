@@ -41,7 +41,7 @@ public class RectangleBoundary {
 	}
 	
 	/*
-	 * Get the coordinates that are not in this area
+	 * Get the coordinates that are not in this area, but are in other's area
 	 */
 	public Collection<Coordinates> getDifference(RectangleBoundary other) {
 		Collection<Coordinates> difference = other.getBetween();

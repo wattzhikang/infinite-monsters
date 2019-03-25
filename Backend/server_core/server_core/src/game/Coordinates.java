@@ -6,14 +6,22 @@ import java.util.LinkedList;
 public class Coordinates /*implements Comparable<Coordinates> */ {
 	private int x;
 	private int y;
+	private int dungeon;
 	
 	public Coordinates(int x, int y) {
 		this.x = x;
 		this.y = y;
 	}
 	
+	public Coordinates(int x, int y, int dungeon) {
+		this.x = x;
+		this.y = y;
+		this.dungeon = dungeon;
+	}
+	
 	public int getX() { return x; }
 	public int getY() { return y; }
+	public int getDungeon() {return dungeon;}
 	
 	public String toString() {
 		return "(" + x + ", " + y + ")";
