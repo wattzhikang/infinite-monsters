@@ -5,6 +5,11 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.myteam.intermon.ClientSocket;
@@ -31,6 +36,7 @@ public class LoginState extends State
         loginBtn = new Texture("login_button.jpg");
         exitBtn = new Texture("exit_button.jpg");
         mc = new MessageConverter();
+        
     }
     
     @Override
@@ -81,13 +87,13 @@ public class LoginState extends State
                 System.out.println("exit button pushed");
                 dispose();
             }
-            if(!loginBtnPushed)
+            /*if(!loginBtnPushed)
             {
                 Gdx.input.getTextInput(passwordListener, "Password", "", "password");
                 Gdx.app.log("password", password);
                 Gdx.input.getTextInput(usernameListener, "Username", "", "username");
                 Gdx.app.log("username", username);
-            }
+            }*/
         }
     }
     

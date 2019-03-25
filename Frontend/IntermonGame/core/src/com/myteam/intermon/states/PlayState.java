@@ -19,11 +19,11 @@ public class PlayState extends State
     private Player player;
     private ClientSocket clientSocket;
     private String serverMessage = null;
-    private Array<Tile> map = new Array<Tile>();
+    private Tile[][] map = new Tile[15][15];
     private Texture dpad;
     private MessageConverter mc;
     private int xLeft, xRight, yLower, yUpper;
-    Texture grass, barrier;
+    private Texture grass, barrier;
     int x = 0;
 
     PlayState(GameStateManager gsm, ClientSocket cs, String username)
@@ -47,7 +47,6 @@ public class PlayState extends State
     @Override
     protected void handleInput()
     {
-        
         //Up: x min: 65, y min: 895
         //Up: x max:115 , y max: 950
         //Down: x min: 65, y min: 1000
@@ -118,7 +117,7 @@ public class PlayState extends State
     @Override
     public void render(SpriteBatch sb)
     {
-        int size = map.size;
+        /*int size = map.size;
         sb.begin();
         for (int i = 0; i < size; i++)
         {
@@ -134,7 +133,7 @@ public class PlayState extends State
             {
                 sb.draw(map.get(i).getCharacter(), map.get(i).getX() * map.get(i).getTerrainType().getWidth(), map.get(i).getY() * map.get(i).getTerrainType().getHeight());
             }
-        }
+        }*/
         /*sb.draw(player.getTexture(), x, 0);
         x++;*/
         sb.draw(dpad, 0, 0);
@@ -176,7 +175,7 @@ public class PlayState extends State
     
     private void generateMap(boolean newDungeon, int xL, int xR, int yL, int yU, JsonValue tiles)
     {
-        TileFactory tiledMap = new TileFactory(newDungeon, xL, xR, yL, yU, tiles, player);
+        TileFactory tiledMap = new TileFactory(newDungeon, xL, xR, yL, yU, tiles, player, map);
         map = tiledMap.getMap();
     }
 

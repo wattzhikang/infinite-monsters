@@ -10,9 +10,9 @@ public class TileFactory
     private int xLeft = 0, xRight = 0, yLower = 0, yUpper = 0;
     private JsonValue tiles;
     private Player player;
-    private Array<Tile> map = new Array<Tile>();
+    private Tile[][] map;
     
-    public TileFactory(boolean newDungeon, int xL, int xR, int yL, int yU, JsonValue tiles, Player player)
+    public TileFactory(boolean newDungeon, int xL, int xR, int yL, int yU, JsonValue tiles, Player player, Tile[][] map)
     {
         this.newDungeon = newDungeon;
         xLeft = xL;
@@ -21,28 +21,69 @@ public class TileFactory
         yUpper = yU;
         this.player = player;
         this.tiles = tiles;
-        createTile();
+        this.map = map;
     }
     
-    public void createTile()
+    /*
+    REMOVE ANYTHING ASSOCIATED WITH COUNT IN THIS CLASS AND THE PLAYSCREEN
+    ONCE THE MAP IS FULLY IMPLEMENTED
+     */
+    public Tile[][] createTiles()
     {
-        int size = tiles.size;
-        int mapSize = map.size;
-        for(JsonValue tile : tiles)
+        int numTiles = tiles.size;
+        int count = 0;
+        
+        int xLeftOld = xLeft;
+        int xRightOld = xRight;
+        int yLowerOld = yLower;
+        int yUpperOld = yUpper;
+        boolean changedBoundaries;
+        
+        if(newDungeon)
         {
-            Tile t = new Tile(tile, xLeft, yLower, player);
-            for(int j = 0; j < mapSize; j++)
+            map = new Tile[15][15];//reset the map to empty since the delta from is contains a new dungeon
+            for(int y = 0; y < 15; y++)
             {
-                if(t.getX() == map.get(j).getX() && t.getY() == map.get(j).getY())
+                for(int x = 0; x < 15; x++)
                 {
-                    map.removeIndex(j);
+                    if(count < numTiles)//will need to go away once we have enough tiles to fill the device
+                    {
+                        Tile t = new Tile(tiles.get(count), xLeft, yLower, player);
+                        map[y][x] = t;
+                    }
+                    count++;
                 }
             }
-            map.add(t);
         }
+        else
+        {
+            for(int n = 0; n < numTiles; n++)
+            {
+                Tile t = new Tile(tiles.get(n), xLeft, yLower, player);
+                for(int y = 0; y < 15; y++)
+                {
+                    for(int x = 0; x < 15; x++)
+                    {
+                        if(count < 45)//will need to go away once we have enough tiles to fill the device
+                        {
+                            if(t.getX() == map[y][x].getX() && t.getY() == map[y][x].getY())
+                            {
+                                map[y][x] = t;
+                            }
+                            count++;
+                        }
+                    }
+                }
+                count = 0;
+            }
+            
+        }
+       
+        
+        return map;
     }
 
-    public Array<Tile> getMap()
+    public Tile[][] getMap()
     {
         return map;
     }
