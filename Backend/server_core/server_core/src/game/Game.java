@@ -33,6 +33,24 @@ public class Game {
 		dungeons = new ConcurrentHashMap<Long, Map<Coordinates, Plot>>();
 	}
 	
+	void getLocks(SubscriptionLock masterLock, Collection<Coordinates> locations) {
+		/*
+		 * TODO Potential for deadlocking
+		 */
+		for (Coordinates position : locations) {
+			SubscriptionLock lock = dungeons.get(new Long(position.getDungeon())).get(position).getStake();
+			synchronized (lock) {
+				Collection<Subscription> alreadyThere = lock.getSubscribers();
+				for (Subscription present : alreadyThere) {
+					masterLock.addSubscriber(present);
+					present.updateLock(masterLock);
+				}
+			}
+			
+			
+		}
+	}
+	
 	void flushTiles(Collection<Tile> tiles) {
 		//assume that tiles exist in the map
 		for (Tile tile : tiles) {
@@ -76,7 +94,8 @@ public class Game {
 	}
 	
 	/**
-	 * Returns tiles at the desired locations, pulling from the database if necessary
+	 * Returns tiles at the desired locations, pulling from the database if necessary. This is a valid way to
+	 * load tiles from the database.
 	 */
 	Collection<Tile> getTiles(Collection<Coordinates> locations) {
 		return null;

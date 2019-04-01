@@ -17,4 +17,8 @@ class SubscriptionLock {
 	void addSubscriber(Subscription sub) {
 		subscribers.add(sub);
 	}
+	
+	void addSubscribers(Collection<Subscription> subs) {
+		subscribers.addAll(subs);
+	}
 }
