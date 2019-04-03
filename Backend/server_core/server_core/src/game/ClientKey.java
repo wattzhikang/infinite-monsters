@@ -15,7 +15,6 @@ public class ClientKey {
 	private String user;
 	private Client userLink;
 	private Privileges priveleges;
-	private Collection<Watcher> subscriptions;
 	
 	private Map<Integer, Subscription> subscribers;
 	
@@ -25,8 +24,6 @@ public class ClientKey {
 		this.user = username;
 		userLink = client;
 		this.priveleges = privileges;
-		
-		subscriptions = new LinkedList<Watcher>();
 		
 		subscribers = new HashMap<Integer, Subscription>();
 	}
@@ -39,18 +36,8 @@ public class ClientKey {
 		return user;
 	}
 	
-	public Client getUserLink() {return userLink;}
-	
-	void addSubscription(Watcher subscription) {
-		subscriptions.add(subscription);
-	}
-	
-	Collection<Watcher> getSubscriptions() {
-		return subscriptions;
-	}
-	
-	public int getNumSubscriptions() {
-		return subscriptions.size();
+	public Client getUserLink() {
+		return userLink;
 	}
 	
 	public int getNextID() {
