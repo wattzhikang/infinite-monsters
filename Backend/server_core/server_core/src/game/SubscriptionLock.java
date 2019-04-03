@@ -2,8 +2,9 @@ package game;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.concurrent.locks.ReentrantLock;
 
-class SubscriptionLock {
+class SubscriptionLock extends ReentrantLock {
 	private Collection<Subscription> subscribers;
 	
 	SubscriptionLock() {
@@ -20,5 +21,41 @@ class SubscriptionLock {
 	
 	void addSubscribers(Collection<Subscription> subs) {
 		subscribers.addAll(subs);
+	}
+	
+	boolean removeSubscriber(Subscription sub) {
+		return subscribers.remove(sub);
+	}
+	
+	/**
+	 * Checks to see if the given subscription overlaps with any other
+	 * subscription at the given position
+	 * @param subscription
+	 * @param position
+	 * @return
+	 */
+	boolean hasOverlap(Subscription subscription, Coordinates position) {
+		for (Subscription otherSub : subscribers) {
+			if (otherSub != subscription && otherSub.getBounds().isAt(position)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Returns true if the given subscription overlaps with *any* other subscription
+	 * within the bounds of this lock
+	 * @param subscription
+	 * @return
+	 */
+	boolean hasOverlap(Subscription subscription) {
+		Collection<Coordinates> positions = subscription.getBounds().getBetween();
+		for (Coordinates position : positions) {
+			if (hasOverlap(subscription, position)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

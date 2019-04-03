@@ -8,6 +8,7 @@ public class RectangleBoundary {
 	private Coordinates lowerLeft;
 	
 	public RectangleBoundary(Coordinates upperRight, Coordinates lowerLeft) {
+		assert (upperRight.getDungeon() == lowerLeft.getDungeon());
 		if (lowerLeft.getX() <= upperRight.getX() && lowerLeft.getY() <= upperRight.getY()) {
 			this.upperRight = upperRight;
 			this.lowerLeft = lowerLeft;
@@ -49,8 +50,22 @@ public class RectangleBoundary {
 		return difference;
 	}
 	
+	/**
+	 * Determines if the given position falls within this rectangle boundary
+	 * @param position
+	 * @return true if the position is within bounds, false otherwise
+	 */
+	public boolean isAt(Coordinates position) {
+		//TODO
+		return true;
+	}
+	
 	public Coordinates getUpperRight() {return upperRight;}
 	public Coordinates getLowerLeft() {return lowerLeft;}
+	
+	public long getDungeon() {
+		return upperRight.getDungeon();
+	}
 	
 	@Override
 	public String toString() {

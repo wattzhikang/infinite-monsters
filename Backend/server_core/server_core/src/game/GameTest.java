@@ -20,7 +20,7 @@ class GameTest {
 	void getSubscriptionTest() {
 		ClientKey key = game.authenticate("zjwatt", "password", new Client(null, null));
 		
-		Watcher watcher = game.getSubscription(key);
+		Watcher watcher = game.getWatcher(key);
 		
 		RectangleBoundary movedBound = new RectangleBoundary(
 				new Coordinates(

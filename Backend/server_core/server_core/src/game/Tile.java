@@ -39,6 +39,10 @@ public class Tile {
 		return object;
 	}
 	
+	public void setObject(String object) {
+		this.object = object;
+	}
+	
 	public String toString() {
 		return location.toString() + ", Walkable: " + walkable +
 				", Terrain: " + terrain +

@@ -1,6 +1,7 @@
 package game;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +12,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import game.ClientKey.Privileges;
 import server_core.Client;
 
+/**
+ * This class holds a secondary cache of game information, and handles
+ * conflicts between different Subscriptions.
+ * 
+ * This class is intended to be like Air Traffic Control. It doesn't do
+ * any flying, it just makes sure that moving places don't collide.
+ * @author Zachariah Watt
+ */
 public class Game {
 	private DBInterface db;
 	
@@ -21,36 +30,29 @@ public class Game {
 	private Map<ClientKey, Object> keys;
 	private Map<Coordinates, WatchedLocation> subscriptions;
 	
-	//problem: the map within the map will probably be locked
+	/**
+	 * A Map of all dungeons within the game. Each dungeon is itself, of course,
+	 * a map unto itself.
+	 */
 	private Map<Long, Map<Coordinates, Plot>> dungeons;
 	
 
+	/**
+	 * Constructs a new Game using the given database
+	 * @param db
+	 */
 	public Game(DBInterface db) {
 		this.db = db;
 		keys = new ConcurrentHashMap<ClientKey, Object>();
 		subscriptions = new ConcurrentHashMap<Coordinates, WatchedLocation>();
 		
-		dungeons = new ConcurrentHashMap<Long, Map<Coordinates, Plot>>();
+		dungeons = new HashMap<Long, Map<Coordinates, Plot>>();
 	}
 	
-	void getLocks(SubscriptionLock masterLock, Collection<Coordinates> locations) {
-		/*
-		 * TODO Potential for deadlocking
-		 */
-		for (Coordinates position : locations) {
-			SubscriptionLock lock = dungeons.get(new Long(position.getDungeon())).get(position).getStake();
-			synchronized (lock) {
-				Collection<Subscription> alreadyThere = lock.getSubscribers();
-				for (Subscription present : alreadyThere) {
-					masterLock.addSubscriber(present);
-					present.updateLock(masterLock);
-				}
-			}
-			
-			
-		}
-	}
-	
+	/**
+	 * Replace outdated tiles with modified ones
+	 * @param tiles
+	 */
 	void flushTiles(Collection<Tile> tiles) {
 		//assume that tiles exist in the map
 		for (Tile tile : tiles) {
@@ -61,44 +63,101 @@ public class Game {
 		}
 	}
 	
+	/**
+	 * Alters the Subscription's footprint on the map, placing the SubscriptionLock where it is supposed
+	 * to be and removing it from areas where the Subscription no longer has a presence.
+	 * @param subscription
+	 * @param oldBounds
+	 * @param newBounds
+	 */
 	void adjustBounds(Subscription subscription, RectangleBoundary oldBounds, RectangleBoundary newBounds) {
-		/*
-		 * Plant new stakes and dig up old ones. If any overlap is detected, create a new subscriptionLock
-		 * and reset the locks for both subscriptions
-		 */
-		
-		Collection<Coordinates> nTiles = oldBounds.getDifference(newBounds);
+		Collection<Coordinates> nTiles = null;
+		if (oldBounds != null) {
+			nTiles = oldBounds.getDifference(newBounds);
+		} else {
+			nTiles = newBounds.getBetween();
+		}
 		
 		getTiles(nTiles); //load tiles if they aren't already loaded
 		
 		//plant new stakes
 		for (Coordinates position : nTiles) {
 			Plot plot = dungeons.get(new Long(position.getDungeon())).get(position);
-			if (plot.getStake() != null && plot.getStake() == subscription.getLock()) {
-				overlapDetected(subscription, plot.getStake().getSubscribers(), plot.getStake());
-			} else {
-				plot.setStake(subscription.getLock());
+			synchronized (plot) {
+				plot.addSubscriber(subscription);
+				subscription.enqueueUpdate(plot.getPlot());
 			}
 		}
 		
-		//remove old stakes, deal with the possibility that you aren't the only subscriber
+		if (oldBounds != null) {
+			//remove old stakes
+			Collection<Coordinates> oTiles = newBounds.getDifference(oldBounds);
+			for (Coordinates position : oTiles) {
+				Plot plot = dungeons.get(new Long(position.getDungeon())).get(position);
+				synchronized (plot) {
+					plot.removeSubscriber(subscription);
+				}
+			}
+		}
 		
+		subscription.setBounds(newBounds);
+		
+		subscription.flushUpdates();
 	}
 	
+	public int getSubscription(ClientKey key) {
+		int ID = key.getNextID();
+		key.addSubscriber(new Subscription(this, key.getUserLink(), ID), ID);
+		adjustBounds(key.getSubscriber(ID), null, db.lastSubscriptionBounds(key));
+		return ID;
+	}
+	
+	/*
+	 * Obsolete since the getLocks() method
+	 */
 	private void overlapDetected(Subscription sub1, Collection<Subscription> sub2, SubscriptionLock otherLock) {
-		synchronized (otherLock) {
-			for (Subscription subscription : sub2) {
-				subscription.updateLock(sub1.getLock());
-			}
+		for (Subscription subscription : sub2) {
+			subscription.updateLock(sub1.getLock());
 		}
+	}
+	
+	private void severOverlap(Subscription subscription, SubscriptionLock lock) {
+		lock.removeSubscriber(subscription);
+		
+		SubscriptionLock nLock = new SubscriptionLock();
+		subscription.updateLock(nLock);
+		nLock.addSubscriber(subscription);
 	}
 	
 	/**
 	 * Returns tiles at the desired locations, pulling from the database if necessary. This is a valid way to
 	 * load tiles from the database.
+	 * @param locations
+	 * @return a Collection of tiles retrieved
 	 */
 	Collection<Tile> getTiles(Collection<Coordinates> locations) {
-		return null;
+		
+		Collection<Coordinates> dbLocations = new LinkedList<Coordinates>();
+		Collection<Tile> tiles = new LinkedList<Tile>();
+		for (Coordinates location : locations) {
+			if (!dungeons.containsKey(new Long(location.getDungeon()))) {
+				dungeons.put(new Long(location.getDungeon()), new HashMap<Coordinates, Plot>());
+			}
+			if (!dungeons.get(new Long(location.getDungeon())).containsKey(location)) {
+				dbLocations.add(location);
+			} else {
+				tiles.add(dungeons.get(new Long(location.getDungeon())).get(location).getPlot());
+			}
+		}
+		
+		Collection<Tile> dbTiles = db.getTiles(dbLocations);
+		for (Tile tile : dbTiles) {
+			dungeons.get(new Long(tile.getLocation().getDungeon())).put(tile.getLocation(), new Plot(tile));
+		}
+		tiles.addAll(dbTiles);
+		
+		
+		return tiles;
 	}
 	
 	public boolean register(String username, String password) {
@@ -124,7 +183,7 @@ public class Game {
 		return key;
 	}
 	
-	public Watcher getSubscription(ClientKey key) {
+	public Watcher getWatcher(ClientKey key) {
 		Watcher subscription = null;
 		if (keys.containsKey(key)) {
 			subscription = new Watcher(key.getUserLink(), key.getNumSubscriptions());
@@ -150,7 +209,13 @@ public class Game {
 		return subscription;
 	}
 	
-	public boolean moveSubscription(ClientKey key, Watcher sub, RectangleBoundary bounds, Coordinates oldLocation, Coordinates newLocation) {
+	public boolean moveSubscription(
+			ClientKey key,
+			Watcher sub,
+			RectangleBoundary bounds,
+			Coordinates oldLocation,
+			Coordinates newLocation)
+	{
 		boolean success = false;
 		if (keys.containsKey(key)) {
 			switch (key.getPriveleges()) {

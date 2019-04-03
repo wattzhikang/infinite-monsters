@@ -19,14 +19,20 @@ public class StrategyModificationMS implements Strategy {
 				new Coordinates(info.getxL(), info.getyL()),
 				new Coordinates(info.getxR(), info.getyU())
 		);
+		Coordinates nPlayerLocation = new Coordinates(
+				info.getNewPlayerX(),
+				info.getNewPlayerY()
+		);
 		
 		StrategyModificationMSSuccess success = null;
 		
-		if (game.moveSubscription(client.getKey(), client.getSubscription(info.getSubscriptionID()), bounds, new Coordinates(info.getOldPlayerX(), info.getOldPlayerY()), new Coordinates(info.getNewPlayerX(), info.getNewPlayerY())) == true) {
-			success = new StrategyModificationMSSuccess(true);
-		} else {
-			success = new StrategyModificationMSSuccess(false);
-		}
+//		if (game.moveSubscription(client.getKey(), client.getSubscription(info.getSubscriptionID()), bounds, new Coordinates(info.getOldPlayerX(), info.getOldPlayerY()), new Coordinates(info.getNewPlayerX(), info.getNewPlayerY())) == true) {
+//			success = new StrategyModificationMSSuccess(true);
+//		} else {
+//			success = new StrategyModificationMSSuccess(false);
+//		}
+		
+		client.getKey().getSubscriber(info.getSubscriptionID()).move(bounds, nPlayerLocation);
 		
 		socket.writeString(
 				(new Gson())

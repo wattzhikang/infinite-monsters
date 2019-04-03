@@ -26,15 +26,12 @@ class FullyLocalTest {
 				socket = new Socket("localhost", ServerCore.PORT);
 				break;
 			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
 				//e.printStackTrace();
 				fail("Unknown host");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				fail("IOException");
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				fail("Interrupted");
 			}
