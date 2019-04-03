@@ -104,8 +104,7 @@ public class Game {
 	}
 	
 	public int getSubscription(ClientKey key) {
-		int ID = key.getNextID();
-		key.addSubscriber(new Subscription(this, key.getUserLink(), ID), ID);
+		int ID = key.addSubscriber(new Subscription(this, key.getUserLink()));
 		adjustBounds(key.getSubscriber(ID), null, db.lastSubscriptionBounds(key));
 		return ID;
 	}

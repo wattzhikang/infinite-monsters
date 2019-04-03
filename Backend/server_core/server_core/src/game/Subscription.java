@@ -29,8 +29,7 @@ public class Subscription {
 	
 	RectangleBoundary bounds;
 	
-	public Subscription(Game game, Client client, int ID) {
-		this.subscriptionID = ID;
+	public Subscription(Game game, Client client) {
 		this.lock = new SubscriptionLock();
 		this.overlaps = new HashMap<Subscription, Integer>();
 		this.lockHierarchy = new ArrayList<Subscription>();
@@ -38,6 +37,10 @@ public class Subscription {
 		this.queuedUpdates = new ArrayList<Tile>();
 		this.client = client;
 		this.game = game;
+	}
+	
+	void setID(int ID) {
+		this.subscriptionID = ID;
 	}
 	
 	SubscriptionLock getLock() {
