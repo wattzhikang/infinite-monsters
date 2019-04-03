@@ -46,6 +46,12 @@ public class ClientKey {
 	 */
 	private int IDs = -1;
 	
+	/**
+	 * Constructs a new ClientKey
+	 * @param username The username of the Client
+	 * @param client The Client object itself
+	 * @param privileges The privilege level of the Client
+	 */
 	public ClientKey(String username, Client client, Privileges privileges) {
 		this.user = username;
 		userLink = client;
@@ -54,33 +60,57 @@ public class ClientKey {
 		subscribers = new HashMap<Integer, Subscription>();
 	}
 
+	/**
+	 * Returns the privilege level of the Client
+	 * @return
+	 */
 	public Privileges getPriveleges() {
 		return priveleges;
 	}
 	
+	/**
+	 * Returns the username of the Client
+	 * @return
+	 */
 	public String getUser() {
 		return user;
 	}
 	
+	/**
+	 * Returns the Client object of the client
+	 * @return
+	 */
 	public Client getUserLink() {
 		return userLink;
 	}
 	
-	public int getNextID() {
-		return IDs;
-	}
-	
-	public int addSubscriber(Subscription subscription) {
+	/**
+	 * Adds a subscription, automatically assigning it a subscription ID.
+	 * @param subscription
+	 * @return The ID assigned to the added subscription
+	 */
+	int addSubscriber(Subscription subscription) {
 		subscribers.put(new Integer(IDs), subscription);
 		subscription.setID(IDs);
 		return IDs++;
 	}
+	
+	/**
+	 * Returns the subscription identified by the ID
+	 * @param ID
+	 * @return
+	 */
 	public Subscription getSubscriber(int ID) {
 		return subscribers.get(ID);
 	}
+	
+	/**
+	 * This unsubscribes every single subscription from the game
+	 */
 	public void unsubscribeAll() {
 		for (Entry<Integer, Subscription> subscriber : subscribers.entrySet()) {
 			subscriber.getValue().unsubscribe();
 		}
+		subscribers = new HashMap<Integer, Subscription>();
 	}
 }
