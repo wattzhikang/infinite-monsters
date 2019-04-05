@@ -1,7 +1,7 @@
 package game;
 
 public class Tile {
-	private Coordinates location;
+	private Position location;
 	private boolean walkable;
 	private String terrain;
 	private String object;
@@ -11,7 +11,7 @@ public class Tile {
 		return character;
 	}
 
-	public Tile(Coordinates location, boolean walkable, String terrain, String object, String character) {
+	public Tile(Position location, boolean walkable, String terrain, String object, String character) {
 		this.location = location;
 		this.walkable = walkable;
 		this.terrain = terrain;
@@ -19,11 +19,11 @@ public class Tile {
 		this.character = character;
 	}
 	
-	public Tile(Coordinates location) {
+	public Tile(Position location) {
 		this.location = location;
 	}
 	
-	public Coordinates getLocation() {
+	public Position getLocation() {
 		return location;
 	}
 
@@ -37,6 +37,10 @@ public class Tile {
 
 	public String getObject() {
 		return object;
+	}
+	
+	public void setObject(String object) {
+		this.object = object;
 	}
 	
 	public String toString() {

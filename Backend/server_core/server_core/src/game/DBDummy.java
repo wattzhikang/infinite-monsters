@@ -11,49 +11,49 @@ public class DBDummy implements DBInterface {
 	private static final String grass = "greenGrass1";
 	private static final String barrier = "genericBarrier1";
 	
-	private RectangleBoundary bounds = new RectangleBoundary(new Coordinates(0,0), new Coordinates(3,2));
+	private RectangleBoundary bounds = new RectangleBoundary(new Position(0,0,0), new Position(3,2,0));
 	
-	private Map<Coordinates, Tile> database;
+	private Map<Position, Tile> database;
 	
 	public DBDummy() {
-		database = new HashMap<Coordinates, Tile>();
+		database = new HashMap<Position, Tile>();
 		
-		Coordinates tmp;
+		Position tmp;
 		
-		tmp = new Coordinates(0,0);
+		tmp = new Position(0,0,0);
 		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
-		tmp = new Coordinates(1,0);
+		tmp = new Position(1,0,0);
 		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
-		tmp = new Coordinates(2,0);
+		tmp = new Position(2,0,0);
 		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
-		tmp = new Coordinates(3,0);
+		tmp = new Position(3,0,0);
 		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
-		tmp = new Coordinates(0,1);
+		tmp = new Position(0,1,0);
 		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
-		tmp = new Coordinates(1,1);
+		tmp = new Position(1,1,0);
 		database.put(tmp, new Tile(tmp, false, grass, null, "lance"));
 		
-		tmp = new Coordinates(2,1);
+		tmp = new Position(2,1,0);
 		database.put(tmp, new Tile(tmp, false, grass, null, null));
 		
-		tmp = new Coordinates(3,1);
+		tmp = new Position(3,1,0);
 		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
-		tmp = new Coordinates(0,2);
+		tmp = new Position(0,2,0);
 		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
-		tmp = new Coordinates(1,2);
+		tmp = new Position(1,2,0);
 		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
-		tmp = new Coordinates(2,2);
+		tmp = new Position(2,2,0);
 		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
-		tmp = new Coordinates(3,2);
+		tmp = new Position(3,2,0);
 		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 	}
 
@@ -84,9 +84,9 @@ public class DBDummy implements DBInterface {
 	}
 
 	@Override
-	public Collection<Tile> getTiles(Collection<Coordinates> locations) {
+	public Collection<Tile> getTiles(Collection<Position> locations) {
 		List<Tile> tiles = new LinkedList<Tile>();
-		for (Coordinates location : locations) {
+		for (Position location : locations) {
 			if (database.containsKey(location)) {
 				tiles.add(database.get(location));
 			}

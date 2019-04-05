@@ -14,7 +14,6 @@ import com.mysql.cj.protocol.Message;
 
 import game.ClientKey;
 import game.Game;
-import game.Watcher;
 
 public class Client extends Thread {
 	private SocketAdapter socket;
@@ -24,7 +23,6 @@ public class Client extends Thread {
 	private ClientListener in;
 	
 	private ClientKey key;
-	private Map<Integer, Watcher> subscriptions;
 	
 	boolean active = true;
 	
@@ -34,9 +32,8 @@ public class Client extends Thread {
 		
 		queue = new LinkedBlockingQueue<SocketMessage>();
 		in = (socket != null) ? 
-				new ClientListener(socket, queue) : null;
-				
-		subscriptions = new HashMap<Integer, Watcher>();
+				new ClientListener(socket, queue) : null
+		;
 	}
 
 	public void run() {
@@ -61,14 +58,6 @@ public class Client extends Thread {
 	
 	public ClientKey getKey() {
 		return key;
-	}
-	
-	public void addSubscription(Watcher subscription) {
-		subscriptions.put(new Integer(subscription.getId()), subscription);
-	}
-	
-	public Watcher getSubscription(int id) {
-		return subscriptions.get(new Integer(id));
 	}
 	
 	public void shutDown() throws InterruptedException {

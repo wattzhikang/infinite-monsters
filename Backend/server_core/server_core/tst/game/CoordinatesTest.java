@@ -10,13 +10,13 @@ import org.junit.jupiter.api.Test;
 
 class CoordinatesTest {
 
-	Coordinates c1, c2, c3;
+	Position c1, c2, c3;
 	
 	@BeforeEach
 	void setUp() throws Exception {
-		c1 = new Coordinates(0,0);
-		c2 = new Coordinates(0,0);
-		c3 = new Coordinates(1,0);
+		c1 = new Position(0,0, 0l);
+		c2 = new Position(0,0, 0l);
+		c3 = new Position(1,0, 0l);
 	}
 
 	@Test
@@ -37,7 +37,7 @@ class CoordinatesTest {
 	
 	@Test
 	void testMap() {
-		Map<Coordinates, String> stringmap = new HashMap<Coordinates, String>();
+		Map<Position, String> stringmap = new HashMap<Position, String>();
 		
 		stringmap.put(c1, "string");
 		stringmap.put(c2, "string2");
