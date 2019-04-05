@@ -42,7 +42,7 @@ class DBDummyTest {
 	
 	@Test
 	void upDateSubscriptionWorks() {
-		RectangleBoundary nBound = new RectangleBoundary(new Coordinates(0,1), new Coordinates(11,12));
+		RectangleBoundary nBound = new RectangleBoundary(new Position(0,1, 0l), new Position(11,12, 0l));
 		
 		db.updateSubscriptionBounds(key0, nBound);
 		
@@ -54,8 +54,8 @@ class DBDummyTest {
 		Collection<Tile> tiles =
 				db.getTiles(
 					(new RectangleBoundary(
-						new Coordinates(0,0),
-						new Coordinates(3,3)
+						new Position(0,0, 0l),
+						new Position(3,3, 0l)
 					).getBetween()));
 		
 //		assert Coordinates.equals(new Coordinates(0,0), new Coordinates(0,0)) == true;
@@ -68,15 +68,15 @@ class DBDummyTest {
 	@Test
 	void updateTilesWorks() {
 		Collection<Tile> tile = new ArrayList<Tile>();
-		tile.add(new Tile(new Coordinates(0,0), true, null, null, null));
+		tile.add(new Tile(new Position(0,0, 0l), true, null, null, null));
 		
 		db.updateTiles(tile);
 		
 		Collection<Tile> tiles =
 				db.getTiles(
 					(new RectangleBoundary(
-						new Coordinates(0,0),
-						new Coordinates(0,0)
+						new Position(0,0, 0l),
+						new Position(0,0, 0l)
 					).getBetween()));
 		
 		System.out.println(tiles.iterator().next());

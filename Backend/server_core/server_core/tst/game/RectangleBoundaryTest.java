@@ -15,17 +15,17 @@ class RectangleBoundaryTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		bound1 = new RectangleBoundary(
-				new Coordinates(0,0),
-				new Coordinates(2,2));
+				new Position(0,0, 0l),
+				new Position(2,2, 0l));
 		
 		bound2 = new RectangleBoundary(
-				new Coordinates(0,0),
-				new Coordinates(0,0));
+				new Position(0,0, 0l),
+				new Position(0,0, 0l));
 	}
 
 	@Test
 	void betweenTest() {
-		Collection<Coordinates> between = bound1.getBetween();
+		Collection<Position> between = bound1.getBetween();
 		
 		System.out.println("Number of tiles: " + between.size());
 		

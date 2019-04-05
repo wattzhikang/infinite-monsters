@@ -12,7 +12,7 @@ import server_core.DeltaFrame;
 public class Subscription {
 	long dungeon;
 	Tile[][] map;
-	Coordinates player;
+	Position player;
 	
 	SubscriptionLock lock;
 	
@@ -61,7 +61,7 @@ public class Subscription {
 	void unsubscribe() {
 		//TODO
 	}
-	public void move(RectangleBoundary nBounds, Coordinates nPlayerLocation) {
+	public void move(RectangleBoundary nBounds, Position nPlayerLocation) {
 		game.adjustBounds(this, bounds, nBounds);
 		
 		lockNeighbors();

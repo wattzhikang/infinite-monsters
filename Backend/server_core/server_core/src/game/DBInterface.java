@@ -9,7 +9,7 @@ public interface DBInterface {
 	public RectangleBoundary lastSubscriptionBounds(ClientKey key);
 	public void updateSubscriptionBounds(ClientKey key, RectangleBoundary bounds);
 	
-	public Collection<Tile> getTiles(Collection<Coordinates> locations);
+	public Collection<Tile> getTiles(Collection<Position> locations);
 	public void updateTiles(Collection<Tile> tiles);
 	
 	public void close();

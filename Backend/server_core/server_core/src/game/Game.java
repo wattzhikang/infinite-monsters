@@ -33,7 +33,7 @@ public class Game {
 	 * A Map of all dungeons within the game. Each dungeon is itself, of course,
 	 * a map unto itself.
 	 */
-	private Map<Long, Map<Coordinates, Plot>> dungeons;
+	private Map<Long, Map<Position, Plot>> dungeons;
 	
 
 	/**
@@ -44,7 +44,7 @@ public class Game {
 		this.db = db;
 		keys = new ConcurrentHashMap<ClientKey, Object>();
 		
-		dungeons = new HashMap<Long, Map<Coordinates, Plot>>();
+		dungeons = new HashMap<Long, Map<Position, Plot>>();
 	}
 	
 	/**
@@ -69,7 +69,7 @@ public class Game {
 	 * @param newBounds
 	 */
 	void adjustBounds(Subscription subscription, RectangleBoundary oldBounds, RectangleBoundary newBounds) {
-		Collection<Coordinates> nTiles = null;
+		Collection<Position> nTiles = null;
 		if (oldBounds != null) {
 			nTiles = oldBounds.getDifference(newBounds);
 		} else {
@@ -79,7 +79,7 @@ public class Game {
 		getTiles(nTiles); //load tiles if they aren't already loaded
 		
 		//plant new stakes
-		for (Coordinates position : nTiles) {
+		for (Position position : nTiles) {
 			Plot plot = dungeons.get(new Long(position.getDungeon())).get(position);
 			synchronized (plot) {
 				plot.addSubscriber(subscription);
@@ -89,8 +89,8 @@ public class Game {
 		
 		if (oldBounds != null) {
 			//remove old stakes
-			Collection<Coordinates> oTiles = newBounds.getDifference(oldBounds);
-			for (Coordinates position : oTiles) {
+			Collection<Position> oTiles = newBounds.getDifference(oldBounds);
+			for (Position position : oTiles) {
 				Plot plot = dungeons.get(new Long(position.getDungeon())).get(position);
 				synchronized (plot) {
 					plot.removeSubscriber(subscription);
@@ -132,13 +132,13 @@ public class Game {
 	 * @param locations
 	 * @return a Collection of tiles retrieved
 	 */
-	Collection<Tile> getTiles(Collection<Coordinates> locations) {
+	Collection<Tile> getTiles(Collection<Position> locations) {
 		
-		Collection<Coordinates> dbLocations = new LinkedList<Coordinates>();
+		Collection<Position> dbLocations = new LinkedList<Position>();
 		Collection<Tile> tiles = new LinkedList<Tile>();
-		for (Coordinates location : locations) {
+		for (Position location : locations) {
 			if (!dungeons.containsKey(new Long(location.getDungeon()))) {
-				dungeons.put(new Long(location.getDungeon()), new HashMap<Coordinates, Plot>());
+				dungeons.put(new Long(location.getDungeon()), new HashMap<Position, Plot>());
 			}
 			if (!dungeons.get(new Long(location.getDungeon())).containsKey(location)) {
 				dbLocations.add(location);

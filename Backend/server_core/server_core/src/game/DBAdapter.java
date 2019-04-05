@@ -156,7 +156,7 @@ public class DBAdapter implements DBInterface {
 	}
 
 	@Override
-	public Collection<Tile> getTiles(Collection<Coordinates> locations) {
+	public Collection<Tile> getTiles(Collection<Position> locations) {
 		// TODO Auto-generated method stub
 		return null;
 	}

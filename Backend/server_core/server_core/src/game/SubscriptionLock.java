@@ -34,7 +34,7 @@ class SubscriptionLock extends ReentrantLock {
 	 * @param position
 	 * @return
 	 */
-	boolean hasOverlap(Subscription subscription, Coordinates position) {
+	boolean hasOverlap(Subscription subscription, Position position) {
 		for (Subscription otherSub : subscribers) {
 			if (otherSub != subscription && otherSub.getBounds().isAt(position)) {
 				return true;
@@ -50,8 +50,8 @@ class SubscriptionLock extends ReentrantLock {
 	 * @return
 	 */
 	boolean hasOverlap(Subscription subscription) {
-		Collection<Coordinates> positions = subscription.getBounds().getBetween();
-		for (Coordinates position : positions) {
+		Collection<Position> positions = subscription.getBounds().getBetween();
+		for (Position position : positions) {
 			if (hasOverlap(subscription, position)) {
 				return true;
 			}
