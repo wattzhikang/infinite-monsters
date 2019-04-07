@@ -19,15 +19,14 @@ import org.springframework.stereotype.Component;
 /**
  * 
  * @author Vamsi Krishna Calpakkam
+ * @author Zachariah Watt
  *
  */
 @ServerEndpoint("/websocket/{username}")
 @Component
 public class WebSocketServer {
-	
-	// Store all socket session and their corresponding username.
-    private static Map<Session, String> sessionUsernameMap = new HashMap<>();
-    private static Map<String, Session> usernameSessionMap = new HashMap<>();
+    
+    private static Map<Session, Transnection> serverCoreSockets = new HashMap<Session, Transnection>();
     
     private final Logger logger = LoggerFactory.getLogger(WebSocketServer.class);
     
@@ -37,13 +36,8 @@ public class WebSocketServer {
     	      @PathParam("username") String username) throws IOException 
     {
         logger.info("Entered into Open");
-        
-        sessionUsernameMap.put(session, username);
-        usernameSessionMap.put(username, session);
-        
-        String message="User:" + username + " has Joined the Chat";
-        	broadcast(message);
 		
+        serverCoreSockets.put(session, new Transnection(session));
     }
  
     @OnMessage
@@ -51,31 +45,18 @@ public class WebSocketServer {
     {
         // Handle new messages
     	logger.info("Entered into Message: Got Message:"+message);
-    	String username = sessionUsernameMap.get(session);
     	
-    	if (message.startsWith("@")) // Direct message to a user using the format "@username <message>"
-    	{
-    		String destUsername = message.split(" ")[0].substring(1); // don't do this in your code!
-    		sendMessageToPArticularUser(destUsername, "[DM] " + username + ": " + message);
-    		sendMessageToPArticularUser(username, "[DM] " + username + ": " + message);
-    	}
-    	else // Message to whole chat
-    	{
-	    	broadcast(username + ": " + message);
-    	}
+    	serverCoreSockets.get(session).onMessage(message);
     }
  
     @OnClose
     public void onClose(Session session) throws IOException
     {
-    	logger.info("Entered into Close");
-    	
-    	String username = sessionUsernameMap.get(session);
-    	sessionUsernameMap.remove(session);
-    	usernameSessionMap.remove(username);
+    	logger.info("Closing a socket");
         
-    	String message= username + " disconnected";
-        broadcast(message);
+        for (Map.Entry<Session, Transnection> transnection : serverCoreSockets.entrySet()) {
+        	transnection.getValue().close();
+        }
     }
  
     @OnError
@@ -83,30 +64,10 @@ public class WebSocketServer {
     {
         // Do error handling here
     	logger.info("Entered into Error");
-    }
-    
-	private void sendMessageToPArticularUser(String username, String message) 
-    {	
-    	try {
-    		usernameSessionMap.get(username).getBasicRemote().sendText(message);
-        } catch (IOException e) {
-        	logger.info("Exception: " + e.getMessage().toString());
-            e.printStackTrace();
+    	
+        for (Map.Entry<Session, Transnection> transnection : serverCoreSockets.entrySet()) {
+        	transnection.getValue().close();
         }
     }
-    
-    private static void broadcast(String message) 
-    	      throws IOException 
-    {	  
-    	sessionUsernameMap.forEach((session, username) -> {
-    		synchronized (session) {
-	            try {
-	                session.getBasicRemote().sendText(message);
-	            } catch (IOException e) {
-	                e.printStackTrace();
-	            }
-	        }
-	    });
-	}
 }
 
