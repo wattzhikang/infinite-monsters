@@ -11,7 +11,7 @@ import java.util.concurrent.BlockingQueue;
 import game.DBInterface;
 import game.Game;
 
-public class ConnectionListener extends Thread{
+public class ConnectionListenerTCP extends Thread{
 	private ServerSocket listener;
 	
 	private List<Client> clientList;
@@ -19,13 +19,13 @@ public class ConnectionListener extends Thread{
 	private DBInterface db;
 	private Game game;
 	
-	public ConnectionListener(DBInterface db, Game game) {
+	public ConnectionListenerTCP(DBInterface db, Game game) {
 		super();
 		this.clientList = new LinkedList<Client>();
 		this.db = db;
 		this.game = game;
 		try {
-			listener = new ServerSocket(ServerCore.PORT);
+			listener = new ServerSocket(ServerCore.PORT_TCP);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -46,7 +46,7 @@ public class ConnectionListener extends Thread{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			Client newClient = new Client(new SocketAdapter(newConnection), game);
+			Client newClient = new Client(new SocketAdapterTCP(newConnection), game);
 			clientList.add(newClient);
 			newClient.start();
 		}
