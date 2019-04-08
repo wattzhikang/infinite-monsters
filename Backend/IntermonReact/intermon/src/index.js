@@ -3,6 +3,47 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 
+var connection = {
+    socket: null,
+    queue : [],
+    instantiate : () => {
+        if (connection.isOpen) {
+            connection.socket = new WebSocket('ws://localhost:8080/websocket/zw');
+            connection.socket.onmessage = function(event) {
+                alert("Message received: " + event.data);
+            };
+            connection.socket.onopen = function(event) {
+                for (let string of connection.queue) {
+                    connection.send(string);
+                }
+            }
+        }
+    },
+    isOpen : () => {
+        if (connection.socket && connection.socket.readyState === 1) {
+            return true;
+        } else {
+            return false;
+        }
+    },
+    send : (string) => {
+        if (!connection.isOpen()) {
+            connection.queue.push(string);
+        } else {
+            connection.socket.send(string);
+        }
+    },
+    close : () => {
+        connection.socket.close();
+    },
+}
+
+function Credentials(name, password) {
+    this.requestType = "authentication";
+    this.name = name;
+    this.password = password;
+}
+
 class Login extends React.Component {
     constructor(props) {
         super(props);
@@ -28,6 +69,10 @@ class Login extends React.Component {
             + this.state.password
         );
         event.preventDefault();
+        connection.instantiate();
+        connection.send(
+            JSON.stringify(new Credentials(this.state.name, this.state.password))
+        );
     }
     
     render() {
