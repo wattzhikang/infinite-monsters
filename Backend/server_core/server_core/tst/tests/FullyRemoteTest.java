@@ -22,7 +22,7 @@ class FullyRemoteTest {
 		for (int i = 0; i < 5; i++) {
 			try {
 				Thread.sleep(1000);
-				socket = new Socket(SERVERURL, ServerCore.PORT);
+				socket = new Socket(SERVERURL, ServerCore.PORT_TCP);
 				break;
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block

@@ -11,7 +11,8 @@ import game.Game;
 import java.sql.*;
 
 public class ServerCore {
-	public static final int PORT = 10042;
+	public static final int PORT_TCP = 10042;
+	public static final int PORT_WEB = 10043;
 	public static final String DEBUG = "debug";
 
 	public static void main(String[] args) {
@@ -19,7 +20,7 @@ public class ServerCore {
 			System.out.println(string);
 		}
 		DBInterface db = null;
-		if (args.length > 1 && args[1].equals(DEBUG)) {
+		if (args.length > 0 && args[0].equals(DEBUG)) {
 			db = new DBDummy();
 		} else {
 			db = new DBAdapter();
@@ -27,7 +28,7 @@ public class ServerCore {
 		
 		Game game = new Game(db);
 		
-		ConnectionListener socketListener = new ConnectionListener(db, game);
+		ConnectionListenerTCP socketListener = new ConnectionListenerTCP(db, game);
 		
 		socketListener.start();
 		
@@ -35,11 +36,11 @@ public class ServerCore {
 	}
 	
 	private static class ShutdownHook extends Thread {
-		ConnectionListener socketListener;
+		ConnectionListenerTCP socketListener;
 		DBInterface db;
 		Game game;
 		
-		public ShutdownHook(ConnectionListener socketListener, DBInterface db, Game game) {
+		public ShutdownHook(ConnectionListenerTCP socketListener, DBInterface db, Game game) {
 			this.socketListener = socketListener;
 			this.db = db;
 		}

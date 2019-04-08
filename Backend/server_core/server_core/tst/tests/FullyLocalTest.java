@@ -23,7 +23,7 @@ class FullyLocalTest {
 		for (int i = 0; i < 5; i++) {
 			try {
 				Thread.sleep(1000);
-				socket = new Socket("localhost", ServerCore.PORT);
+				socket = new Socket("localhost", ServerCore.PORT_TCP);
 				break;
 			} catch (UnknownHostException e) {
 				//e.printStackTrace();
