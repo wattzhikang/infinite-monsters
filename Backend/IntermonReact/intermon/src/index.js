@@ -115,30 +115,146 @@ class Login extends React.Component {
     }
 }
 
+function Tile(x, y, walkable, terrainType, object, character) {
+    this.x = x;
+    this.y = y;
+    this.walkable = walkable;
+    this.terrainType = terrainType;
+    this.object = object;
+    this.character = character;
+}
+
+class MapRow extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        const tiles = this.props.row.map((element, i) => {
+            if (element.character !== null) {
+                return (
+                    <span key={i}>Tile({element.character})</span>
+                );
+            } else {
+                return (
+                    <span key={i}>Tile({element.x},{element.y})</span>
+                );
+            }
+        });
+        
+        return (
+            <div>{tiles}</div>
+        );
+    }
+}
+
 class Game extends React.Component {
     constructor(props) {
         super(props);
+
         connection.game = this;
-        this.map = null;
+
+        this.width = 0;
+        this.height = 0;
+
+        this.state = {
+            map: []
+        }
+
+        this.map = this.state.map;
     }
 
     receivedDeltaFrame(deltaframe) {
-        if (this.map = null) {
-            this.map = Array(
-                (deltaframe.xR - deltaframe.xL)
-                * (deltaframe.yU - deltaframe.yL)
-            ).fill(null);
+        //the dimensions may have changed and tiles
+        //hay have to be shifted
+        this.width = deltaframe.xR - deltaframe.xL + 1;
+        this.height = deltaframe.yU - deltaframe.yL + 1;
+
+        //take out tile refugees
+        let tmpTiles = [];
+        if (this.map !== null) {
+            for (let row of this.state.map) {
+                for (let tile of row) {
+                    tmpTiles.push(tile);
+                }
+            }
         }
+
+        //first adjust the array to the appropriate size
+        this.map = Array(this.height).fill(null);
+        for (let i = 0; i < this.map.length; i++) {
+            this.map[i] = Array(this.width).fill(null);
+        }
+
+        //relocate refugees
+        for (let refugee of tmpTiles) {
+            this.map
+                [refugee.y - deltaframe.yL]
+                [refugee.x - deltaframe.xL]
+            = refugee;
+        }
+
+        //then hash tne new ones in
+        for (let object of deltaframe.tiles) {
+            let tmpTile = new Tile(
+                object.x,
+                object.y,
+                object.walkable,
+                object.terrainType,
+                object.character
+            );
+            console.log(tmpTile.y - deltaframe.yL);
+            this.map
+                [tmpTile.y - deltaframe.yL]
+                [tmpTile.x - deltaframe.xL]
+            = tmpTile;
+        }
+
+        this.setState({
+            map: this.map.slice()
+        }); //rerenders here
     }
 
-    testShowHistory() {
+    left() {
+        console.log("Moving left");
+    }
+
+    right() {
+
+    }
+
+    up() {
+
+    }
+
+    down() {
 
     }
 
     render() {
-        return (
-            <h1>Here haveth game</h1>
-        );
+        if (this.state.map !== null) {
+
+            const tileRows = this.state.map.reverse().map((element, i) => {
+                return (
+                    <li key={i}><MapRow row={element}/></li>
+                )
+            })
+
+            console.log(tileRows);
+            return (
+                <div>
+                    <ol>{tileRows}</ol>
+                    <button id="leftButton" type="button" onClick={this.left}>Left</button>
+                    <button id="upButton" type="button">Up</button>
+                    <button id="downButton" type="button">Down</button>
+                    <button id="rightButton" type="button">Right</button>
+                </div>
+            );
+        } else {
+            return (
+                <h1>Here haveth game</h1>
+            );
+        }
     }
 }
 
