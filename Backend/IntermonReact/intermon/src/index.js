@@ -122,6 +122,28 @@ function RequestSubscription() {
     this.requestType = "subscription";
 }
 
+//also a dummy class for JSON parsing
+function ModMoveSubscription(
+    subscriptionID,
+    xL, xR,
+    yU, yL,
+    oldPlayerX,
+    oldPlayerY,
+    newPlayerX,
+    newPlayerY
+) {
+    this.requestType = "mod_move_subscription";
+    this.subscriptionID = subscriptionID;
+    this.xL = xL;
+    this.xR = xR;
+    this.yU = yU;
+    this.yL = yL;
+    this.oldPlayerX = oldPlayerX;
+    this.oldPlayerY = oldPlayerY;
+    this.newPlayerX = newPlayerX;
+    this.newPlayerY = newPlayerY;
+};
+
 //Defines the Login component
 class Login extends React.Component {
     constructor(props) {
@@ -217,11 +239,91 @@ class Game extends React.Component {
         }
 
         this.map = this.state.map;
+
+        this.left = () => {
+            console.log("Moving left");
+            let move = new ModMoveSubscription(
+                this.subscriptionID,
+                this.xAbsL, //TODO move bounds as well
+                this.xAbsR, //TODO move bounds as well
+                this.yAbsU, //TODO move bounds as well
+                this.yAbsL, //TODO move bounds as well
+                this.playerX,
+                this.playerY,
+                this.playerX - 1,
+                this.playerY,
+            );
+    
+            connection.send(JSON.stringify(
+                move
+            ));
+        };
+
+        this.right = () => {
+            console.log("Moving right");
+            let move = new ModMoveSubscription(
+                this.subscriptionID,
+                this.xAbsL, //TODO move bounds as well
+                this.xAbsR, //TODO move bounds as well
+                this.yAbsU, //TODO move bounds as well
+                this.yAbsL, //TODO move bounds as well
+                this.playerX,
+                this.playerY,
+                this.playerX + 1,
+                this.playerY,
+            );
+
+            console.log(move);
+            console.log(JSON.stringify(move));
+    
+            connection.send(JSON.stringify(move));
+        };
+
+        this.up = () => {
+            console.log("Moving up");
+            let move = new ModMoveSubscription(
+                this.subscriptionID,
+                this.xAbsL, //TODO move bounds as well
+                this.xAbsR, //TODO move bounds as well
+                this.yAbsU, //TODO move bounds as well
+                this.yAbsL, //TODO move bounds as well
+                this.playerX,
+                this.playerY,
+                this.playerX,
+                this.playerY + 1,
+            );
+    
+            connection.send(JSON.stringify(
+                move
+            ));
+        };
+
+        this.down = () => {
+            console.log("Moving down");
+            let move = new ModMoveSubscription(
+                this.subscriptionID,
+                this.xAbsL, //TODO move bounds as well
+                this.xAbsR, //TODO move bounds as well
+                this.yAbsU, //TODO move bounds as well
+                this.yAbsL, //TODO move bounds as well
+                this.playerX,
+                this.playerY,
+                this.playerX,
+                this.playerY - 1,
+            );
+    
+            connection.send(JSON.stringify(
+                move
+            ));
+        };
     }
 
     //unpacks the delta frame and hashes tiles into an array
     //TODO this doesn't need to be a 2D array
     receivedDeltaFrame(deltaframe) {
+        //record subscriptionID
+        this.subscriptionID = deltaframe.subscriptionID;
+        
         //the dimensions may have changed
         this.xAbsR = deltaframe.xR;
         this.xAbsL = deltaframe.xL;
@@ -257,6 +359,11 @@ class Game extends React.Component {
                 object.object,
                 object.character
             );
+
+            if (tmpTile.character != null) {
+                this.playerX = tmpTile.x;
+                this.playerY = tmpTile.y;
+            }
 
             this.map.push(tmpTile);
         }
@@ -304,10 +411,6 @@ class Game extends React.Component {
         }
     }
 
-    left() {
-        console.log("Moving left");
-    }
-
     right() {
 
     }
@@ -325,12 +428,12 @@ class Game extends React.Component {
             return (
                 <div>
                     <div><canvas id="board" width="500" height="500"></canvas></div>
-                    <div><button id="upButton" type="button">Up</button></div>
+                    <div><button id="upButton" type="button" onClick={this.up}>Up</button></div>
                     <div>
                         <button id="leftButton" type="button" onClick={this.left}>Left</button>
-                        <button id="rightButton" type="button">Right</button>
+                        <button id="rightButton" type="button" onClick={this.right}>Right</button>
                     </div>
-                    <div><button id="downButton" type="button">Down</button></div>
+                    <div><button id="downButton" type="button" onClick={this.down}>Down</button></div>
                 </div>
             );
         } else {
