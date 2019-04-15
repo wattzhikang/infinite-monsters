@@ -15,7 +15,7 @@ public class Transnection {
 	
 	public Transnection(Session session) {
 		try {
-			socket = new SocketAdapter(new Socket("localhost", SERVER_CORE_PORT));
+			socket = new SocketAdapter(new Socket("cs309-yt-1.misc.iastate.edu", SERVER_CORE_PORT));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -9,7 +9,7 @@ var connection = {
     game : null,
     instantiate : () => {
         if (connection.isOpen) {
-            connection.socket = new WebSocket('ws://localhost:8080/websocket/zw');
+            connection.socket = new WebSocket('ws://cs309-yt-1.misc.iastate.edu:8080/websocket/zw');
             connection.socket.onmessage = function(event) {
                 console.log("Message received: " + event.data);
                 let object = JSON.parse(event.data);
@@ -49,6 +49,61 @@ var connection = {
         connection.socket.close();
     },
 }
+
+// var characterImage = new Image();
+// characterImage.onload = function() {
+//     document
+//     .getElementById("board")
+//     .getContext("2d")
+//     .drawImage(characterImage, 0, 0);
+// }
+// characterImage.src = process.env.PUBLIC_URL + "/rec/character.svg";
+// console.log("Public URL: " +process.env.PUBLIC_URL);
+
+var imgLoader = new (function() {
+    //new images can be added here. They will load automatically
+    var urls = {
+        genericBarrier01 : (process.env.PUBLIC_URL + "/rec/genericBarrier_01.svg"),
+        character : (process.env.PUBLIC_URL + "/rec/character.svg"),
+    };
+
+    var allLoaded = false;
+
+    var images = {};
+    function ImageType(url) {
+        var that = this;
+        
+        this.loaded = false;
+
+        this.image = new Image();
+
+        //could have async issues
+        this.image.onload = function() {
+            that.loaded = true;
+            for (let img in images) {
+                let tmploaded = true;
+                if (img.loaded === false) {
+                    tmploaded = false;
+                }
+                allLoaded = tmploaded;
+            }
+        };
+        this.image.src = url;
+    };
+
+    for (let url in urls) {
+        images[url] = new ImageType(urls[url]);
+        console.log(urls[url]);
+    }
+
+    this.getImage = (img) => {
+        return images[img].image;
+    }
+
+    this.allLoaded = () => {
+        return allLoaded;
+    }
+})();
 
 function Credentials(name, password) {
     this.requestType = "authentication";
@@ -115,15 +170,6 @@ class Login extends React.Component {
     }
 }
 
-function Tile(x, y, walkable, terrainType, object, character) {
-    this.x = x;
-    this.y = y;
-    this.walkable = walkable;
-    this.terrainType = terrainType;
-    this.object = object;
-    this.character = character;
-}
-
 class MapRow extends React.Component {
     constructor(props) {
         super(props);
@@ -148,6 +194,15 @@ class MapRow extends React.Component {
     }
 }
 
+function Tile(x, y, walkable, terrainType, object, character) {
+    this.x = x;
+    this.y = y;
+    this.walkable = walkable;
+    this.terrainType = terrainType;
+    this.object = object;
+    this.character = character;
+}
+
 class Game extends React.Component {
     constructor(props) {
         super(props);
@@ -156,6 +211,8 @@ class Game extends React.Component {
 
         this.width = 0;
         this.height = 0;
+
+        this.board = document.getElementById("board");
 
         this.state = {
             map: []
@@ -201,9 +258,10 @@ class Game extends React.Component {
                 object.y,
                 object.walkable,
                 object.terrainType,
+                object.object,
                 object.character
             );
-            console.log(tmpTile.y - deltaframe.yL);
+
             this.map
                 [tmpTile.y - deltaframe.yL]
                 [tmpTile.x - deltaframe.xL]
@@ -213,6 +271,49 @@ class Game extends React.Component {
         this.setState({
             map: this.map.slice()
         }); //rerenders here
+
+        this.canvasRender();
+    }
+
+    canvasRender() {
+        //just display some of the sprites to prove
+        //that your loader code works
+        if (imgLoader.allLoaded) {
+            var context = document
+                .getElementById("board")
+                .getContext("2d")
+            ;
+
+            //console.log(imgLoader.getImage("character"));
+            //context.drawImage(imgLoader.getImage("character"), 0, 0);
+            //context.rect(0,0,40,40);
+            //context.stroke();
+
+            this.state.map.forEach( function(element) {
+                element.forEach( function(element) {
+                    console.log(element);
+                    //draw terrain
+                    if (element.terrainType == "greenGrass1") {
+                        context.rect(element.x * 50, element.y * 50, 50, 50);
+                    } else {
+                        context.arc(element.x * 50, element.y * 50, 50, 2 * Math.PI);
+                    }
+                    context.stroke();
+
+                    //draw object
+
+                    switch (element.object) {
+                        case "genericBarrier1" :
+                            context.drawImage(imgLoader.getImage("genericBarrier01"), element.x * 50, element.y * 50);
+                    }
+
+                    switch (element.character) {
+                        case "lance" :
+                            context.drawImage(imgLoader.getImage("character"), element.x * 50, element.y * 50);
+                    }
+                });
+            });
+        }
     }
 
     left() {
@@ -240,14 +341,22 @@ class Game extends React.Component {
                 )
             })
 
-            console.log(tileRows);
+            this.state.map.forEach((element) => {
+                element.forEach((element) => {
+                    console.log(element);
+                });
+            });
+
+
             return (
                 <div>
-                    <ol>{tileRows}</ol>
-                    <button id="leftButton" type="button" onClick={this.left}>Left</button>
-                    <button id="upButton" type="button">Up</button>
-                    <button id="downButton" type="button">Down</button>
-                    <button id="rightButton" type="button">Right</button>
+                    <div><canvas id="board" width="500" height="500"></canvas></div>
+                    <div><button id="upButton" type="button">Up</button></div>
+                    <div>
+                        <button id="leftButton" type="button" onClick={this.left}>Left</button>
+                        <button id="rightButton" type="button">Right</button>
+                    </div>
+                    <div><button id="downButton" type="button">Down</button></div>
                 </div>
             );
         } else {
