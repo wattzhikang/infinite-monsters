@@ -3,13 +3,19 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 
+//singleton that establishes a websocket connection to the server
 var connection = {
     socket: null,
     queue : [],
-    game : null,
+    game : null, //it needs the game so it knows where to send
+                 //the delta frames to
+    
+    //establishes a connection to the server
     instantiate : () => {
         if (connection.isOpen) {
             connection.socket = new WebSocket('ws://cs309-yt-1.misc.iastate.edu:8080/websocket/zw');
+            
+            //this function handles messages from the server
             connection.socket.onmessage = function(event) {
                 console.log("Message received: " + event.data);
                 let object = JSON.parse(event.data);
@@ -24,6 +30,9 @@ var connection = {
                     connection.game.receivedDeltaFrame(object);
                 }
             };
+
+            //sends messages that were waiting for the
+            //socket to finish connecting
             connection.socket.onopen = function(event) {
                 for (let string of connection.queue) {
                     connection.send(string);
@@ -39,6 +48,9 @@ var connection = {
         }
     },
     send : (string) => {
+        //if an attempt is made to send a message before the
+        //socket is open, this function enqueues the message
+        //in a queue and will be sent when it opens
         if (!connection.isOpen()) {
             connection.queue.push(string);
         } else {
@@ -50,16 +62,8 @@ var connection = {
     },
 }
 
-// var characterImage = new Image();
-// characterImage.onload = function() {
-//     document
-//     .getElementById("board")
-//     .getContext("2d")
-//     .drawImage(characterImage, 0, 0);
-// }
-// characterImage.src = process.env.PUBLIC_URL + "/rec/character.svg";
-// console.log("Public URL: " +process.env.PUBLIC_URL);
-
+//singleton that loads all the images so they can be displayed.
+//To load additional images, just add URLs to the "urls" object
 var imgLoader = new (function() {
     //new images can be added here. They will load automatically
     var urls = {
@@ -105,16 +109,20 @@ var imgLoader = new (function() {
     }
 })();
 
+//Basically a dummy class for parsing
+//the JSON stringfrom the server
 function Credentials(name, password) {
     this.requestType = "authentication";
     this.name = name;
     this.password = password;
 }
 
+//Dummy class for parsing JSON string from the server
 function RequestSubscription() {
     this.requestType = "subscription";
 }
 
+//Defines the Login component
 class Login extends React.Component {
     constructor(props) {
         super(props);
@@ -170,39 +178,29 @@ class Login extends React.Component {
     }
 }
 
-class MapRow extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        const tiles = this.props.row.map((element, i) => {
-            if (element.character !== null) {
-                return (
-                    <span key={i}>Tile({element.character})</span>
-                );
-            } else {
-                return (
-                    <span key={i}>Tile({element.x},{element.y})</span>
-                );
-            }
-        });
-        
-        return (
-            <div>{tiles}</div>
-        );
-    }
-}
-
-function Tile(x, y, walkable, terrainType, object, character) {
+//not a dummy class for JSON parsing. This is actually used
+//x and y are determined to be the RELATIVE coordinates
+function Tile(x, y, xAbs, yAbs, walkable, terrainType, object, character) {
     this.x = x;
     this.y = y;
+    this.xAbs = xAbs;
+    this.yAbs = yAbs;
     this.walkable = walkable;
     this.terrainType = terrainType;
     this.object = object;
     this.character = character;
+
+    this.inBounds = (xAbsL, xAbsR, yAbsL, yAbsU) => {
+        return (
+            xAbsL <= this.xAbs &&
+            xAbsR >= this.xAbs &&
+            yAbsL <= this.yAbs &&
+            yAbsU >= this.yAbs
+        );
+    };
 }
 
+//holds all the actual game logic
 class Game extends React.Component {
     constructor(props) {
         super(props);
@@ -221,39 +219,37 @@ class Game extends React.Component {
         this.map = this.state.map;
     }
 
+    //unpacks the delta frame and hashes tiles into an array
+    //TODO this doesn't need to be a 2D array
     receivedDeltaFrame(deltaframe) {
-        //the dimensions may have changed and tiles
-        //hay have to be shifted
+        //the dimensions may have changed
+        this.xAbsR = deltaframe.xR;
+        this.xAbsL = deltaframe.xL;
+        this.yAbsU = deltaframe.yU;
+        this.yAbsL = deltaframe.yL;
+
         this.width = deltaframe.xR - deltaframe.xL + 1;
         this.height = deltaframe.yU - deltaframe.yL + 1;
 
-        //take out tile refugees
-        let tmpTiles = [];
+        //remove tiles that are no longer within bounds
         if (this.map !== null) {
-            for (let row of this.state.map) {
-                for (let tile of row) {
-                    tmpTiles.push(tile);
+            this.map.forEach( (tile, i) => {
+                if (!tile.inBounds(
+                    this.xAbsL,
+                    this.xAbsR,
+                    this.yAbsL,
+                    this.yAbsU
+                )) {
+                    this.state.map.splice(i, 1);
                 }
-            }
-        }
-
-        //first adjust the array to the appropriate size
-        this.map = Array(this.height).fill(null);
-        for (let i = 0; i < this.map.length; i++) {
-            this.map[i] = Array(this.width).fill(null);
-        }
-
-        //relocate refugees
-        for (let refugee of tmpTiles) {
-            this.map
-                [refugee.y - deltaframe.yL]
-                [refugee.x - deltaframe.xL]
-            = refugee;
+            });
         }
 
         //then hash tne new ones in
         for (let object of deltaframe.tiles) {
             let tmpTile = new Tile(
+                object.x - deltaframe.xL,
+                object.y - deltaframe.yL,
                 object.x,
                 object.y,
                 object.walkable,
@@ -262,10 +258,7 @@ class Game extends React.Component {
                 object.character
             );
 
-            this.map
-                [tmpTile.y - deltaframe.yL]
-                [tmpTile.x - deltaframe.xL]
-            = tmpTile;
+            this.map.push(tmpTile);
         }
 
         this.setState({
@@ -275,6 +268,7 @@ class Game extends React.Component {
         this.canvasRender();
     }
 
+    //actually draws the map on the canvas
     canvasRender() {
         //just display some of the sprites to prove
         //that your loader code works
@@ -284,34 +278,28 @@ class Game extends React.Component {
                 .getContext("2d")
             ;
 
-            //console.log(imgLoader.getImage("character"));
-            //context.drawImage(imgLoader.getImage("character"), 0, 0);
-            //context.rect(0,0,40,40);
-            //context.stroke();
-
             this.state.map.forEach( function(element) {
-                element.forEach( function(element) {
-                    console.log(element);
-                    //draw terrain
-                    if (element.terrainType == "greenGrass1") {
-                        context.rect(element.x * 50, element.y * 50, 50, 50);
-                    } else {
-                        context.arc(element.x * 50, element.y * 50, 50, 2 * Math.PI);
-                    }
-                    context.stroke();
+                console.log(element);
+                //draw terrain
+                const cellWidth = 49;
+                if (element.terrainType == "greenGrass1") {
+                    context.rect(element.x * cellWidth, element.y * cellWidth, cellWidth, cellWidth);
+                } else {
+                    context.arc(element.x * cellWidth, element.y * cellWidth, cellWidth, 2 * Math.PI);
+                }
+                context.stroke();
 
-                    //draw object
+                //draw object
 
-                    switch (element.object) {
-                        case "genericBarrier1" :
-                            context.drawImage(imgLoader.getImage("genericBarrier01"), element.x * 50, element.y * 50);
-                    }
+                switch (element.object) {
+                    case "genericBarrier1" :
+                        context.drawImage(imgLoader.getImage("genericBarrier01"), element.x * 50, element.y * 50);
+                }
 
-                    switch (element.character) {
-                        case "lance" :
-                            context.drawImage(imgLoader.getImage("character"), element.x * 50, element.y * 50);
-                    }
-                });
+                switch (element.character) {
+                    case "lance" :
+                        context.drawImage(imgLoader.getImage("character"), element.x * 50, element.y * 50);
+                }
             });
         }
     }
@@ -334,20 +322,6 @@ class Game extends React.Component {
 
     render() {
         if (this.state.map !== null) {
-
-            const tileRows = this.state.map.reverse().map((element, i) => {
-                return (
-                    <li key={i}><MapRow row={element}/></li>
-                )
-            })
-
-            this.state.map.forEach((element) => {
-                element.forEach((element) => {
-                    console.log(element);
-                });
-            });
-
-
             return (
                 <div>
                     <div><canvas id="board" width="500" height="500"></canvas></div>
