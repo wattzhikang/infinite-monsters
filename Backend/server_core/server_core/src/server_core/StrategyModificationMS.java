@@ -27,13 +27,8 @@ public class StrategyModificationMS implements Strategy {
 				dungeon
 		);
 		
-		StrategyModificationMSSuccess success = null;
 		
-//		if (game.moveSubscription(client.getKey(), client.getSubscription(info.getSubscriptionID()), bounds, new Coordinates(info.getOldPlayerX(), info.getOldPlayerY()), new Coordinates(info.getNewPlayerX(), info.getNewPlayerY())) == true) {
-//			success = new StrategyModificationMSSuccess(true);
-//		} else {
-//			success = new StrategyModificationMSSuccess(false);
-//		}
+		StrategyModificationMSSuccess success = new StrategyModificationMSSuccess(true);
 		
 		client.getKey().getSubscriber(info.getSubscriptionID()).move(bounds, nPlayerLocation);
 		

@@ -67,6 +67,13 @@ public class RectangleBoundary {
 		return upperRight.getDungeon();
 	}
 	
+	public int getWidth() {
+		return upperRight.getX() - lowerLeft.getX() + 1;
+	}
+	public int getHeight() {
+		return upperRight.getY() - lowerLeft.getY() + 1;
+	}
+	
 	@Override
 	public String toString() {
 		return "lowerLeft: " + lowerLeft.toString() + " " +

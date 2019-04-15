@@ -56,9 +56,7 @@ class FullyLocalTest {
 			
 			out.writeObject("{\"requestType\":\"subscription\"}");
 			
-			for (int i = 0; i < 12; i++) {
-				System.out.println("Testing Thread: Received " + in.readObject().toString());
-			}
+			System.out.println("Testing Thread: Received " + in.readObject().toString());
 			
 			out.writeObject("{"
 					+ "\"requestType\":\"mod_move_subscription\","
@@ -96,7 +94,7 @@ class FullyLocalTest {
 private class ServerThread extends Thread {
 	@Override
 	public void run() {
-		String[] args = {null, ServerCore.DEBUG};
+		String[] args = {ServerCore.DEBUG};
 		ServerCore.main(args);
 	}
 }

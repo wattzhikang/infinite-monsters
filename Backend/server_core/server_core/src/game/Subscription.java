@@ -20,6 +20,7 @@ public class Subscription {
 	ArrayList<Subscription> lockHierarchy;
 	
 	ArrayList<Tile> queuedUpdates;
+	Position queuedPlayerPosition;
 	
 	Client client;
 	
@@ -62,24 +63,25 @@ public class Subscription {
 		//TODO
 	}
 	public void move(RectangleBoundary nBounds, Position nPlayerLocation) {
-		game.adjustBounds(this, bounds, nBounds);
-		
 		lockNeighbors();
 		
 		Collection<Tile> buffer = new LinkedList<Tile>();
 		
-		String tmp = map[player.getX()][player.getY()].getObject();
-		map[player.getX()][player.getY()].setObject(
-				map[nPlayerLocation.getX()][nPlayerLocation.getY()].getObject()
-		);
-		map[nPlayerLocation.getX()][nPlayerLocation.getY()].setObject(
-				map[player.getX()][player.getY()].getObject()
-		);
+		Tile nTile = map[player.getX()][player.getY()];
+		Tile oTile = map[nPlayerLocation.getX()][nPlayerLocation.getY()];
 		
-		buffer.add(map[player.getX()][player.getY()]);
-		buffer.add(map[nPlayerLocation.getX()][nPlayerLocation.getY()]);
+		String tmp = oTile.getCharacter();
+		oTile.setCharacter(nTile.getCharacter());
+		nTile.setCharacter(tmp);
 		
-		game.flushTiles(buffer);
+		buffer.add(nTile);
+		enqueueUpdate(nTile);
+		buffer.add(oTile);
+		enqueueUpdate(oTile);
+		
+		game.flushTiles(buffer, this);
+		
+		game.adjustBounds(this, bounds, nBounds);
 		
 		unlockNeighbors();
 	}
@@ -112,10 +114,31 @@ public class Subscription {
 	}
 	void enqueueUpdate(Tile tile) {
 		queuedUpdates.add(tile);
+		
+		assert tile != null;
+		
+		if (tile.getCharacter() != null /* && tile.getCharacter().equals(client.getKey().getUser())*/) {
+			queuedPlayerPosition = tile.getLocation();
+			System.out.println("Player " + tile.getCharacter() + " at " + tile.getLocation().toString());
+		}
 	}
 	void flushUpdates() {
+		//TODO this method should be able to handle queuedUpdates being null
+		for (Tile tile : queuedUpdates) {
+			int nX = tile.getLocation().getX() - bounds.getLowerLeft().getX();
+			int nY = tile.getLocation().getY() - bounds.getLowerLeft().getY();
+			
+			map[nY][nX] = tile;
+		}
+		
 		client.enqueueDeltaFrame(new DeltaFrame(bounds, queuedUpdates, false, subscriptionID));
 		queuedUpdates = new ArrayList<Tile>();
+		
+		if (queuedPlayerPosition != null) {
+			player = queuedPlayerPosition;
+			queuedPlayerPosition = null;
+			
+		}
 	}
 	void lock() {
 		lock.lock();
@@ -138,5 +161,20 @@ public class Subscription {
 	void setBounds(RectangleBoundary nBounds) {
 		bounds = nBounds;
 		dungeon = bounds.getDungeon();
+		
+		Tile[][] nMap = new Tile[bounds.getHeight()][bounds.getWidth()];
+		if (map != null) {
+			for (Tile[] row : map) {
+				for (Tile tile : row) {
+					int nX = tile.getLocation().getX() - bounds.getLowerLeft().getX();
+					int nY = tile.getLocation().getY() - bounds.getLowerLeft().getY();
+					
+					if (nY > 0 && nY < nMap.length && nX > 0 && nX < nMap[0].length) {
+						nMap[nY][nX] = tile;
+					}
+				}
+			}
+		}
+		map = nMap;
 	}
 }

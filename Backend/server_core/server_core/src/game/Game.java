@@ -52,12 +52,31 @@ public class Game {
 	 * @param tiles
 	 */
 	void flushTiles(Collection<Tile> tiles) {
+		flushTiles(tiles, null);
+	}
+	
+	void flushTiles(Collection<Tile> tiles, Subscription chiefSubscriber) {
 		//assume that tiles exist in the map
+		Collection<Subscription> subscribers = new LinkedList<Subscription>();
 		for (Tile tile : tiles) {
-			dungeons.get(new Long(tile.getLocation().getDungeon()))
+			Plot plot = dungeons.get(new Long(tile.getLocation().getDungeon()))
 				.get(tile.getLocation())
-				.setPlot(tile)
 			;
+			
+			plot.setPlot(tile);
+			
+			for (Subscription subscriber : plot.getSubscribers()) {
+				subscriber.enqueueUpdate(tile);
+				if (!subscribers.contains(subscriber)) {
+					subscribers.add(subscriber);
+				}
+			}
+		}
+		
+		for (Subscription subscriber : subscribers) {
+			if (subscriber != chiefSubscriber) {
+				subscriber.flushUpdates();
+			}
 		}
 	}
 	
@@ -132,29 +151,48 @@ public class Game {
 	 * @param locations
 	 * @return a Collection of tiles retrieved
 	 */
-	Collection<Tile> getTiles(Collection<Position> locations) {
+	Collection<Tile> getTiles(Collection<Position> locationsArg) {
+		Collection<Position> locations = new LinkedList<Position>();
+		locations.addAll(locationsArg);
+		Collection<Tile> returnTiles = new LinkedList<Tile>();
 		
-		Collection<Position> dbLocations = new LinkedList<Position>();
-		Collection<Tile> tiles = new LinkedList<Tile>();
+		//first get tiles that are already cached
 		for (Position location : locations) {
+			//add a map for this dungeon if there isn't one
 			if (!dungeons.containsKey(new Long(location.getDungeon()))) {
 				dungeons.put(new Long(location.getDungeon()), new HashMap<Position, Plot>());
 			}
-			if (!dungeons.get(new Long(location.getDungeon())).containsKey(location)) {
-				dbLocations.add(location);
-			} else {
-				tiles.add(dungeons.get(new Long(location.getDungeon())).get(location).getPlot());
+			
+			//if the tile is already cached, be sure, add it to the list of tiles to return
+			//and check off the location
+			if (dungeons.get(new Long(location.getDungeon())).containsKey(location)) {
+				returnTiles.add(dungeons.get(new Long(location.getDungeon())).get(location).getPlot());
+				locations.remove(location);
 			}
 		}
 		
-		Collection<Tile> dbTiles = db.getTiles(dbLocations);
+		//check database for remaining locations
+		Collection<Tile> dbTiles = db.getTiles(locations);
 		for (Tile tile : dbTiles) {
 			dungeons.get(new Long(tile.getLocation().getDungeon())).put(tile.getLocation(), new Plot(tile));
+			locations.remove(tile.getLocation());
 		}
-		tiles.addAll(dbTiles);
+		returnTiles.addAll(dbTiles);
+		
+		//the remaining tiles are in neither the database nor the cache. They are null tiles
+		for (Position location : locations) {
+			Tile tile = new Tile(location);
+			dungeons.get(new Long(location.getDungeon()))
+				.put(
+					location,
+					new Plot(tile)
+				)
+			;
+			returnTiles.add(tile);
+		}
 		
 		
-		return tiles;
+		return returnTiles;
 	}
 	
 	public boolean register(String username, String password) {

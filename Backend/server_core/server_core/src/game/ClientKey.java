@@ -90,9 +90,10 @@ public class ClientKey {
 	 * @return The ID assigned to the added subscription
 	 */
 	int addSubscriber(Subscription subscription) {
+		IDs++;
 		subscribers.put(new Integer(IDs), subscription);
 		subscription.setID(IDs);
-		return IDs++;
+		return IDs;
 	}
 	
 	/**

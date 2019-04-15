@@ -21,6 +21,10 @@ public class Tile {
 	
 	public Tile(Position location) {
 		this.location = location;
+		this.walkable = false;
+		this.terrain = null;
+		this.object = null;
+		this.character = null;
 	}
 	
 	public Position getLocation() {
@@ -43,6 +47,12 @@ public class Tile {
 		this.object = object;
 	}
 	
+	
+	
+	public void setCharacter(String character) {
+		this.character = character;
+	}
+
 	public String toString() {
 		return location.toString() + ", Walkable: " + walkable +
 				", Terrain: " + terrain +
