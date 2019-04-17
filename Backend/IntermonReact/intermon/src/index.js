@@ -63,7 +63,10 @@ var connection = {
 }
 
 //singleton that loads all the images so they can be displayed.
-//To load additional images, just add URLs to the "urls" object
+//To load additional images, just add URLs to the "urls" object.
+//Note that this singleton is implemented with different syntax.
+//That's just because I learned a different way to do it. Both
+//connection and imgLoader are the same thing.
 var imgLoader = new (function() {
     //new images can be added here. They will load automatically
     var urls = {
@@ -150,27 +153,34 @@ class Login extends React.Component {
         super(props);
         this.state = {name: 'username', password: 'password'};
 
+        //I think these statements just ensure that the 'this' reference
+        //in these methods refers to this object, and not their own
+        //objects. Javascript sure is interesting.
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
+    //When a different username is entered, the state of this object is changed
+    //to reflect that.
     handleNameChange(event) {
         this.setState({name: event.target.value});
     }
 
+    //Same as handleNameChange()
     handlePasswordChange(event) {
         this.setState({password: event.target.value});
     }
 
+    //Sends the credentials to the server and subsequently requests a subscription.
     handleSubmit(event) {
         alert(
             "Credentials were submitted: "
             + this.state.name + " "
             + this.state.password
         );
-        event.preventDefault();
-        connection.instantiate();
+        event.preventDefault(); //I don't know what this does
+        connection.instantiate(); //prior to this, the websocket is not connected
         connection.send(
             JSON.stringify(new Credentials(this.state.name, this.state.password))
         );
@@ -200,8 +210,7 @@ class Login extends React.Component {
     }
 }
 
-//not a dummy class for JSON parsing. This is actually used
-//x and y are determined to be the RELATIVE coordinates
+//not a dummy class for JSON parsing. This is actually used internally
 function Tile(x, y, xAbs, yAbs, walkable, terrainType, object, character) {
     this.x = x;
     this.y = y;
@@ -234,12 +243,22 @@ class Game extends React.Component {
 
         this.board = document.getElementById("board");
 
+        //The state of the game is simply the map array itself.
+        //When it changes, the game is re-rendered.
+        /*
+         * TODO Now that the game is rendered in a canvas, it
+         * isn't necessary for this to be a state anymore,
+         * causing the entire component to re-render.
+        */
         this.state = {
             map: []
         }
 
         this.map = this.state.map;
 
+        /*
+         * These four methods are where the buttons are implemented
+        */
         this.left = () => {
             console.log("Moving left");
             let move = new ModMoveSubscription(
@@ -319,7 +338,6 @@ class Game extends React.Component {
     }
 
     //unpacks the delta frame and hashes tiles into an array
-    //TODO this doesn't need to be a 2D array
     receivedDeltaFrame(deltaframe) {
         //record subscriptionID
         this.subscriptionID = deltaframe.subscriptionID;
@@ -377,8 +395,6 @@ class Game extends React.Component {
 
     //actually draws the map on the canvas
     canvasRender() {
-        //just display some of the sprites to prove
-        //that your loader code works
         if (imgLoader.allLoaded) {
             var context = document
                 .getElementById("board")
@@ -389,6 +405,7 @@ class Game extends React.Component {
                 console.log(element);
                 //draw terrain
                 const cellWidth = 49;
+                //TODO This should be a switch statement as well
                 if (element.terrainType == "greenGrass1") {
                     context.rect(element.x * cellWidth, element.y * cellWidth, cellWidth, cellWidth);
                 } else {
@@ -397,12 +414,13 @@ class Game extends React.Component {
                 context.stroke();
 
                 //draw object
-
                 switch (element.object) {
                     case "genericBarrier1" :
                         context.drawImage(imgLoader.getImage("genericBarrier01"), element.x * 50, element.y * 50);
                 }
 
+                //draw character
+                //TODO Obviously not all characters will be named "lance"
                 switch (element.character) {
                     case "lance" :
                         context.drawImage(imgLoader.getImage("character"), element.x * 50, element.y * 50);
@@ -411,19 +429,8 @@ class Game extends React.Component {
         }
     }
 
-    right() {
-
-    }
-
-    up() {
-
-    }
-
-    down() {
-
-    }
-
     render() {
+        //TODO this if statement is no longer necessary
         if (this.state.map !== null) {
             return (
                 <div>
