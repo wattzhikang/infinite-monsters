@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 
 
 
@@ -58,8 +59,10 @@ public class SocketAdapterTCP implements SocketAdapter {
 				out.writeObject((Object)toWrite);
 				out.flush();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//only print stack trace if an unusual exception has occurred
+				if (!(e instanceof EOFException || e instanceof SocketException)) {
+					e.printStackTrace();
+				}
 			}
 //		}
 	}

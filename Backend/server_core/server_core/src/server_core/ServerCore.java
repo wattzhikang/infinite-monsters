@@ -28,7 +28,7 @@ public class ServerCore {
 		
 		Game game = new Game(db);
 		
-		ConnectionListenerTCP socketListener = new ConnectionListenerTCP(db, game);
+		ConnectionListener socketListener = new ConnectionListener(db, game);
 		
 		socketListener.start();
 		
@@ -36,11 +36,11 @@ public class ServerCore {
 	}
 	
 	private static class ShutdownHook extends Thread {
-		ConnectionListenerTCP socketListener;
+		ConnectionListener socketListener;
 		DBInterface db;
 		Game game;
 		
-		public ShutdownHook(ConnectionListenerTCP socketListener, DBInterface db, Game game) {
+		public ShutdownHook(ConnectionListener socketListener, DBInterface db, Game game) {
 			this.socketListener = socketListener;
 			this.db = db;
 		}

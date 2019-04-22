@@ -158,6 +158,8 @@ public class DBAdapter implements DBInterface {
 	@Override
 	public Collection<Tile> getTiles(Collection<Position> locations) {
 		// TODO Auto-generated method stub
+		Statement statement = null;
+		ResultSet results = null;
 		return null;
 	}
 

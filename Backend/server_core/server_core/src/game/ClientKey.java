@@ -106,12 +106,21 @@ public class ClientKey {
 	}
 	
 	/**
+	 * Unsubscribes a specific subscription
+	 * @param ID
+	 */
+	public void removeSubscriber(int ID) {
+		subscribers.get(ID).unsubscribe();
+		subscribers.remove(ID);
+	}
+	
+	/**
 	 * This unsubscribes every single subscription from the game
 	 */
 	public void unsubscribeAll() {
 		for (Entry<Integer, Subscription> subscriber : subscribers.entrySet()) {
 			subscriber.getValue().unsubscribe();
+			subscribers.remove(subscriber.getKey());
 		}
-		subscribers = new HashMap<Integer, Subscription>();
 	}
 }

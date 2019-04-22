@@ -16,12 +16,15 @@ public class SocketMessage {
 	
 	public static final String REQUEST_REGISTRATION = "registration";
 	public static final String REQUEST_AUTHENTICATION = "authentication";
+	public static final String REQUEST_DEAUTHENTICATION = "deauthentication";
 	public static final String REQUEST_SUBSCRIPTION = "subscription";
 	public static final String REQUEST_MOD_MOVE_SUBSCRIPTION = "mod_move_subscription";
+	public static final String REQUEST_UNSUBSCRIPTION = "unsubscription";
+	public static final String REQUEST_REVERSE_DELTA = "reverseDelta";
 	
 	private Strategy strategy;
 	
-	public SocketMessage(String JSONMessage) throws Exception {
+	public SocketMessage(String JSONMessage) {
 		String requestType = null;
 		try {
 			requestType =
@@ -32,7 +35,8 @@ public class SocketMessage {
 					.getAsString()
 			;
 		} catch (Exception e) {
-			throw e;
+			strategy = new StrategyNop();
+			return;
 		}
 		
 		switch (requestType) {
@@ -48,6 +52,9 @@ public class SocketMessage {
 					.fromJson(JSONMessage, StrategyAuthenticationInfo.class)
 			);
 			break;
+		case REQUEST_DEAUTHENTICATION:
+			strategy = new StrategySeppuku();
+			break;
 		case REQUEST_SUBSCRIPTION:
 			strategy = new StrategySubscription();
 			break;
@@ -57,6 +64,17 @@ public class SocketMessage {
 					.fromJson(JSONMessage, StrategyModificationMSInfo.class)
 			);
 			break;
+		case REQUEST_UNSUBSCRIPTION:
+			strategy = new StrategyUnsubscription(
+					(new Gson())
+					.fromJson(JSONMessage, StrategyUnsubscriptionInfo.class)
+			);
+			break;
+		case REQUEST_REVERSE_DELTA:
+			strategy = new StrategyReverseDelta(
+					(new Gson())
+					.fromJson(JSONMessage, StrategyReverseDeltaInfo.class)
+			);
 		}
 	}
 	
