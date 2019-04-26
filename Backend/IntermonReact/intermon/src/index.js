@@ -6,20 +6,21 @@ import * as serviceWorker from './serviceWorker';
 //singleton that establishes a websocket connection to the server
 var connection = {
     socket: null,
-    queue : [],
-    game : null, //it needs the game so it knows where to send
-                 //the delta frames to
-    
+    queue: [],
+    game: null, //it needs the game so it knows where to send
+    //the delta frames to
+
     //establishes a connection to the server
-    instantiate : () => {
+    instantiate: () => {
         if (connection.isOpen) {
-            connection.socket = new WebSocket('ws://cs309-yt-1.misc.iastate.edu:8080/websocket/zw');
-            
+            //connection.socket = new WebSocket('ws://cs309-yt-1.misc.iastate.edu:8080/websocket/zw');
+            connection.socket = new WebSocket('ws://localhost:8080/websocket/zjwatt');
+
             //this function handles messages from the server
-            connection.socket.onmessage = function(event) {
+            connection.socket.onmessage = function (event) {
                 console.log("Message received: " + event.data);
                 let object = JSON.parse(event.data);
-                if (object.subscriptionID !== undefined 
+                if (object.subscriptionID !== undefined
                     && object.newDungeon !== undefined
                     && object.xL !== undefined
                     && object.xR !== undefined
@@ -33,21 +34,21 @@ var connection = {
 
             //sends messages that were waiting for the
             //socket to finish connecting
-            connection.socket.onopen = function(event) {
+            connection.socket.onopen = function (event) {
                 for (let string of connection.queue) {
                     connection.send(string);
                 }
             }
         }
     },
-    isOpen : () => {
+    isOpen: () => {
         if (connection.socket && connection.socket.readyState === 1) {
             return true;
         } else {
             return false;
         }
     },
-    send : (string) => {
+    send: (string) => {
         //if an attempt is made to send a message before the
         //socket is open, this function enqueues the message
         //in a queue and will be sent when it opens
@@ -57,7 +58,7 @@ var connection = {
             connection.socket.send(string);
         }
     },
-    close : () => {
+    close: () => {
         connection.socket.close();
     },
 }
@@ -67,11 +68,11 @@ var connection = {
 //Note that this singleton is implemented with different syntax.
 //That's just because I learned a different way to do it. Both
 //connection and imgLoader are the same thing.
-var imgLoader = new (function() {
+var imgLoader = new (function () {
     //new images can be added here. They will load automatically
     var urls = {
-        genericBarrier01 : (process.env.PUBLIC_URL + "/rec/genericBarrier_01.svg"),
-        character : (process.env.PUBLIC_URL + "/rec/character.svg"),
+        genericBarrier01: (process.env.PUBLIC_URL + "/rec/genericBarrier_01.svg"),
+        character: (process.env.PUBLIC_URL + "/rec/character.svg"),
     };
 
     var allLoaded = false;
@@ -79,13 +80,13 @@ var imgLoader = new (function() {
     var images = {};
     function ImageType(url) {
         var that = this;
-        
+
         this.loaded = false;
 
         this.image = new Image();
 
         //could have async issues
-        this.image.onload = function() {
+        this.image.onload = function () {
             that.loaded = true;
             for (let img in images) {
                 let tmploaded = true;
@@ -151,7 +152,7 @@ function ModMoveSubscription(
 class Login extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {name: 'username', password: 'password'};
+        this.state = { name: 'username', password: 'password' };
 
         //I think these statements just ensure that the 'this' reference
         //in these methods refers to this object, and not their own
@@ -164,12 +165,12 @@ class Login extends React.Component {
     //When a different username is entered, the state of this object is changed
     //to reflect that.
     handleNameChange(event) {
-        this.setState({name: event.target.value});
+        this.setState({ name: event.target.value });
     }
 
     //Same as handleNameChange()
     handlePasswordChange(event) {
-        this.setState({password: event.target.value});
+        this.setState({ password: event.target.value });
     }
 
     //Sends the credentials to the server and subsequently requests a subscription.
@@ -188,7 +189,7 @@ class Login extends React.Component {
             JSON.stringify(new RequestSubscription())
         );
     }
-    
+
     render() {
         return (
             <form onSubmit={this.handleSubmit}>
@@ -197,14 +198,14 @@ class Login extends React.Component {
                     type="text"
                     value={this.state.name}
                     onChange={this.handleNameChange}
-                /><br/>
+                /><br />
                 password
                 <input
                     type="text"
                     value={this.state.password}
                     onChange={this.handlePasswordChange}
-                /><br/>
-                <input type="submit" value="Log In"/>
+                /><br />
+                <input type="submit" value="Log In" />
             </form>
         );
     }
@@ -231,6 +232,13 @@ function Tile(x, y, xAbs, yAbs, walkable, terrainType, object, character) {
     };
 }
 
+//class for JSON parsing. Used to send a deltaFrame to the server when the Game Designer edits the map
+function ReverseDeltaFrame(subscriptionID, tiles) {
+    this.requestType = "reverseDelta";
+    this.subscriptionID = subscriptionID;
+    this.tiles = tiles;
+}
+
 //holds all the actual game logic
 class Game extends React.Component {
     constructor(props) {
@@ -242,7 +250,8 @@ class Game extends React.Component {
         this.height = 0;
 
         this.board = document.getElementById("board");
-
+        this.tileEditor = document.getElementById("tileEditor");
+        console.log(this.imgLoader.urls.length)
         //The state of the game is simply the map array itself.
         //When it changes, the game is re-rendered.
         /*
@@ -272,7 +281,7 @@ class Game extends React.Component {
                 this.playerX - 1,
                 this.playerY,
             );
-    
+
             connection.send(JSON.stringify(
                 move
             ));
@@ -294,7 +303,7 @@ class Game extends React.Component {
 
             console.log(move);
             console.log(JSON.stringify(move));
-    
+
             connection.send(JSON.stringify(move));
         };
 
@@ -311,7 +320,7 @@ class Game extends React.Component {
                 this.playerX,
                 this.playerY + 1,
             );
-    
+
             connection.send(JSON.stringify(
                 move
             ));
@@ -330,10 +339,15 @@ class Game extends React.Component {
                 this.playerX,
                 this.playerY - 1,
             );
-    
+
             connection.send(JSON.stringify(
                 move
             ));
+        };
+
+        this.canvas = (event) => {
+            let rect = document.getElementById("board").getBoundingClientRect();
+            console.log((event.clientX - rect.left) + ',' + (event.clientY - rect.top))
         };
     }
 
@@ -341,7 +355,7 @@ class Game extends React.Component {
     receivedDeltaFrame(deltaframe) {
         //record subscriptionID
         this.subscriptionID = deltaframe.subscriptionID;
-        
+
         //the dimensions may have changed
         this.xAbsR = deltaframe.xR;
         this.xAbsL = deltaframe.xL;
@@ -353,7 +367,7 @@ class Game extends React.Component {
 
         //remove tiles that are no longer within bounds
         if (this.map !== null) {
-            this.map.forEach( (tile, i) => {
+            this.map.forEach((tile, i) => {
                 if (!tile.inBounds(
                     this.xAbsL,
                     this.xAbsR,
@@ -399,9 +413,9 @@ class Game extends React.Component {
             var context = document
                 .getElementById("board")
                 .getContext("2d")
-            ;
+                ;
 
-            this.state.map.forEach( function(element) {
+            this.state.map.forEach(function (element) {
                 console.log(element);
                 //draw terrain
                 const cellWidth = 49;
@@ -415,17 +429,43 @@ class Game extends React.Component {
 
                 //draw object
                 switch (element.object) {
-                    case "genericBarrier1" :
+                    case "genericBarrier1":
                         context.drawImage(imgLoader.getImage("genericBarrier01"), element.x * 50, element.y * 50);
                 }
 
                 //draw character
                 //TODO Obviously not all characters will be named "lance"
                 switch (element.character) {
-                    case "lance" :
+                    case "lance":
                         context.drawImage(imgLoader.getImage("character"), element.x * 50, element.y * 50);
                 }
             });
+        }
+
+        //report the mouse position when clicked
+        //canvas.addEventListener('click', function (evt) {
+        //console.log(evt.pageX + ',' + evt.pageY);
+        //var mousePos = getMousePos(canvas, evt);
+        //console.log(mousePos.x + ',' + mousePos.y);
+        //}, false);
+
+        //Get mouse position
+        //function getMousePos(canvas, evt) {
+        //var rect = canvas.getBoundingClientRect();
+        //return {
+        // x: evt.clientX - rect.left,
+        //y: evt.clientY - rect.top
+        //};
+        //}
+    }
+
+    //Displays all of the images of every game tile for the Game Designer
+    tileEditorRender() {
+        if (imgLoader.allLoaded) {
+            var tileEditorContext = document
+                .getElementById("tileEditor")
+                .getContext("2d")
+                ;
         }
     }
 
@@ -434,7 +474,8 @@ class Game extends React.Component {
         if (this.state.map !== null) {
             return (
                 <div>
-                    <div><canvas id="board" width="500" height="500"></canvas></div>
+                    <div><canvas id="board" width="500" height="500" onClick={this.canvas}></canvas></div>
+                    <div><canvas id="tileEditor" width="500" height="300"></canvas></div>
                     <div><button id="upButton" type="button" onClick={this.up}>Up</button></div>
                     <div>
                         <button id="leftButton" type="button" onClick={this.left}>Left</button>
@@ -454,6 +495,7 @@ class Game extends React.Component {
 ReactDOM.render(<Login />, document.getElementById('root'));
 
 ReactDOM.render(<Game />, document.getElementById('game'));
+
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

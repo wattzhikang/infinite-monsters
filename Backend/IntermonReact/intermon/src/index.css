@@ -12,6 +12,14 @@ body {
   border: 1px solid #000000;
 }
 
+#tileEditor, #testTileEditor {
+  border: 1px solid #000000;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
