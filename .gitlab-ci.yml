@@ -5,7 +5,7 @@ stages:
 server-core-maven-build:
   stage: scmaven
   tags:
-    -shell
+    - shell
   script:
     - cd Backend/server_core/servercore/
     - mvn package
@@ -13,6 +13,6 @@ server-core-maven-build:
 server-core-autodeploy:
     stage: scdeploy
     tags:
-     -shell
+     - shell
     script:
      - sudo systemctl restart intermon-server
