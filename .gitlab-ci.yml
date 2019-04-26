@@ -8,7 +8,7 @@ server-core-maven-build:
     - shell
   script:
     - cd Backend/server_core/servercore/
-    - mvn package
+    - sudo mvn package
 
 server-core-autodeploy:
     stage: scdeploy
