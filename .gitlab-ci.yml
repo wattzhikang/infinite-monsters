@@ -10,7 +10,7 @@ server-core-maven-build:
     - cd Backend/server_core/servercore/
     - mvn package
 
-server-core-autodeploy
+server-core-autodeploy:
     stage: scdeploy
     tags:
      -shell
