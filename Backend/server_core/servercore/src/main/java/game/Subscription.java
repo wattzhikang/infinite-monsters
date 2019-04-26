@@ -60,7 +60,13 @@ public class Subscription {
 		return dungeon;
 	}
 	void unsubscribe() {
-		//TODO
+		LinkedList<Tile> allTiles = new LinkedList<Tile>();
+		for (Tile[] row : map) {
+			for (Tile tile : row) {
+				allTiles.add(tile);
+			}
+		}
+		game.flushTiles(allTiles);
 	}
 	public void move(RectangleBoundary nBounds, Position nPlayerLocation) {
 		lockNeighbors();
@@ -82,6 +88,13 @@ public class Subscription {
 		game.flushTiles(buffer, this);
 		
 		game.adjustBounds(this, bounds, nBounds);
+		
+		unlockNeighbors();
+	}
+	public void reverseDelta(Collection<Tile> tiles) {
+		lockNeighbors();
+		
+		game.flushTiles(tiles);
 		
 		unlockNeighbors();
 	}

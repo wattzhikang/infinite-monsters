@@ -55,24 +55,34 @@ public class Game {
 		flushTiles(tiles, null);
 	}
 	
+	/**
+	 * Replaces outdated tiles with modified ones, flushing updates on all subscribers
+	 * to all modified tiles except the chiefSubscriber.
+	 * @param tiles The tiles to be modified
+	 * @param chiefSubscriber If null, all affected subscriptions will be flushed
+	 */
 	void flushTiles(Collection<Tile> tiles, Subscription chiefSubscriber) {
-		//assume that tiles exist in the map
+		//this loop places all the tiles on the plots that they go to, then enqueues updates
 		Collection<Subscription> subscribers = new LinkedList<Subscription>();
 		for (Tile tile : tiles) {
-			Plot plot = dungeons.get(new Long(tile.getLocation().getDungeon()))
-				.get(tile.getLocation())
-			;
-			
-			plot.setPlot(tile);
-			
-			for (Subscription subscriber : plot.getSubscribers()) {
-				subscriber.enqueueUpdate(tile);
-				if (!subscribers.contains(subscriber)) {
-					subscribers.add(subscriber);
+			if (tile != null) {
+				Plot plot = dungeons.get(new Long(tile.getLocation().getDungeon()))
+					.get(tile.getLocation())
+				;
+				
+				plot.setPlot(tile);
+				
+				for (Subscription subscriber : plot.getSubscribers()) {
+					subscriber.enqueueUpdate(tile);
+					if (!subscribers.contains(subscriber)) {
+						subscribers.add(subscriber);
+					}
 				}
 			}
 		}
 		
+		//flushes updates to all subscribers except chiefSubscriber, which, if not null,
+		//means that the calling subscription intends to flush itself
 		for (Subscription subscriber : subscribers) {
 			if (subscriber != chiefSubscriber) {
 				subscriber.flushUpdates();
@@ -122,27 +132,15 @@ public class Game {
 		subscription.flushUpdates();
 	}
 	
+	/**
+	 * Gets a subscription for the given client identity
+	 * @param key
+	 * @return
+	 */
 	public int getSubscription(ClientKey key) {
 		int ID = key.addSubscriber(new Subscription(this, key.getUserLink()));
 		adjustBounds(key.getSubscriber(ID), null, db.lastSubscriptionBounds(key));
 		return ID;
-	}
-	
-	/*
-	 * Obsolete since the getLocks() method
-	 */
-	private void overlapDetected(Subscription sub1, Collection<Subscription> sub2, SubscriptionLock otherLock) {
-		for (Subscription subscription : sub2) {
-			subscription.updateLock(sub1.getLock());
-		}
-	}
-	
-	private void severOverlap(Subscription subscription, SubscriptionLock lock) {
-		lock.removeSubscriber(subscription);
-		
-		SubscriptionLock nLock = new SubscriptionLock();
-		subscription.updateLock(nLock);
-		nLock.addSubscriber(subscription);
 	}
 	
 	/**
@@ -195,6 +193,12 @@ public class Game {
 		return returnTiles;
 	}
 	
+	/**
+	 * Registers an identity with the database with the given username and password
+	 * @param username
+	 * @param password
+	 * @return
+	 */
 	public boolean register(String username, String password) {
 		if (db.register(username, password)) {
 			return true;
@@ -203,8 +207,12 @@ public class Game {
 		}
 	}
 	
-	/*
-	 * Returns a unique key to identify the user
+	/**
+	 * Gets an identity for the given username and password
+	 * @param username
+	 * @param password
+	 * @param client
+	 * @return Returns null if authentication fails
 	 */
 	public ClientKey authenticate(String username, String password, Client client) {
 		ClientKey key = null;
@@ -217,9 +225,9 @@ public class Game {
 		}
 		return key;
 	}
-	//https://stackoverflow.com/questions/6992608/why-there-is-no-concurrenthashset-against-concurrenthashmap
-	/*
-	 * This method should join all of its threads to ensure complete shutdown
+	
+	/**
+	 * Flushes all tiles to the database
 	 */
 	public void shutDown() {
 		//TODO

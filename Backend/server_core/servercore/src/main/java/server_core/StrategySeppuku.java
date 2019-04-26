@@ -6,12 +6,9 @@ public class StrategySeppuku implements Strategy {
 
 	@Override
 	public void takeAction(Game game, SocketAdapter socket, Client client) {
-		try {
-			client.shutDown();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		//this should not attempt to close the socket, simply deauthenticate
+		client.getKey().unsubscribeAll();
+		client.setKey(null);
 	}
 
 }

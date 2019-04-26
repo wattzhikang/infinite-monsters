@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.mysql.cj.protocol.Message;
-
 import game.ClientKey;
 import game.Game;
 
@@ -40,7 +38,6 @@ public class Client extends Thread {
 		in.start();
 		
 		try {
-			
 			SocketMessage message;
 			while (active) {
 				message = queue.take();
@@ -60,15 +57,14 @@ public class Client extends Thread {
 		return key;
 	}
 	
+	//deauthentication doesn't have to shut down the client, that can be done by shutdown
 	public void shutDown() throws InterruptedException {
 		in.shutDown();
 		in.join(500);
 	}
 	
 	public void enqueueDeltaFrame(DeltaFrame frame) {
-		//queue.offer(new SocketMessage(SocketMessage.MessageOrigin.SERVER, frame.toString()));
 		queue.add(new SocketMessage(frame));
-		//System.out.println(frame);
 	}
 	
 	private class ClientListener extends Thread {
@@ -86,37 +82,29 @@ public class Client extends Thread {
 			try {
 				while (true) {
 					clientMessage = socket.readString();
-					try {
-						message = new SocketMessage(clientMessage);
-					} catch (Exception e) {
-						System.out.println("Malformed input");
-						continue;
-					}
+					message = new SocketMessage(clientMessage);
 					queue.offer(message);
 				}
 			} catch (IOException e) {
-				if (e instanceof EOFException || e instanceof SocketException) {
-					if (!socket.isClosed()) {
-						this.shutDown();
-					}
-					queue.offer(new SocketMessage());
-				} else {
+				/*
+				 * Any time there is an exception, we want to shut down this client.
+				 * The only difference between some unexpected exception and the normal
+				 * case of a client terminating its connection is that if it is some
+				 * unusual exception, we want to print the stack trace. If it isn't,
+				 * then we don't.
+				 */
+				if (!(e instanceof EOFException || e instanceof SocketException)) {
 					e.printStackTrace();
 				}
+				this.shutDown();
+				queue.offer(new SocketMessage());
 			}
 		}
 		
 		public void shutDown() {
-			socket.close();
-			active = false;
+			if (!socket.isClosed()) {
+				socket.close();
+			}
 		}
 	}
-
-	//{"requestType":"registration","username":"user1","password":"sunshine","privileges":"player"}
-	//{ requestType : registration , username : user1 , password : sunshine , privileges : player }
-	//0 1           2 3            4 5        6 7     8 9       10 11      12 13        14 15     16
-	
-	//{"requestType":"authentication","username":"user1","password":"sunshine"}
-	//{ requestType : authentication , username : user1 , password : sunshine }
-	//0 1           2 3              4 5        6 7     8 9       10 11       12
 }
