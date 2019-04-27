@@ -21,10 +21,23 @@ public class DBAdapter implements DBInterface {
 	
 	private static final String USER_TABLE = "intermondb.users";
 	private static final String USER_USERNAME = "username";
-	private static final String USER_PASSWORD = "password"
+	private static final String USER_PASSWORD = "password";
 	private static final String USER_PLAYERX = "playerX";
 	private static final String USER_PLAYERY = "playerY";
 	private static final String USER_XLOWERLEFT = "xLowerLeft";
+	private static final String USER_YLOWERLEFT = "yLowerLeft";
+	private static final String USER_XUPPERRIGHT = "xUpperRight";
+	private static final String USER_YUPPERRIGHT = "yUpperRight";
+	private static final String USER_DUNGEON = "dungeon";
+
+	private static final String UNIVERSE_TABLE = "intermondb.universe";
+	private static final String UNIVERSE_DUNGEON = "dungeon";
+	private static final String UNIVERSE_X = "x";
+	private static final String UNIVERSE_Y = "y";
+	private static final String UNIVERSE_TERRAIN = "backgroundTerrain";
+	private static final String UNIVERSE_OBJECT = "foregroundObject";
+	private static final String UNIVERSE_PLAYER = "player";
+	private static final String UNIVERSE_WALKABLE = "walkable";
 
 	Connection connection = null;
 	
@@ -41,7 +54,7 @@ public class DBAdapter implements DBInterface {
 			System.out.println("Statement Created");
 			
 			
-			String sql = "SELECT username FROM intermondb.user";
+			String sql = "SELECT " + USER_USERNAME + " FROM intermondb.user";
 			System.out.println("Executing Query...");
 			results = statement.executeQuery(sql);
 			System.out.println("Query Successfully Executed");
@@ -52,8 +65,10 @@ public class DBAdapter implements DBInterface {
 			}
 			
 		} catch (SQLException se) {
+			// TODO this needs to stop the server from starting
 			se.printStackTrace();
 		} catch (Exception e) {
+			// TODO this needs to stop the server from starting
 			e.printStackTrace();
 			System.exit(1);
 		} finally {
@@ -83,8 +98,16 @@ public class DBAdapter implements DBInterface {
 		ResultSet results = null;
 		try {
 			statement = connection.createStatement();
-			String sql = "SELECT UserName, Password FROM " + USER_TABLE + " WHERE UserName='"
-					+ username + "' AND Password='" + password + "';";
+
+			String sql = 
+				"SELECT " +
+				USER_USERNAME + ", " + USER_PASSWORD +
+				" FROM " +
+				USER_TABLE + 
+				" WHERE UserName='" + username +
+				"' AND Password='" + password + "';"
+			;
+
 			results = statement.executeQuery(sql);
 			
 			if (results.next()) {
@@ -121,7 +144,13 @@ public class DBAdapter implements DBInterface {
 		try {
 			//first check that user is not already in database
 			statement = connection.createStatement();
-			String sql = "SELECT UserName FROM " + USER_TABLE + " WHERE UserName='" + username + "';";
+			
+			String sql = 
+				"SELECT " + USER_USERNAME +
+				" FROM " + USER_TABLE +
+				" WHERE " + USER_USERNAME + "='" + username + "';"
+			;
+			
 			results = statement.executeQuery(sql);
 			
 			if (results.next()) {
@@ -132,7 +161,13 @@ public class DBAdapter implements DBInterface {
 			statement.close();
 			
 			statement = connection.createStatement();
-			sql = "INSERT INTO " + USER_TABLE + " VALUES ('" + username + "', '" + password + "');";
+
+			sql =
+				"INSERT INTO " + USER_TABLE +
+				"( " + USER_USERNAME + ", " + USER_PASSWORD + ") " +
+				" VALUES ('" + username + "', '" + password + "');"
+			;
+			
 			statement.executeUpdate(sql);
 		} catch (SQLException e) {
 			e.printStackTrace();
