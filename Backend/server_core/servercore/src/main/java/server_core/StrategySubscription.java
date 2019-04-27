@@ -2,6 +2,11 @@ package server_core;
 
 import game.Game;
 
+/**
+ * Attempts to get a Subscripton for a client
+ * @author Zachariah Watt
+ *
+ */
 public class StrategySubscription implements Strategy {
 
 	@Override

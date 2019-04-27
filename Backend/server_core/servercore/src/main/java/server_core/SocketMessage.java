@@ -12,6 +12,12 @@ import com.google.gson.JsonPrimitive;
 
 import game.Tile;
 
+/**
+ * Takes a JSON string from a client and constructs the appropriate
+ * strategy based on it. Can also send message to client.
+ * @author zjwatt
+ *
+ */
 public class SocketMessage {
 	
 	public static final String REQUEST_REGISTRATION = "registration";
@@ -24,6 +30,10 @@ public class SocketMessage {
 	
 	private Strategy strategy;
 	
+	/**
+	 * Constructs based on a JSON string from a client
+	 * @param JSONMessage
+	 */
 	public SocketMessage(String JSONMessage) {
 		String requestType = null;
 		try {
@@ -78,6 +88,11 @@ public class SocketMessage {
 		}
 	}
 	
+	/**
+	 * Constructs a strategy that will send the delta frame
+	 * to the client
+	 * @param message
+	 */
 	public SocketMessage(DeltaFrame message) {
 		Collection<Tile> tiles = message.getTiles();
 		List<TileInfo> tileInfos = new ArrayList<TileInfo>();
@@ -107,6 +122,9 @@ public class SocketMessage {
 		);
 	}
 	
+	/**
+	 * Choses StrategySeppuku, usually for when a socket is closed
+	 */
 	public SocketMessage() {
 		strategy = new StrategySeppuku();
 	}

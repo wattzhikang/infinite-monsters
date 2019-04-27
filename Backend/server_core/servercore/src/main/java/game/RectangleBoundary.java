@@ -3,10 +3,21 @@ package game;
 import java.util.Collection;
 import java.util.LinkedList;
 
+/**
+ * Represents a rectangular area in the world
+ * @author zjwatt
+ *
+ */
 public class RectangleBoundary {
 	private Position upperRight;
 	private Position lowerLeft;
 	
+	/**
+	 * Constructs a Rectangle boundary with all the tiles between (inclusive)
+	 * the two parameters
+	 * @param upperRight The upper right corner
+	 * @param lowerLeft The lower left corner
+	 */
 	public RectangleBoundary(Position upperRight, Position lowerLeft) {
 		assert (upperRight.getDungeon() == lowerLeft.getDungeon());
 		if (lowerLeft.getX() <= upperRight.getX() && lowerLeft.getY() <= upperRight.getY()) {
@@ -18,6 +29,10 @@ public class RectangleBoundary {
 		}
 	}
 	
+	/**
+	 * Constructs a RectangleBoundary consisting of a single location
+	 * @param location
+	 */
 	public RectangleBoundary(Position location) {
 		upperRight = location;
 		lowerLeft = location;
@@ -35,14 +50,21 @@ public class RectangleBoundary {
 		return coordinates;
 	}
 	
+	/**
+	 * Returns the total number of tiles between this subscription and bound
+	 * @param bound
+	 * @return
+	 */
 	public int getUnitChange(RectangleBoundary bound) {
 		int deltaX = bound.upperRight.getX() - upperRight.getX();
 		int deltaY = bound.upperRight.getY() - upperRight.getY();
 		return Math.abs(deltaX) + Math.abs(deltaY);
 	}
 	
-	/*
+	/**
 	 * Get the coordinates that are not in this area, but are in other's area
+	 * @param other
+	 * @return
 	 */
 	public Collection<Position> getDifference(RectangleBoundary other) {
 		Collection<Position> difference = other.getBetween();
@@ -51,7 +73,9 @@ public class RectangleBoundary {
 	}
 	
 	/**
-	 * Determines if the given position falls within this rectangle boundary
+	 * Determines if the given position falls within this rectangle boundary.
+	 * 
+	 * Doesn't currently do anything.
 	 * @param position
 	 * @return true if the position is within bounds, false otherwise
 	 */
@@ -63,6 +87,10 @@ public class RectangleBoundary {
 	public Position getUpperRight() {return upperRight;}
 	public Position getLowerLeft() {return lowerLeft;}
 	
+	/**
+	 * Gets the dungeon number that this area is in
+	 * @return
+	 */
 	public long getDungeon() {
 		return upperRight.getDungeon();
 	}

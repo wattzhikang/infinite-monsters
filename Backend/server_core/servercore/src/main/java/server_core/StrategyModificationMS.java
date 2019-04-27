@@ -6,6 +6,11 @@ import game.Position;
 import game.Game;
 import game.RectangleBoundary;
 
+/**
+ * Attempts to move a client's subscription
+ * @author Zachariah Watt
+ *
+ */
 public class StrategyModificationMS implements Strategy {
 	private StrategyModificationMSInfo info;
 	

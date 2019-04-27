@@ -11,6 +11,13 @@ import java.util.concurrent.BlockingQueue;
 import game.DBInterface;
 import game.Game;
 
+/**
+ * Maintains a ServerSocket listening for clients. When a client
+ * connects, it spins off a new Client object. Also maintains a
+ * list of Client objects.
+ * @author zjwatt
+ *
+ */
 public class ConnectionListener extends Thread{
 	private ServerSocket listener;
 	
@@ -32,6 +39,10 @@ public class ConnectionListener extends Thread{
 		}
 	}
 	
+	/**
+	 * Listens for connecting clients and spins of a Client
+	 * thread to represent them
+	 */
 	public void run() {
 		while(!listener.isClosed()) {
 			Socket newConnection = null;
@@ -54,6 +65,11 @@ public class ConnectionListener extends Thread{
 		}
 	}
 	
+	/**
+	 * Calls shutdown() for every single Client this ConnectionListener has
+	 * created
+	 * @throws InterruptedException
+	 */
 	public void shutDown() throws InterruptedException {
 		try {
 			listener.close();

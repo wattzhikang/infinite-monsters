@@ -1,6 +1,11 @@
 package server_core;
 import game.Game;
 
+/**
+ * Takes no action
+ * @author Zachariah Watt
+ *
+ */
 public class StrategyNop implements Strategy {
 
 	@Override

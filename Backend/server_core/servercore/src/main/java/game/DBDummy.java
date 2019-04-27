@@ -7,6 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+/**
+ * Provides a fake database for debugging purposes
+ * @author zjwatt
+ *
+ */
 public class DBDummy implements DBInterface {
 	private static final String grass = "greenGrass1";
 	private static final String barrier = "genericBarrier1";

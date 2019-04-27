@@ -10,6 +10,11 @@ import game.Game;
 
 import java.sql.*;
 
+/**
+ * Main class of the Intermon Server Core
+ * @author zjwatt
+ *
+ */
 public class ServerCore {
 	public static final int PORT_TCP = 10042;
 	public static final int PORT_WEB = 10043;

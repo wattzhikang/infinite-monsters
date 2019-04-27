@@ -5,6 +5,11 @@ import com.google.gson.GsonBuilder;
 
 import game.Game;
 
+/**
+ * Sends a Delta Frame to the client
+ * @author zjwatt
+ *
+ */
 public class StrategyDeltaFrame implements Strategy {
 	private DeltaFrameInfo info;
 	

@@ -1,5 +1,11 @@
 package server_core;
 
+/**
+ * Dummy class encapsulating the information in
+ * the client's JSON message
+ * @author zjwatt
+ *
+ */
 public class StrategyAuthenticationInfo {
 	private String requestType;
 	private String username;

@@ -2,6 +2,11 @@ package server_core;
 
 import game.Game;
 
+/**
+ * Deauthenticates a client
+ * @author Zachariah Watt
+ *
+ */
 public class StrategySeppuku implements Strategy {
 
 	@Override

@@ -7,14 +7,24 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 
+/**
+ * Connects to a MySQL or MariaDB database
+ * @author Zachariah Watt
+ *
+ */
 public class DBAdapter implements DBInterface {
 
 	private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
 	private static final String DB_URL = "jdbc:mysql://localhost/intermondb";
-	private static final String USER = "root";
-	private static final String PASSWORD = "Abundant space 421 points!";
+	private static final String USER = "intermon";
+	private static final String PASSWORD = "6$r6F~q9gWj$_pj";
 	
-	private static final String USER_TABLE = "intermondb.user";
+	private static final String USER_TABLE = "intermondb.users";
+	private static final String USER_USERNAME = "username";
+	private static final String USER_PASSWORD = "password"
+	private static final String USER_PLAYERX = "playerX";
+	private static final String USER_PLAYERY = "playerY";
+	private static final String USER_XLOWERLEFT = "xLowerLeft";
 
 	Connection connection = null;
 	
@@ -31,7 +41,7 @@ public class DBAdapter implements DBInterface {
 			System.out.println("Statement Created");
 			
 			
-			String sql = "SELECT UserName FROM intermondb.user";
+			String sql = "SELECT username FROM intermondb.user";
 			System.out.println("Executing Query...");
 			results = statement.executeQuery(sql);
 			System.out.println("Query Successfully Executed");

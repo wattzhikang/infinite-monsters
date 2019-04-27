@@ -9,6 +9,12 @@ import java.util.Map;
 import server_core.Client;
 import server_core.DeltaFrame;
 
+/**
+ * Represents a client's subscription to a map area. Provides features
+ * for manipulating that area.
+ * @author Zachariah Watt
+ *
+ */
 public class Subscription {
 	long dungeon;
 	Tile[][] map;
@@ -30,6 +36,12 @@ public class Subscription {
 	
 	RectangleBoundary bounds;
 	
+	/**
+	 * Constructs a new Subscription with the given game to draw
+	 * data from and the given client to push updates to
+	 * @param game
+	 * @param client
+	 */
 	public Subscription(Game game, Client client) {
 		this.lock = new SubscriptionLock();
 		this.overlaps = new HashMap<Subscription, Integer>();
@@ -40,25 +52,49 @@ public class Subscription {
 		this.game = game;
 	}
 	
+	/**
+	 * Sets the Subscription ID (see communication protocol documentation)
+	 * @param ID
+	 */
 	void setID(int ID) {
 		this.subscriptionID = ID;
 	}
 	
+	/**
+	 * Returns the lock for this Subscription
+	 * @return
+	 */
 	SubscriptionLock getLock() {
 		return lock;
 	}
 	
+	/**
+	 * Changes the lock of this subscription
+	 * @param lock
+	 */
 	void updateLock(SubscriptionLock lock) {
 		this.lock = lock;
 	}
 	
+	/**
+	 * Returns the area of this subscription
+	 * @return
+	 */
 	RectangleBoundary getBounds() {
 		return bounds;
 	}
 	
+	/**
+	 * Returns the dungeon this subscription is located in
+	 * @return
+	 */
 	public long dungeon() {
 		return dungeon;
 	}
+	
+	/**
+	 * Flushes this subscription's entire map to the game
+	 */
 	void unsubscribe() {
 		LinkedList<Tile> allTiles = new LinkedList<Tile>();
 		for (Tile[] row : map) {
@@ -68,6 +104,13 @@ public class Subscription {
 		}
 		game.flushTiles(allTiles);
 	}
+	
+	/**
+	 * Called when the client wants to move this
+	 * subscription from one location to another
+	 * @param nBounds Desired boundary of subscription
+	 * @param nPlayerLocation Desired new location of player
+	 */
 	public void move(RectangleBoundary nBounds, Position nPlayerLocation) {
 		lockNeighbors();
 		
@@ -91,6 +134,11 @@ public class Subscription {
 		
 		unlockNeighbors();
 	}
+	
+	/**
+	 * Updates tiles in this Subscription
+	 * @param tiles
+	 */
 	public void reverseDelta(Collection<Tile> tiles) {
 		lockNeighbors();
 		
@@ -98,6 +146,12 @@ public class Subscription {
 		
 		unlockNeighbors();
 	}
+	
+	/**
+	 * Notifies this Subscription that it has a new neighbor, and must
+	 * lock it whenever it attempts to modify anything
+	 * @param subscription
+	 */
 	void addNeighbor(Subscription subscription) {
 		if (overlaps.containsKey(subscription)) {
 			int i = overlaps.remove(subscription).intValue();
@@ -116,6 +170,12 @@ public class Subscription {
 			}
 		}
 	}
+	
+	/**
+	 * Notifies this subscription that it no longer has to lock this
+	 * neighbor if it modifies anything
+	 * @param subscription
+	 */
 	void removeNeighbor(Subscription subscription) {
 		if (overlaps.get(subscription).intValue() > 1) {
 			int i = overlaps.remove(subscription).intValue();
@@ -125,6 +185,11 @@ public class Subscription {
 			lockHierarchy.remove(subscription);
 		}
 	}
+	
+	/**
+	 * Enqueues an update for the Client
+	 * @param tile
+	 */
 	void enqueueUpdate(Tile tile) {
 		queuedUpdates.add(tile);
 		
@@ -135,6 +200,10 @@ public class Subscription {
 			System.out.println("Player " + tile.getCharacter() + " at " + tile.getLocation().toString());
 		}
 	}
+	
+	/**
+	 * Flushes all enqueued updates to the client
+	 */
 	void flushUpdates() {
 		//TODO this method should be able to handle queuedUpdates being null
 		for (Tile tile : queuedUpdates) {
@@ -153,17 +222,35 @@ public class Subscription {
 			
 		}
 	}
+	
+	/**
+	 * Locks this subscription
+	 */
 	void lock() {
 		lock.lock();
 	}
+	
+	/**
+	 * Unlocks this subscription
+	 */
 	void unlock() {
 		lock.unlock();
 	}
+	
+	/**
+	 * Locks all neighbors in accordance with the standard
+	 * lock hierarchy
+	 */
 	private void lockNeighbors() {
 		for (Subscription subscription : lockHierarchy) {
 			subscription.lock();
 		}
 	}
+	
+	/**
+	 * Unlocks all neighbors in accordance with the standard
+	 * lock hierarchy
+	 */
 	private void unlockNeighbors() {
 		//I'd love to use a foreach loop, but I don't know
 		//how to iterate backwards
@@ -171,6 +258,11 @@ public class Subscription {
 			lockHierarchy.get(i).unlock();
 		}
 	}
+	
+	/**
+	 * Resets the boundaries of this subscription
+	 * @param nBounds
+	 */
 	void setBounds(RectangleBoundary nBounds) {
 		bounds = nBounds;
 		dungeon = bounds.getDungeon();

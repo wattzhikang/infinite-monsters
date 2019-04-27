@@ -1,5 +1,11 @@
 package server_core;
 
+/**
+ * Dummy class encapsulating the information in
+ * the client's JSON message
+ * @author Zachariah Watt
+ *
+ */
 public class StrategyRegistrationInfo {
 	private String requestType;
 	private String username;

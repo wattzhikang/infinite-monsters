@@ -2,6 +2,11 @@ package server_core;
 
 import game.Game;
 
+/**
+ * Implements the reverse delta frame protocol
+ * @author zjwatt
+ *
+ */
 public class StrategyReverseDelta implements Strategy {
 	private StrategyReverseDeltaInfo info;
 	

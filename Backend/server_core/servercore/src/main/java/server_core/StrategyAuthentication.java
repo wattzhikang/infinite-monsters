@@ -5,6 +5,11 @@ import com.google.gson.Gson;
 import game.ClientKey;
 import game.Game;
 
+/**
+ * Registers a client with the server, getting a ClientKey from Game
+ * @author zjwatt
+ *
+ */
 public class StrategyAuthentication implements Strategy {
 	
 	StrategyAuthenticationInfo info;

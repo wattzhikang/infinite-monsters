@@ -1,5 +1,10 @@
 package game;
 
+/**
+ * Represents a tile on the grand game map
+ * @author Zachariah Watt
+ *
+ */
 public class Tile {
 	private Position location;
 	private boolean walkable;
@@ -11,6 +16,14 @@ public class Tile {
 		return character;
 	}
 
+	/**
+	 * Constructs a tile with the given information
+	 * @param location
+	 * @param walkable Whether the tile can be trod upon by ordinary players
+	 * @param terrain The background terrain asset of this tile
+	 * @param object The asset of this tile
+	 * @param character The character occupying the tile
+	 */
 	public Tile(Position location, boolean walkable, String terrain, String object, String character) {
 		this.location = location;
 		this.walkable = walkable;
@@ -19,6 +32,10 @@ public class Tile {
 		this.character = character;
 	}
 	
+	/**
+	 * Constructs a blank tile at the given location
+	 * @param location
+	 */
 	public Tile(Position location) {
 		this.location = location;
 		this.walkable = false;

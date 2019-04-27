@@ -2,6 +2,11 @@ package server_core;
 
 import java.util.Collection;
 
+/**
+ * JSON-convertible version of a Delta Frame object
+ * @author zjwatt
+ *
+ */
 public class DeltaFrameInfo {
 	private int subscriptionID;
 	private boolean newDungeon;

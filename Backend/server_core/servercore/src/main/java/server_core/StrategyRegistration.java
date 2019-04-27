@@ -4,6 +4,11 @@ import com.google.gson.Gson;
 
 import game.Game;
 
+/**
+ * Attempts to register a client with the database
+ * @author Zachariah Watt
+ *
+ */
 public class StrategyRegistration implements Strategy {
 	
 	private StrategyRegistrationInfo info;

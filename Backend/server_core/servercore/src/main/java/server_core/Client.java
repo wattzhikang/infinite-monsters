@@ -13,6 +13,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import game.ClientKey;
 import game.Game;
 
+/**
+ * Handles and represents a connection to a client
+ * @author Zachariah Watt
+ *
+ */
 public class Client extends Thread {
 	private SocketAdapter socket;
 	private Game game;
@@ -24,6 +29,11 @@ public class Client extends Thread {
 	
 	boolean active = true;
 	
+	/**
+	 * 
+	 * @param socket
+	 * @param game
+	 */
 	public Client(SocketAdapter socket, Game game) {
 		this.socket = socket;
 		this.game = game;
@@ -34,6 +44,9 @@ public class Client extends Thread {
 		;
 	}
 
+	/**
+	 * Begin accepting messages from the client
+	 */
 	public void run() {
 		in.start();
 		
@@ -57,12 +70,20 @@ public class Client extends Thread {
 		return key;
 	}
 	
-	//deauthentication doesn't have to shut down the client, that can be done by shutdown
+	/**
+	 * Shuts down the client and closes its socket
+	 * @throws InterruptedException
+	 */
 	public void shutDown() throws InterruptedException {
 		in.shutDown();
 		in.join(500);
 	}
 	
+	/**
+	 * Enqueue a Delta Frame that will be sent to the client
+	 * as soon as possible
+	 * @param frame
+	 */
 	public void enqueueDeltaFrame(DeltaFrame frame) {
 		queue.add(new SocketMessage(frame));
 	}

@@ -5,6 +5,11 @@ import java.util.Collection;
 import game.RectangleBoundary;
 import game.Tile;
 
+/**
+ * Represents a Delta Frame that can be sent to the server
+ * @author zjwatt
+ *
+ */
 public class DeltaFrame {
 
 	RectangleBoundary bounds;

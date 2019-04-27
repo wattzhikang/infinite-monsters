@@ -5,6 +5,11 @@ import server_core.Client;
 import server_core.SocketAdapter;
 import server_core.Strategy;
 
+/**
+ * Unsubscribes a specific subscription
+ * @author zjwatt
+ *
+ */
 public class StrategyUnsubscription implements Strategy {
 	StrategyUnsubscriptionInfo info = null;
 	
