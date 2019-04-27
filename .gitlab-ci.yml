@@ -15,4 +15,7 @@ server-core-autodeploy:
     tags:
      - shell
     script:
-     - sudo systemctl restart intermon-server
+     - sudo systemctl stop intermon-server
+     - cd Backend/server_core/servercore/target/
+     - cp servercore-0.9.jar /opt/intermon/server_core.jar
+     - sudo systemctl start intermon-server
