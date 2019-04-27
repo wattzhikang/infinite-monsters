@@ -9,6 +9,9 @@ server-core-maven-build:
   script:
     - cd Backend/server_core/servercore/
     - mvn package
+  artifacts:
+    paths:
+      - Backend/server_core/servercore/target/
 
 server-core-autodeploy:
     stage: scdeploy
