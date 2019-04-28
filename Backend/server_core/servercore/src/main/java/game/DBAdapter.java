@@ -17,7 +17,7 @@ import com.mysql.jdbc.Driver;
 public class DBAdapter implements DBInterface {
 
 	private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	private static final String DB_URL = "jdbc:mysql://localhost:3306/intermondb";
+	private static final String DB_URL = "jdbc:mysql://localhost:3306/intermondb?useLegacyDatetimeCode=false&serverTimezone=America/Chicago";
 	private static final String USER = "intermon";
 	private static final String PASSWORD = "6$r6F~q9gWj$_pj";
 	
