@@ -54,6 +54,19 @@
             </execution>
            </executions>
          </plugin>
+         <plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-shade-plugin</artifactId>
+           <version>3.2.1</version>
+           <executions>
+             <execution>
+               <phase>package</phase>
+               <goals>
+                 <goal>shade</goal>
+               </goals>
+             </execution>
+           </executions>
+         </plugin>
        </plugins>
   </build>
 
@@ -73,6 +86,7 @@
     	<groupId>mysql</groupId>
     	<artifactId>mysql-connector-java</artifactId>
     	<version>8.0.15</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 </project>
