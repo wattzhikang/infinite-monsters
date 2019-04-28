@@ -59,7 +59,7 @@ public class DBAdapter implements DBInterface {
 			System.out.println("Statement Created");
 			
 			
-			String sql = "SELECT " + USER_USERNAME + " FROM intermondb.user";
+			String sql = "SELECT " + USER_USERNAME + " FROM " + USER_TABLE;
 			System.out.println("Executing Query...");
 			results = statement.executeQuery(sql);
 			System.out.println("Query Successfully Executed");
