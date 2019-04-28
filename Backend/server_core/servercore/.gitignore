@@ -42,3 +42,5 @@ buildNumber.properties
 
 # Since the javadoc can be automatically generated, let's not include it
 doc/
+
+.vscode/

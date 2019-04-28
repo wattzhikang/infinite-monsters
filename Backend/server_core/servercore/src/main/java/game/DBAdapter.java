@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 
+import com.mysql.jdbc.Driver;
+
 /**
  * Connects to a MySQL or MariaDB database
  * @author Zachariah Watt
@@ -47,7 +49,7 @@ public class DBAdapter implements DBInterface {
 		try {
 			Class.forName(JDBC_DRIVER);
 			System.out.println("Driver loaded");
-			
+
 			System.out.println("Connecting to database...");
 			connection = DriverManager.getConnection(DB_URL, USER, PASSWORD);
 			System.out.println("Connection established");

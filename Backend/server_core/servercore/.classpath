@@ -41,4 +41,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>
+	<classpathentry kind="output" path="target"/>
 </classpath>
