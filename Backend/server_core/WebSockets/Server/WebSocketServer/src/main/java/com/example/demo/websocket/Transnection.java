@@ -3,10 +3,12 @@ package com.example.demo.websocket;
 import javax.websocket.Session;
 
 import java.io.IOException;
+import java.io.EOFException;
 import java.net.*;
 
 public class Transnection {
 	
+	public static final String SERVER_CORE_URL = "localhost";
 	public static final int SERVER_CORE_PORT = 10042;
 	
 	private SocketAdapter socket;
@@ -15,7 +17,7 @@ public class Transnection {
 	
 	public Transnection(Session session) {
 		try {
-			socket = new SocketAdapter(new Socket("cs309-yt-1.misc.iastate.edu", SERVER_CORE_PORT));
+			socket = new SocketAdapter(new Socket(SERVER_CORE_URL, SERVER_CORE_PORT));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -29,7 +31,7 @@ public class Transnection {
 	}
 	
 	public void close() {
-		//TODO
+		reader.shutDown();
 	}
 	
 	private class Reader extends Thread {
@@ -42,16 +44,25 @@ public class Transnection {
 		}
 		
 		public void run() {
-			while(true) {
-				try {
+			try {
+				while (true) {
 					String message = socket.readString();
 					synchronized (session) {
 						session.getBasicRemote().sendText(message);
 					}
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
+				}
+			} catch (IOException e) {
+				if (!(e instanceof EOFException || e instanceof SocketException)) {
 					e.printStackTrace();
 				}
+			} finally {
+				this.shutDown();
+			}
+		}
+
+		public void shutDown() {
+			if (!socket.isClosed()) {
+				socket.close();
 			}
 		}
 	}
