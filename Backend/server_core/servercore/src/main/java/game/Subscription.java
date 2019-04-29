@@ -35,6 +35,8 @@ public class Subscription {
 	int subscriptionID;
 	
 	RectangleBoundary bounds;
+
+	boolean dungeonChange = true;
 	
 	/**
 	 * Constructs a new Subscription with the given game to draw
@@ -213,7 +215,7 @@ public class Subscription {
 			map[nY][nX] = tile;
 		}
 		
-		client.enqueueDeltaFrame(new DeltaFrame(bounds, queuedUpdates, false, subscriptionID));
+		client.enqueueDeltaFrame(new DeltaFrame(bounds, queuedUpdates, dungeonChange, subscriptionID));
 		queuedUpdates = new ArrayList<Tile>();
 		
 		if (queuedPlayerPosition != null) {
@@ -264,6 +266,14 @@ public class Subscription {
 	 * @param nBounds
 	 */
 	void setBounds(RectangleBoundary nBounds) {
+		if (bounds == null) {
+			dungeonChange = true;
+		} else if (bounds.getDungeon() == nBounds.getDungeon()) {
+			dungeonChange = false;
+		} else {
+			dungeonChange = true;
+		}
+		
 		bounds = nBounds;
 		dungeon = bounds.getDungeon();
 		
