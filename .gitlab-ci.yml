@@ -54,6 +54,7 @@ web-application-build:
       - shell
     script:
       - cd Backend/IntermonReact/intermon/
+      - yarn install
       - yarn run build
     artifacts:
       paths:
