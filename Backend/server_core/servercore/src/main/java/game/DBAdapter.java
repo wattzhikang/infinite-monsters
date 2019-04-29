@@ -150,6 +150,7 @@ public class DBAdapter implements DBInterface {
 		ResultSet results = null;
 		try {
 			//first check that user is not already in database
+			// TODO this can be done with SQL
 			statement = connection.createStatement();
 			
 			String sql = 
@@ -306,6 +307,12 @@ public class DBAdapter implements DBInterface {
 				statement = connection.createStatement();
 
 				String sql = 
+					"IF EXISTS (SELECT * WHERE " +
+					UNIVERSE_DUNGEON + " = " + tile.getLocation().getDungeon() + " AND " +
+					UNIVERSE_X + " = " + tile.getLocation().getX() + " AND " + 
+					UNIVERSE_Y + " = " + tile.getLocation().getY() + ") " +
+					"THEN " +
+
 					"UPDATE " + UNIVERSE_TABLE + " SET " +
 					UNIVERSE_WALKABLE + " = " + ((tile.isWalkable()) ? 0 : 1) + ", " +
 					UNIVERSE_TERRAIN + " = '" + tile.getTerrain() + "', " +
@@ -314,7 +321,28 @@ public class DBAdapter implements DBInterface {
 					" WHERE " +
 					UNIVERSE_DUNGEON + " = " + tile.getLocation().getDungeon() + " AND " +
 					UNIVERSE_X + " = " + tile.getLocation().getX() + " AND " + 
-					UNIVERSE_Y + " = " + tile.getLocation().getY() + ";"
+					UNIVERSE_Y + " = " + tile.getLocation().getY() +
+
+					" ELSE INSERT INTO " + UNIVERSE_TABLE +
+					"( " +
+					UNIVERSE_DUNGEON + " " +
+					UNIVERSE_X + " " +
+					UNIVERSE_Y + " " +
+					UNIVERSE_WALKABLE + " " +
+					UNIVERSE_TERRAIN + " " +
+					UNIVERSE_OBJECT + " " +
+					UNIVERSE_PLAYER +
+					" ) VALUES ( " +
+					tile.getLocation().getDungeon() + ", " +
+					tile.getLocation().getX() + ", " +
+					tile.getLocation().getY() + ", " +
+					((tile.isWalkable()) ? 0 : 1) + ", " +
+					"'" + tile.getTerrain() + "', " +
+					"'" + tile.getObject() + "', " +
+					"'" + tile.getCharacter() + "'" +
+					")" +
+
+					";"
 				;
 
 				statement.executeUpdate(sql);
