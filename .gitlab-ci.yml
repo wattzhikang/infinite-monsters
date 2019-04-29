@@ -66,5 +66,5 @@ web-application-deploy:
     - shell
   script:
     - cd Backend/IntermonReact/intermon/
-    - rm -rf /var/www/html/intermon/*
-    - cp -r build/* /var/www/html/intermon/
+    - sudo rm -rf /var/www/html/intermon/*
+    - sudo cp -r build/* /var/www/html/intermon/
