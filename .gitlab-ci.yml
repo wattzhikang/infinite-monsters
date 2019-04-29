@@ -1,6 +1,8 @@
 stages:
   - scmaven
   - scdeploy
+  - wsmaven
+  - wsdeploy
 
 server-core-maven-build:
   stage: scmaven
@@ -43,3 +45,23 @@ server-core-autodeploy:
     - cd Backend/server_core/WebSockets/Server/WebSocketServer/target/
     - cp WebSocketServer-0.0.1-SNAPSHOT.jar /opt/intermon/websocket_server.jar
     - sudo systemctl start intermon-websocket
+
+web-application-build:
+    stage: wabuild
+    tags:
+      - shell
+    script:
+      - cd Backend/IntermonReact/intermon/
+      - yarn run build
+    artifacts:
+      paths:
+        - Backend/IntermonReact/intermon/build
+
+web-application-deploy:
+  stage: wadeploy
+  tags:
+    - shell
+  script:
+    - cd Backend/IntermonReact/intermon/
+    - rm -rf /var/www/html/intermon/*
+    - cp -r build/* /var/www/html/intermon/
