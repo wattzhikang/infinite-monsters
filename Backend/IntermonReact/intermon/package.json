@@ -21,5 +21,6 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "homepage" : "http://cs309-yt-1.misc.iastate.edu/intermon/build/"
 }
