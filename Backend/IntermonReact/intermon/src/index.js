@@ -104,12 +104,20 @@ var imgLoader = new (function () {
         console.log(urls[url]);
     }
 
+    this.getImages = () => {
+        return Object.keys(images);
+    }
+
     this.getImage = (img) => {
         return images[img].image;
     }
 
     this.allLoaded = () => {
         return allLoaded;
+    }
+
+    this.getLength = () => {
+        return Object.keys(urls).length;
     }
 })();
 
@@ -245,13 +253,12 @@ class Game extends React.Component {
         super(props);
 
         connection.game = this;
-
         this.width = 0;
         this.height = 0;
 
         this.board = document.getElementById("board");
         this.tileEditor = document.getElementById("tileEditor");
-        console.log(this.imgLoader.urls.length)
+        var reverseDeltaFrameTiles = [];
         //The state of the game is simply the map array itself.
         //When it changes, the game is re-rendered.
         /*
@@ -347,7 +354,38 @@ class Game extends React.Component {
 
         this.canvas = (event) => {
             let rect = document.getElementById("board").getBoundingClientRect();
-            console.log((event.clientX - rect.left) + ',' + (event.clientY - rect.top))
+            var x = event.clientX - rect.left;
+            var y = event.clientY - rect.top;
+            console.log(x + ',' + y);
+            return x;
+        };
+
+        this.tileEditor = (event) => {
+            let tileEditorContext = document
+                .getElementById("tileEditor")
+                .getContext("2d")
+                ;
+            let rect = document.getElementById("tileEditor").getBoundingClientRect();
+            var x = event.clientX - rect.left;
+            var y = event.clientY - rect.top;
+            var cellLocX = Math.floor(x / 50);
+            var cellLocY = Math.floor(y / 50);
+            console.log("pointer location: " + x + ',' + y);
+            var tileEditorImages = imgLoader.getImages();
+            var numImages = imgLoader.getLength();
+            for (var i = 0; i < numImages; i++) {
+                tileEditorContext.drawImage(imgLoader.getImage(tileEditorImages[i]), i * 50, 0);
+            }
+
+            for (var n = 0; n < numImages; n++) {
+                console.log("n: " + n + ", cellLocX: " + cellLocX);
+                if (cellLocX === n) {
+                    tileEditorContext.globalAlpha = '0.5';
+                    console.log("cell location: " + cellLocX + ',' + cellLocY)
+                    tileEditorContext.fillRect((cellLocX * 50), (cellLocY * 50), 50, 50);
+                }
+            }
+            connection.send(JSON.stringify(new ReverseDeltaFrame(0, reverseDeltaFrameTiles)));
         };
     }
 
@@ -405,6 +443,7 @@ class Game extends React.Component {
         }); //rerenders here
 
         this.canvasRender();
+        this.tileEditorRender();
     }
 
     //actually draws the map on the canvas
@@ -414,13 +453,12 @@ class Game extends React.Component {
                 .getElementById("board")
                 .getContext("2d")
                 ;
-
             this.state.map.forEach(function (element) {
                 console.log(element);
                 //draw terrain
                 const cellWidth = 49;
                 //TODO This should be a switch statement as well
-                if (element.terrainType == "greenGrass1") {
+                if (element.terrainType === "greenGrass1") {
                     context.rect(element.x * cellWidth, element.y * cellWidth, cellWidth, cellWidth);
                 } else {
                     context.arc(element.x * cellWidth, element.y * cellWidth, cellWidth, 2 * Math.PI);
@@ -431,6 +469,9 @@ class Game extends React.Component {
                 switch (element.object) {
                     case "genericBarrier1":
                         context.drawImage(imgLoader.getImage("genericBarrier01"), element.x * 50, element.y * 50);
+                        break;
+                    default:
+                        break;
                 }
 
                 //draw character
@@ -438,34 +479,29 @@ class Game extends React.Component {
                 switch (element.character) {
                     case "lance":
                         context.drawImage(imgLoader.getImage("character"), element.x * 50, element.y * 50);
+                        break;
+                    default:
+                        break;
                 }
             });
         }
-
-        //report the mouse position when clicked
-        //canvas.addEventListener('click', function (evt) {
-        //console.log(evt.pageX + ',' + evt.pageY);
-        //var mousePos = getMousePos(canvas, evt);
-        //console.log(mousePos.x + ',' + mousePos.y);
-        //}, false);
-
-        //Get mouse position
-        //function getMousePos(canvas, evt) {
-        //var rect = canvas.getBoundingClientRect();
-        //return {
-        // x: evt.clientX - rect.left,
-        //y: evt.clientY - rect.top
-        //};
-        //}
     }
 
     //Displays all of the images of every game tile for the Game Designer
     tileEditorRender() {
         if (imgLoader.allLoaded) {
+            console.log("tile editor");
             var tileEditorContext = document
                 .getElementById("tileEditor")
                 .getContext("2d")
                 ;
+            let count = 0;
+            console.log(imgLoader.getImages);
+            for (let i in imgLoader.getImages) {
+                console.log(i);
+                tileEditorContext.drawImage(i, count * 50, count * 50);
+                count++;
+            }
         }
     }
 
@@ -475,7 +511,7 @@ class Game extends React.Component {
             return (
                 <div>
                     <div><canvas id="board" width="500" height="500" onClick={this.canvas}></canvas></div>
-                    <div><canvas id="tileEditor" width="500" height="300"></canvas></div>
+                    <div><canvas id="tileEditor" width="500" height="300" onClick={this.tileEditor}></canvas></div>
                     <div><button id="upButton" type="button" onClick={this.up}>Up</button></div>
                     <div>
                         <button id="leftButton" type="button" onClick={this.left}>Left</button>
