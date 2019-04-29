@@ -5,9 +5,9 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collection;
 
-import com.mysql.jdbc.Driver;
+import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * Connects to a MySQL or MariaDB database
@@ -17,7 +17,9 @@ import com.mysql.jdbc.Driver;
 public class DBAdapter implements DBInterface {
 
 	private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	private static final String DB_URL = "jdbc:mysql://localhost:3306/intermondb?useLegacyDatetimeCode=false&serverTimezone=America/Chicago";
+	private static final String DB_URL = "jdbc:mysql://localhost:3306/intermondb" +
+		"?useLegacyDatetimeCode=false&serverTimezone=America/Chicago"
+	;
 	private static final String USER = "intermon";
 	private static final String PASSWORD = "6$r6F~q9gWj$_pj";
 	
@@ -207,27 +209,216 @@ public class DBAdapter implements DBInterface {
 
 	@Override
 	public Collection<Tile> getTiles(Collection<Position> locations) {
-		// TODO Auto-generated method stub
+		Collection<Tile> tiles = new LinkedList<Tile>();
+		
 		Statement statement = null;
 		ResultSet results = null;
-		return null;
+		try {
+			statement = connection.createStatement();
+
+			String sql =
+				"SELECT * FROM " +
+				UNIVERSE_TABLE +
+				" WHERE "
+			;
+
+			boolean firstClause = true;
+			for (Position location : locations) {
+				if (!firstClause) {
+					sql += " OR ";
+				} else {
+					firstClause = false;
+				}
+				sql += " ( ";
+				sql += UNIVERSE_DUNGEON + "=";
+				sql += location.getDungeon();
+				sql += " AND " + UNIVERSE_X + "=";
+				sql += location.getX();
+				sql += "AND " + UNIVERSE_Y + "=";
+				sql += location.getY();
+				sql += " ) ";
+			}
+
+			sql += ";";
+
+			results = statement.executeQuery(sql);
+
+			while (results.next()) {
+				int dungeon = results.getInt(UNIVERSE_DUNGEON);
+				int x = results.getInt(UNIVERSE_X);
+				int y = results.getInt(UNIVERSE_Y);
+				
+				Position position = new Position(
+					x,
+					y,
+					dungeon
+				);
+
+				boolean walkable =
+					(results.getInt(UNIVERSE_WALKABLE) == 0) ?
+					false : true
+				;
+				String terrain = results.getString(UNIVERSE_TERRAIN);
+				String object = results.getString(UNIVERSE_OBJECT);
+				String character = results.getString(UNIVERSE_PLAYER);
+
+				Tile tile = new Tile(
+					position,
+					walkable,
+					terrain,
+					object,
+					character
+				);
+
+				tiles.add(tile);
+			}
+		} catch (SQLException se) {
+			se.printStackTrace();
+			tiles = null;
+		} catch (Exception e) {
+
+		} finally {
+			if (statement != null) {
+				try {
+					statement.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (results != null) {
+				try {
+					results.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return tiles;
 	}
 
 	@Override
 	public void updateTiles(Collection<Tile> tiles) {
-		// TODO Auto-generated method stub
-		
+		Statement statement = null;
+
+		try {
+			for (Tile tile : tiles) {
+				statement = connection.createStatement();
+
+				String sql = 
+					"UPDATE " + UNIVERSE_TABLE + " SET " +
+					UNIVERSE_WALKABLE + " = " + ((tile.isWalkable()) ? 0 : 1) + ", " +
+					UNIVERSE_TERRAIN + " = '" + tile.getTerrain() + "', " +
+					UNIVERSE_OBJECT + " = '" + tile.getObject() + "', " + 
+					UNIVERSE_PLAYER + " = '" + tile.getCharacter() + "' " +
+					" WHERE " +
+					UNIVERSE_DUNGEON + " = " + tile.getLocation().getDungeon() + " AND " +
+					UNIVERSE_X + " = " + tile.getLocation().getX() + " AND " + 
+					UNIVERSE_Y + " = " + tile.getLocation().getY() + ";"
+				;
+
+				statement.executeUpdate(sql);
+
+				statement.close();
+			}
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} finally {
+			if (statement != null) {
+				try {
+					statement.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	@Override
 	public RectangleBoundary lastSubscriptionBounds(ClientKey key) {
-		// TODO Auto-generated method stub
-		return null;
+		Statement statement = null;
+		ResultSet results = null;
+
+		RectangleBoundary boundary = null;
+
+		try {
+			statement = connection.createStatement();
+
+			String sql = 
+				"SELECT * FROM " + USER_TABLE + " WHERE " +
+				USER_USERNAME + " = '" + key.getUser() + "';"
+			;
+
+			results = statement.executeQuery(sql);
+
+			int xLowerLeft = results.getInt(USER_XLOWERLEFT);
+			int yLowerLeft = results.getInt(USER_YLOWERLEFT);
+			int xUpperRight = results.getInt(USER_XUPPERRIGHT);
+			int yUpperRight = results.getInt(USER_YUPPERRIGHT);
+			long dungeon = results.getLong(USER_DUNGEON);
+
+			Position lowerLeft = new Position(xLowerLeft, yLowerLeft, dungeon);
+			Position upperRight = new Position(xUpperRight, yUpperRight, dungeon);
+
+			boundary = new RectangleBoundary(upperRight, lowerLeft);
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} finally {
+			if (statement != null) {
+				try {
+					statement.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (results != null) {
+				try {
+					results.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return boundary;
 	}
 
 	@Override
 	public void updateSubscriptionBounds(ClientKey key, RectangleBoundary bounds) {
-		// TODO Auto-generated method stub
-		
+		Statement statement = null;
+		ResultSet results = null;
+
+		try{
+			statement = connection.createStatement();
+
+			String sql =
+				"UPDATE SET " +
+				USER_XLOWERLEFT + " = " + bounds.getLowerLeft().getX() + ", " +
+				USER_YLOWERLEFT + " = " + bounds.getLowerLeft().getY() + ", " +
+				USER_XUPPERRIGHT + " = " + bounds.getUpperRight().getX() + ", " +
+				USER_YUPPERRIGHT + " = " + bounds.getUpperRight().getY() + " " +
+				" WHERE " +
+				USER_USERNAME + " = '" + key.getUser() + "'" +
+				";"
+			;
+
+			statement.executeUpdate(sql);
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} finally {
+			if (statement != null) {
+				try {
+					statement.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (results != null) {
+				try {
+					results.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 }
