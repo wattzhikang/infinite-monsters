@@ -22,3 +22,24 @@ server-core-autodeploy:
      - cd Backend/server_core/servercore/target/
      - cp servercore-0.9.jar /opt/intermon/server_core.jar
      - sudo systemctl start intermon-server
+
+websocket-module-build:
+  stage: wsmaven
+  tags:
+    - shell
+  script:
+    - cd Backend/server_core/WebSockets/Server/WebSocketServer
+    - mvn package
+  artifacts:
+    paths:
+      - Backend/server_core/WebSockets/Server/WebSocketServer/target/
+
+server-core-autodeploy:
+  stage: wsdeploy
+  tags:
+    - shell
+  script:
+    - sudo systemctl stop intermon-websocket
+    - cd Backend/server_core/WebSockets/Server/WebSocketServer/target/
+    - cp WebSocketServer-0.0.1-SNAPSHOT.jar /opt/intermon/websocket_server.jar
+    - sudo systemctl start intermon-websocket
