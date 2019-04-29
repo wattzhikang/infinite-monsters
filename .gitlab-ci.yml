@@ -3,6 +3,8 @@ stages:
   - scdeploy
   - wsmaven
   - wsdeploy
+  - wabuild
+  - wadeploy
 
 server-core-maven-build:
   stage: scmaven
