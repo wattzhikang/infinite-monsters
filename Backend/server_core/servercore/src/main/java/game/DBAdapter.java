@@ -238,7 +238,7 @@ public class DBAdapter implements DBInterface {
 				sql += location.getDungeon();
 				sql += " AND " + UNIVERSE_X + "=";
 				sql += location.getX();
-				sql += "AND " + UNIVERSE_Y + "=";
+				sql += " AND " + UNIVERSE_Y + "=";
 				sql += location.getY();
 				sql += " ) ";
 			}
