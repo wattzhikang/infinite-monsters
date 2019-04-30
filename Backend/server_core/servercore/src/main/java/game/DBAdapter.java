@@ -266,6 +266,9 @@ public class DBAdapter implements DBInterface {
 				String terrain = results.getString(UNIVERSE_TERRAIN);
 				String object = results.getString(UNIVERSE_OBJECT);
 				String character = results.getString(UNIVERSE_PLAYER);
+				if (character.length() < 1) {
+					character = null;
+				}
 
 				Tile tile = new Tile(
 					position,
