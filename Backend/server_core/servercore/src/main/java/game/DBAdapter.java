@@ -115,6 +115,8 @@ public class DBAdapter implements DBInterface {
 				"' AND Password='" + password + "';"
 			;
 
+			System.out.println("Executing SQL statement: " + sql);
+
 			results = statement.executeQuery(sql);
 			
 			if (results.next()) {
@@ -159,6 +161,7 @@ public class DBAdapter implements DBInterface {
 				" WHERE " + USER_USERNAME + "='" + username + "';"
 			;
 			
+			System.out.println("Executing SQL statement: " + sql);
 			results = statement.executeQuery(sql);
 			
 			if (results.next()) {
@@ -242,6 +245,7 @@ public class DBAdapter implements DBInterface {
 
 			sql += ";";
 
+			System.out.println("Executing SQL statement: " + sql);
 			results = statement.executeQuery(sql);
 
 			while (results.next()) {
@@ -345,6 +349,7 @@ public class DBAdapter implements DBInterface {
 					";"
 				;
 
+				System.out.println("Executing SQL statement: " + sql);
 				statement.executeUpdate(sql);
 
 				statement.close();
@@ -377,6 +382,7 @@ public class DBAdapter implements DBInterface {
 				USER_USERNAME + " = '" + key.getUser() + "';"
 			;
 
+			System.out.println("Executing SQL statement: " + sql);
 			results = statement.executeQuery(sql);
 
 			int xLowerLeft = results.getInt(USER_XLOWERLEFT);
@@ -429,6 +435,7 @@ public class DBAdapter implements DBInterface {
 				";"
 			;
 
+			System.out.println("Executing SQL statement: " + sql);
 			statement.executeUpdate(sql);
 		} catch (SQLException se) {
 			se.printStackTrace();
