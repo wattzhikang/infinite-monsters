@@ -385,6 +385,8 @@ public class DBAdapter implements DBInterface {
 			System.out.println("Executing SQL statement: " + sql);
 			results = statement.executeQuery(sql);
 
+			results.next();
+
 			int xLowerLeft = results.getInt(USER_XLOWERLEFT);
 			int yLowerLeft = results.getInt(USER_YLOWERLEFT);
 			int xUpperRight = results.getInt(USER_XUPPERRIGHT);
