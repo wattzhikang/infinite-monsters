@@ -56,6 +56,9 @@ public class RectangleBoundary {
 	 * @return
 	 */
 	public int getUnitChange(RectangleBoundary bound) {
+		if (upperRight.getDungeon() != bound.getDungeon()) {
+			return Integer.MAX_VALUE;
+		}
 		int deltaX = bound.upperRight.getX() - upperRight.getX();
 		int deltaY = bound.upperRight.getY() - upperRight.getY();
 		return Math.abs(deltaX) + Math.abs(deltaY);
