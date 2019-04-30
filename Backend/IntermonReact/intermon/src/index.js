@@ -14,7 +14,7 @@ var connection = {
     instantiate: () => {
         if (connection.isOpen) {
             //connection.socket = new WebSocket('ws://cs309-yt-1.misc.iastate.edu:8080/websocket/zw');
-            connection.socket = new WebSocket('ws://localhost:8080/websocket/zjwatt');
+            connection.socket = new WebSocket('ws://cs309-yt-1.misc.iastate.edu:8080/websocket/zjwatt');
 
             //this function handles messages from the server
             connection.socket.onmessage = function (event) {
