@@ -38,7 +38,7 @@ websocket-module-build:
     paths:
       - Backend/server_core/WebSockets/Server/WebSocketServer/target/
 
-server-core-autodeploy:
+websocket-module-autodeploy:
   stage: wsdeploy
   tags:
     - shell
