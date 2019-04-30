@@ -111,8 +111,8 @@ public class DBAdapter implements DBInterface {
 				USER_USERNAME + ", " + USER_PASSWORD +
 				" FROM " +
 				USER_TABLE + 
-				" WHERE UserName='" + username +
-				"' AND Password='" + password + "';"
+				" WHERE " + USER_USERNAME + "='" + username +
+				"' AND " + USER_PASSWORD + "='" + password + "';"
 			;
 
 			System.out.println("Executing SQL statement: " + sql);
