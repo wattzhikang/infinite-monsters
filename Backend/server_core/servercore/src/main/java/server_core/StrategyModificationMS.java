@@ -20,6 +20,11 @@ public class StrategyModificationMS implements Strategy {
 	
 	@Override
 	public void takeAction(Game game, SocketAdapter socket, Client client) {
+		if (client.getKey() == null) {
+			System.out.println("This client does not have an identity");
+			return;
+		}
+
 		long dungeon = client.getKey().getSubscriber(info.getSubscriptionID()).dungeon();
 		
 		RectangleBoundary bounds = new RectangleBoundary(

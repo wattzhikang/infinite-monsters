@@ -85,7 +85,7 @@ public class Subscription {
 	 * Returns the area of this subscription
 	 * @return
 	 */
-	RectangleBoundary getBounds() {
+	public RectangleBoundary getBounds() {
 		return bounds;
 	}
 	

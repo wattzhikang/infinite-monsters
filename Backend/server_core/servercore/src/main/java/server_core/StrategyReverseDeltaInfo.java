@@ -10,5 +10,6 @@ import java.util.Collection;
  */
 public class StrategyReverseDeltaInfo {
 	public String requestType;
+	public int subscriptionID;
 	public Collection<TileInfo> tiles;
 }
