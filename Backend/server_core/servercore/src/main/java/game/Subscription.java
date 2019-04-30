@@ -21,6 +21,8 @@ public class Subscription {
 	Position player;
 	
 	SubscriptionLock lock;
+
+	Rules rulebook;
 	
 	Map<Subscription, Integer> overlaps;
 	ArrayList<Subscription> lockHierarchy;
@@ -44,7 +46,7 @@ public class Subscription {
 	 * @param game
 	 * @param client
 	 */
-	public Subscription(Game game, Client client) {
+	public Subscription(Game game, Client client, Rules rulebook) {
 		this.lock = new SubscriptionLock();
 		this.overlaps = new HashMap<Subscription, Integer>();
 		this.lockHierarchy = new ArrayList<Subscription>();
@@ -52,6 +54,7 @@ public class Subscription {
 		this.queuedUpdates = new ArrayList<Tile>();
 		this.client = client;
 		this.game = game;
+		this.rulebook = rulebook;
 	}
 	
 	/**
@@ -114,27 +117,40 @@ public class Subscription {
 	 * @param nPlayerLocation Desired new location of player
 	 */
 	public void move(RectangleBoundary nBounds, Position nPlayerLocation) {
-		lockNeighbors();
-		
-		Collection<Tile> buffer = new LinkedList<Tile>();
-		
-		Tile nTile = map[player.getX()][player.getY()];
-		Tile oTile = map[nPlayerLocation.getX()][nPlayerLocation.getY()];
-		
-		String tmp = oTile.getCharacter();
-		oTile.setCharacter(nTile.getCharacter());
-		nTile.setCharacter(tmp);
-		
-		buffer.add(nTile);
-		enqueueUpdate(nTile);
-		buffer.add(oTile);
-		enqueueUpdate(oTile);
-		
-		game.flushTiles(buffer, this);
-		
-		game.adjustBounds(this, bounds, nBounds);
-		
-		unlockNeighbors();
+		try {
+			lockNeighbors();
+
+			if (
+				!rulebook.isMoveLegal(
+					bounds, nBounds,
+					map[nPlayerLocation.getX()][nPlayerLocation.getY()]
+				)
+			) {
+				return;
+			}
+			
+			Collection<Tile> buffer = new LinkedList<Tile>();
+			
+			Tile nTile = map[player.getX()][player.getY()];
+			Tile oTile = map[nPlayerLocation.getX()][nPlayerLocation.getY()];
+			
+			String tmp = oTile.getCharacter();
+			oTile.setCharacter(nTile.getCharacter());
+			nTile.setCharacter(tmp);
+			
+			buffer.add(nTile);
+			enqueueUpdate(nTile);
+			buffer.add(oTile);
+			enqueueUpdate(oTile);
+			
+			game.flushTiles(buffer, this);
+			
+			game.adjustBounds(this, bounds, nBounds);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			unlockNeighbors();
+		}
 	}
 	
 	/**
@@ -142,11 +158,19 @@ public class Subscription {
 	 * @param tiles
 	 */
 	public void reverseDelta(Collection<Tile> tiles) {
-		lockNeighbors();
-		
-		game.flushTiles(tiles);
-		
-		unlockNeighbors();
+		try {
+			lockNeighbors();
+
+			if (!rulebook.canReverseDelta()) {
+				return;
+			}
+			
+			game.flushTiles(tiles);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			unlockNeighbors();
+		}
 	}
 	
 	/**

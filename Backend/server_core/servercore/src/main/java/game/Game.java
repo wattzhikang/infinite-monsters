@@ -138,7 +138,17 @@ public class Game {
 	 * @return
 	 */
 	public int getSubscription(ClientKey key) {
-		int ID = key.addSubscriber(new Subscription(this, key.getUserLink()));
+		Rules rulebook = null;
+		switch (key.getPriveleges()) {
+			case SPECTATOR:
+			case PLAYER:
+				rulebook = new RulesPlayer();
+				break;
+			case DESIGNER:
+				rulebook = new RulesDesigner();
+				break;
+		}
+		int ID = key.addSubscriber(new Subscription(this, key.getUserLink(), rulebook));
 		adjustBounds(key.getSubscriber(ID), null, db.lastSubscriptionBounds(key));
 		return ID;
 	}
