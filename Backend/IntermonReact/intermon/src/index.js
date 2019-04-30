@@ -125,7 +125,7 @@ var imgLoader = new (function () {
 //the JSON stringfrom the server
 function Credentials(name, password) {
     this.requestType = "authentication";
-    this.name = name;
+    this.username = name;
     this.password = password;
 }
 
