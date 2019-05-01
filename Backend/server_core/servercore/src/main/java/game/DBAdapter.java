@@ -319,7 +319,7 @@ public class DBAdapter implements DBInterface {
 				statement = connection.createStatement();
 
 				String sql = 
-					"IF EXISTS (SELECT * WHERE " +
+					"IF EXISTS (SELECT * FROM " + UNIVERSE_DUNGEON + " WHERE " +
 					UNIVERSE_DUNGEON + " = " + tile.getLocation().getDungeon() + " AND " +
 					UNIVERSE_X + " = " + tile.getLocation().getX() + " AND " + 
 					UNIVERSE_Y + " = " + tile.getLocation().getY() + ") " +
@@ -337,12 +337,12 @@ public class DBAdapter implements DBInterface {
 
 					" ELSE INSERT INTO " + UNIVERSE_TABLE +
 					"( " +
-					UNIVERSE_DUNGEON + " " +
-					UNIVERSE_X + " " +
-					UNIVERSE_Y + " " +
-					UNIVERSE_WALKABLE + " " +
-					UNIVERSE_TERRAIN + " " +
-					UNIVERSE_OBJECT + " " +
+					UNIVERSE_DUNGEON + ", " +
+					UNIVERSE_X + ", " +
+					UNIVERSE_Y + ", " +
+					UNIVERSE_WALKABLE + ", " +
+					UNIVERSE_TERRAIN + ", " +
+					UNIVERSE_OBJECT + ", " +
 					UNIVERSE_PLAYER +
 					" ) VALUES ( " +
 					tile.getLocation().getDungeon() + ", " +
