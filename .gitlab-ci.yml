@@ -15,7 +15,9 @@ server-core-maven-build:
     - mvn package
   artifacts:
     paths:
-      - Backend/server_core/servercore/
+      - Backend/server_core/servercore/target/
+      - Backend/server_core/servercore/src/main/java/game/
+      - Backend/server_core/servercore/src/main/java/server_core/
 
 server-core-autodeploy:
     stage: scdeploy
