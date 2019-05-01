@@ -55,6 +55,7 @@ public class ServerCore {
 			System.out.println("Shutting Down...");
 			try {
 				socketListener.shutDown();
+				//TODO this whole if statement is unnecessary now
 				if (game != null) {
 					game.shutDown();
 				} else {

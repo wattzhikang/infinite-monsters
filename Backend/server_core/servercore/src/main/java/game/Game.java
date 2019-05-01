@@ -240,22 +240,12 @@ public class Game {
 	 * Flushes all tiles to the database
 	 */
 	public void shutDown() {
-		//TODO
-//		List<Tile> tiles = new LinkedList<Tile>();
-//		Collection<WatchedLocation> locations = subscriptions.values();
-//		for (WatchedLocation location : locations) {
-//			tiles.add(location.getTile());
-//		}
-//		db.updateTiles(tiles);
-//		
-//		
-//		Collection<ClientKey> allKeys = keys.keySet();
-//		for (ClientKey key : allKeys) {
-//			Collection<Watcher> subscriptions = key.getSubscriptions();
-//			for (Watcher subscription : subscriptions) {
-//				db.updateSubscriptionBounds(key, subscription.getBounds());
-//			}
-//		}
-//		return;
+		Collection<Tile> allTiles = new LinkedList<Tile>();
+		for (Map<Position, Plot> dungeon : dungeons.values()) {
+			for (Plot plot : dungeon.values()) {
+				allTiles.add(plot.getPlot());
+			}
+		}
+		db.updateTiles(allTiles);
 	}
 }
