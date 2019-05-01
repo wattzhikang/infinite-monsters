@@ -412,7 +412,7 @@ class Game extends React.Component {
                     this.yAbsL,
                     this.yAbsU
                 )) {
-                    this.state.map.splice(i, 1);
+                    this.map.splice(i, 1);
                 }
             });
         }
@@ -435,12 +435,23 @@ class Game extends React.Component {
                 this.playerY = tmpTile.y;
             }
 
+            //TODO this is a band-aid solution
+            //to ensure that old tiles are overwritten
+            for (let i = 0; i < this.map.length; i++) {
+                let tile = this.map[i];
+                if (tile.xAbs === tmpTile.xAbs &&
+                    tile.yAbs === tmpTile.yAbs
+                ) {
+                    this.map.splice(i, 1);
+                }
+            }
+
             this.map.push(tmpTile);
         }
 
         this.setState({
             map: this.map.slice()
-        }); //rerenders here
+        });
 
         this.canvasRender();
         this.tileEditorRender();
