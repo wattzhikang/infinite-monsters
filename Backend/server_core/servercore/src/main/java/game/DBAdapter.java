@@ -337,7 +337,7 @@ public class DBAdapter implements DBInterface {
 
 					" ELSE INSERT INTO " + UNIVERSE_TABLE +
 					"( " +
-					UNIVERSE_DUNGEON + ", " +
+					UNIVERSE_TABLE + ", " +
 					UNIVERSE_X + ", " +
 					UNIVERSE_Y + ", " +
 					UNIVERSE_WALKABLE + ", " +
