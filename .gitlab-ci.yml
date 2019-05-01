@@ -27,8 +27,10 @@ server-core-autodeploy:
      - sudo systemctl stop intermon-server
      - cd Backend/server_core/servercore/target/
      - cp servercore-0.9.jar /opt/intermon/server_core.jar
-     - cd Backend/server_core/servercore/
-     - cp -r src /opt/intermon/
+     - cd Backend/server_core/servercore/src/main/java/game/
+     - cp * /opt/intermon/
+     - cd Backend/server_core/servercore/src/main/java/server_core/
+     - cp * /opt/intermon/
      - sudo systemctl start intermon-server
 
 websocket-module-build:
