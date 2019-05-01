@@ -31,9 +31,9 @@ var connection = {
                     connection.game.receivedDeltaFrame(object);
                 } else if (object.loginSuccess !== undefined) {
                     if (object.loginSuccess) {
-                        this.login.handleLoginSuccess();
+                        connection.login.handleLoginSuccess();
                     } else {
-                        this.login.handleLoginFailure();
+                        connection.login.handleLoginFailure();
                     }
                 }
             };
