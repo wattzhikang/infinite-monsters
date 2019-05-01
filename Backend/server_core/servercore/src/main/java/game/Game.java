@@ -99,6 +99,8 @@ public class Game {
 	 */
 	void adjustBounds(Subscription subscription, RectangleBoundary oldBounds, RectangleBoundary newBounds) {
 		Collection<Position> nTiles = null;
+
+		//if the subscription is new, then this if statement matters
 		if (oldBounds != null) {
 			nTiles = oldBounds.getDifference(newBounds);
 		} else {
