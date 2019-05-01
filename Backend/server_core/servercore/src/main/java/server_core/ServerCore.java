@@ -48,6 +48,7 @@ public class ServerCore {
 		public ShutdownHook(ConnectionListener socketListener, DBInterface db, Game game) {
 			this.socketListener = socketListener;
 			this.db = db;
+			this.game = game;
 		}
 		
 		public void run() {
