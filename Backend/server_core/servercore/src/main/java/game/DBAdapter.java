@@ -215,6 +215,10 @@ public class DBAdapter implements DBInterface {
 	@Override
 	public Collection<Tile> getTiles(Collection<Position> locations) {
 		Collection<Tile> tiles = new LinkedList<Tile>();
+
+		if (locations == null || locations.size() < 1) {
+			return tiles;
+		}
 		
 		Statement statement = null;
 		ResultSet results = null;
