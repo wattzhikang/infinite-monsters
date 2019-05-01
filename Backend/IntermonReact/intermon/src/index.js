@@ -9,11 +9,11 @@ var connection = {
     queue: [],
     game: null, //it needs the game so it knows where to send
     //the delta frames to
+    login: null, //it also needs to know who to notify of login success
 
     //establishes a connection to the server
     instantiate: () => {
         if (connection.isOpen) {
-            //connection.socket = new WebSocket('ws://cs309-yt-1.misc.iastate.edu:8080/websocket/zw');
             connection.socket = new WebSocket('ws://cs309-yt-1.misc.iastate.edu:8080/websocket/zjwatt');
 
             //this function handles messages from the server
@@ -29,6 +29,12 @@ var connection = {
                     && object.tiles !== undefined
                 ) {
                     connection.game.receivedDeltaFrame(object);
+                } else if (object.loginSuccess !== undefined) {
+                    if (object.loginSuccess) {
+                        login.handleLoginSuccess();
+                    } else {
+                        login.handleLoginFailure();
+                    }
                 }
             };
 
@@ -58,8 +64,15 @@ var connection = {
             connection.socket.send(string);
         }
     },
-    close: () => {
-        connection.socket.close();
+    close: () => { //this function is basically reverse instantiate
+        if (connection.isOpen) {
+            connection.socket.close();
+
+            connection.socket = null;
+            connection.queue = [];
+
+            connection.isOpen = false;
+        }
     },
 }
 
@@ -75,11 +88,12 @@ var imgLoader = new (function () {
         character: (process.env.PUBLIC_URL + "/rec/character.svg"),
     };
 
+    var that = this;
+
     var allLoaded = false;
 
     var images = {};
     function ImageType(url) {
-        var that = this;
 
         this.loaded = false;
 
@@ -160,7 +174,15 @@ function ModMoveSubscription(
 class Login extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { name: 'username', password: 'password' };
+
+        connection.login = this;
+
+        this.state = {
+            name: 'username',
+            password: 'password',
+            loggedIn: false,
+            readOnly: false
+        };
 
         //I think these statements just ensure that the 'this' reference
         //in these methods refers to this object, and not their own
@@ -183,38 +205,88 @@ class Login extends React.Component {
 
     //Sends the credentials to the server and subsequently requests a subscription.
     handleSubmit(event) {
-        alert(
-            "Credentials were submitted: "
-            + this.state.name + " "
-            + this.state.password
-        );
-        event.preventDefault(); //I don't know what this does
-        connection.instantiate(); //prior to this, the websocket is not connected
-        connection.send(
-            JSON.stringify(new Credentials(this.state.name, this.state.password))
+        if (!this.state.loggedIn) {
+            alert(
+                "Credentials were submitted: "
+                + this.state.name + " "
+                + this.state.password
+            );
+            this.submittedName = this.state.name;
+            event.preventDefault(); //I don't know what this does
+            connection.instantiate(); //prior to this, the websocket is not connected
+            connection.send(
+                JSON.stringify(new Credentials(this.state.name, this.state.password))
+            );
+            this.setState(
+                {
+                    loggedIn: true,
+                    readOnly: true
+                }
+            );
+        }
+    }
+
+    handleLoginSuccess() {
+        this.setState(
+            {
+                name: this.submittedName,
+                password: '',
+                loggedIn: true,
+                readOnly: true
+            }
         );
         connection.send(
             JSON.stringify(new RequestSubscription())
         );
     }
 
+    handleLoginFailure() {
+        this.setState(
+            {
+                loggedIn: false,
+                readOnly: false
+            }
+        );
+    }
+
+    logOut() {
+        connection.send(
+            JSON.stringify({requestType: "deauthentication"})
+        );
+        this.setState(
+            {
+                name: 'username',
+                password: 'password',
+                loggedIn: false,
+                readOnly: false
+            }
+        );
+    }
+
     render() {
         return (
-            <form onSubmit={this.handleSubmit}>
-                username
-                <input
-                    type="text"
-                    value={this.state.name}
-                    onChange={this.handleNameChange}
-                /><br />
-                password
-                <input
-                    type="text"
-                    value={this.state.password}
-                    onChange={this.handlePasswordChange}
-                /><br />
-                <input type="submit" value="Log In" />
-            </form>
+            <div>
+                <form onSubmit={this.handleSubmit}>
+                    username
+                    <input
+                        type="text"
+                        value={this.state.name}
+                        onChange={this.handleNameChange}
+                        readOnly={this.state.readOnly}
+                    /><br />
+                    password
+                    <input
+                        type="text"
+                        value={this.state.password}
+                        onChange={this.handlePasswordChange}
+                        readOnly={this.state.readOnly}
+                    /><br />
+                    <input type="submit" value="Log In" />
+                </form>
+                <div>
+                    <button type="button" >Log Out</button>
+                </div>
+            </div>
         );
     }
 }
