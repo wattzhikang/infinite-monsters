@@ -15,7 +15,7 @@ server-core-maven-build:
     - mvn package
   artifacts:
     paths:
-      - Backend/server_core/servercore/target/
+      - Backend/server_core/servercore/
 
 server-core-autodeploy:
     stage: scdeploy
@@ -25,6 +25,8 @@ server-core-autodeploy:
      - sudo systemctl stop intermon-server
      - cd Backend/server_core/servercore/target/
      - cp servercore-0.9.jar /opt/intermon/server_core.jar
+     - cd ..
+     - sudo cp -r src/* /opt/intermon/src
      - sudo systemctl start intermon-server
 
 websocket-module-build:
