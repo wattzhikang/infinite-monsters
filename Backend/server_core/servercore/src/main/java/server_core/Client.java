@@ -75,6 +75,7 @@ public class Client extends Thread {
 	 * @throws InterruptedException
 	 */
 	public void shutDown() throws InterruptedException {
+		active = false;
 		in.shutDown();
 		in.join(500);
 	}
