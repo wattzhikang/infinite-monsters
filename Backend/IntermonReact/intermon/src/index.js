@@ -452,7 +452,16 @@ class Game extends React.Component {
             var context = document
                 .getElementById("board")
                 .getContext("2d")
-                ;
+            ;
+
+            //clear the canvas before drawing every time
+            context.clearRect(
+                0,
+                0,
+                document.getElementById("board").width,
+                document.getElementById("board").height
+            );
+
             this.state.map.forEach(function (element) {
                 console.log(element);
                 //draw terrain
