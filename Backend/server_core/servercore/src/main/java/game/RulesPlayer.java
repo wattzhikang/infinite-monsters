@@ -7,12 +7,15 @@ class RulesPlayer implements Rules {
         Tile nPlayerLocation
     ) {
         if (oBounds.getUnitChange(nBounds) > 1) {
+            System.out.println("UnitChange greater than 1");
             return false;
         }
         if (!nPlayerLocation.isWalkable()) {
+            System.out.println("Destination Tile is not walkable");
             return false;
         }
         if (nPlayerLocation.getCharacter() != null) {
+            System.out.println("Destination Tile has a player on it already");
             return false;
         }
         return true;
