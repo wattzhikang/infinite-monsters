@@ -253,6 +253,13 @@ class Login extends React.Component {
         connection.send(
             JSON.stringify({requestType: "deauthentication"})
         );
+        //TODO this is bad architecture
+        document.getElementById("board").getContext("2d").clearRect(
+            0,
+            0,
+            document.getElementById("board").width,
+            document.getElementById("board").height
+        );
         this.setState(
             {
                 name: 'username',
@@ -284,7 +291,7 @@ class Login extends React.Component {
                     <input type="submit" value="Log In" />
                 </form>
                 <div>
-                    <button type="button" >Log Out</button>
+                    <button type="button" onClick={this.logOut}>Log Out</button>
                 </div>
             </div>
         );
