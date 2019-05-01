@@ -325,7 +325,7 @@ class Game extends React.Component {
                 this.playerX,
                 this.playerY,
                 this.playerX,
-                this.playerY + 1,
+                this.playerY - 1,
             );
 
             connection.send(JSON.stringify(
@@ -344,7 +344,7 @@ class Game extends React.Component {
                 this.playerX,
                 this.playerY,
                 this.playerX,
-                this.playerY - 1,
+                this.playerY + 1,
             );
 
             connection.send(JSON.stringify(

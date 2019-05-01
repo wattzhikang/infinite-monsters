@@ -123,7 +123,7 @@ public class Subscription {
 			if (
 				!rulebook.isMoveLegal(
 					bounds, nBounds,
-					map[nPlayerLocation.getX()][nPlayerLocation.getY()]
+					map[nPlayerLocation.getY()][nPlayerLocation.getX()]
 				)
 			) {
 				return;
@@ -131,8 +131,9 @@ public class Subscription {
 			
 			Collection<Tile> buffer = new LinkedList<Tile>();
 			
-			Tile nTile = map[player.getX()][player.getY()];
-			Tile oTile = map[nPlayerLocation.getX()][nPlayerLocation.getY()];
+			//TODO this tiles are misnamed, though it doesn't affect the program
+			Tile nTile = map[player.getY()][player.getX()];
+			Tile oTile = map[nPlayerLocation.getY()][nPlayerLocation.getX()];
 			
 			String tmp = oTile.getCharacter();
 			oTile.setCharacter(nTile.getCharacter());
