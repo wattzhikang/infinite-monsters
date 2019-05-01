@@ -152,7 +152,7 @@ public class Subscription {
 			unlockNeighbors();
 		}
 	}
-	
+	 
 	/**
 	 * Updates tiles in this Subscription
 	 * @param tiles
@@ -308,7 +308,7 @@ public class Subscription {
 					int nX = tile.getLocation().getX() - bounds.getLowerLeft().getX();
 					int nY = tile.getLocation().getY() - bounds.getLowerLeft().getY();
 					
-					if (nY > 0 && nY < nMap.length && nX > 0 && nX < nMap[0].length) {
+					if (nY >= 0 && nY < nMap.length && nX >= 0 && nX < nMap[0].length) {
 						nMap[nY][nX] = tile;
 					}
 				}
