@@ -318,24 +318,19 @@ public class DBAdapter implements DBInterface {
 			for (Tile tile : tiles) {
 				statement = connection.createStatement();
 
+				int tileIsWalkable = ((tile.isWalkable()) ? 0 : 1);
+				String tileTerrain = (tile.getTerrain() == null) ?
+					"" : tile.getTerrain()
+				;
+				String tileObject = (tile.getObject() == null) ?
+					"" : tile.getObject()
+				;
+				String tileCharacter = (tile.getCharacter() == null) ?
+					"" : tile.getCharacter()
+				;
+
 				String sql = 
-					"IF EXISTS (SELECT * FROM " + UNIVERSE_TABLE + " WHERE " +
-					UNIVERSE_DUNGEON + " = " + tile.getLocation().getDungeon() + " AND " +
-					UNIVERSE_X + " = " + tile.getLocation().getX() + " AND " + 
-					UNIVERSE_Y + " = " + tile.getLocation().getY() + ") " +
-					"THEN " +
-
-					"UPDATE " + UNIVERSE_TABLE + " SET " +
-					UNIVERSE_WALKABLE + " = " + ((tile.isWalkable()) ? 0 : 1) + ", " +
-					UNIVERSE_TERRAIN + " = '" + tile.getTerrain() + "', " +
-					UNIVERSE_OBJECT + " = '" + tile.getObject() + "', " + 
-					UNIVERSE_PLAYER + " = '" + tile.getCharacter() + "' " +
-					" WHERE " +
-					UNIVERSE_DUNGEON + " = " + tile.getLocation().getDungeon() + " AND " +
-					UNIVERSE_X + " = " + tile.getLocation().getX() + " AND " + 
-					UNIVERSE_Y + " = " + tile.getLocation().getY() +
-
-					" ELSE INSERT INTO " + UNIVERSE_TABLE +
+					"INSERT INTO " + UNIVERSE_TABLE +
 					"( " +
 					UNIVERSE_DUNGEON + ", " +
 					UNIVERSE_X + ", " +
@@ -348,11 +343,23 @@ public class DBAdapter implements DBInterface {
 					tile.getLocation().getDungeon() + ", " +
 					tile.getLocation().getX() + ", " +
 					tile.getLocation().getY() + ", " +
-					((tile.isWalkable()) ? 0 : 1) + ", " +
-					"'" + tile.getTerrain() + "', " +
-					"'" + tile.getObject() + "', " +
-					"'" + tile.getCharacter() + "'" +
+					tileIsWalkable + ", " +
+					"'" + tileTerrain + "', " +
+					"'" + tileObject + "', " +
+					"'" + tileCharacter + "'" +
 					")" +
+
+					" ON DUPLICATE KEY " +
+
+					"UPDATE " + UNIVERSE_TABLE + " SET " +
+					UNIVERSE_WALKABLE + " = " + tileIsWalkable + ", " +
+					UNIVERSE_TERRAIN + " = '" + tileTerrain + "', " +
+					UNIVERSE_OBJECT + " = '" + tileObject + "', " + 
+					UNIVERSE_PLAYER + " = '" + tileCharacter + "' " +
+					" WHERE " +
+					UNIVERSE_DUNGEON + " = " + tile.getLocation().getDungeon() + " AND " +
+					UNIVERSE_X + " = " + tile.getLocation().getX() + " AND " + 
+					UNIVERSE_Y + " = " + tile.getLocation().getY() +
 
 					";"
 				;
