@@ -16,6 +16,11 @@ public class StrategySeppuku implements Strategy {
 			client.getKey().unsubscribeAll();
 		}
 		client.setKey(null);
+		try {
+			client.shutDown();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
