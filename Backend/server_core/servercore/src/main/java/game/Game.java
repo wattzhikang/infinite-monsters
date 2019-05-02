@@ -159,11 +159,11 @@ public class Game {
 	 * @param locations
 	 * @return a Collection of tiles retrieved
 	 */
-	Collection<Tile> getTiles(Collection<Position> locationsArg) {
-		Collection<Position> locations = new LinkedList<Position>();
-		locations.addAll(locationsArg);
+	Collection<Tile> getTiles(Collection<Position> locations) {
 		Collection<Tile> returnTiles = new LinkedList<Tile>();
-		
+
+		Collection<Position> nonCached = new LinkedList<Position>();
+
 		//first get tiles that are already cached
 		for (Position location : locations) {
 			//add a map for this dungeon if there isn't one
@@ -175,20 +175,21 @@ public class Game {
 			//and check off the location
 			if (dungeons.get(new Long(location.getDungeon())).containsKey(location)) {
 				returnTiles.add(dungeons.get(new Long(location.getDungeon())).get(location).getPlot());
-				locations.remove(location);
+			} else {
+				nonCached.add(location);
 			}
 		}
 		
 		//check database for remaining locations
-		Collection<Tile> dbTiles = db.getTiles(locations);
+		Collection<Tile> dbTiles = db.getTiles(nonCached);
 		for (Tile tile : dbTiles) {
 			dungeons.get(new Long(tile.getLocation().getDungeon())).put(tile.getLocation(), new Plot(tile));
-			locations.remove(tile.getLocation());
+			nonCached.remove(tile.getLocation());
 		}
 		returnTiles.addAll(dbTiles);
 		
 		//the remaining tiles are in neither the database nor the cache. They are null tiles
-		for (Position location : locations) {
+		for (Position location : nonCached) {
 			Tile tile = new Tile(location);
 			dungeons.get(new Long(location.getDungeon()))
 				.put(
