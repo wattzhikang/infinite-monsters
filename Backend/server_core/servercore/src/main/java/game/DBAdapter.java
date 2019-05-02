@@ -331,7 +331,7 @@ public class DBAdapter implements DBInterface {
 
 				String sql = 
 					"INSERT INTO " + UNIVERSE_TABLE +
-					"( " +
+					" ( " +
 					UNIVERSE_DUNGEON + ", " +
 					UNIVERSE_X + ", " +
 					UNIVERSE_Y + ", " +
@@ -351,15 +351,11 @@ public class DBAdapter implements DBInterface {
 
 					" ON DUPLICATE KEY " +
 
-					"UPDATE " + UNIVERSE_TABLE + " SET " +
+					"UPDATE " +
 					UNIVERSE_WALKABLE + " = " + tileIsWalkable + ", " +
 					UNIVERSE_TERRAIN + " = '" + tileTerrain + "', " +
 					UNIVERSE_OBJECT + " = '" + tileObject + "', " + 
 					UNIVERSE_PLAYER + " = '" + tileCharacter + "' " +
-					" WHERE " +
-					UNIVERSE_DUNGEON + " = " + tile.getLocation().getDungeon() + " AND " +
-					UNIVERSE_X + " = " + tile.getLocation().getX() + " AND " + 
-					UNIVERSE_Y + " = " + tile.getLocation().getY() +
 
 					";"
 				;
