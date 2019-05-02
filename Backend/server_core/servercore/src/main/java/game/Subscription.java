@@ -107,7 +107,7 @@ public class Subscription {
 				allTiles.add(tile);
 			}
 		}
-		game.flushTiles(allTiles);
+		game.flushTiles(allTiles, this);
 	}
 	
 	/**

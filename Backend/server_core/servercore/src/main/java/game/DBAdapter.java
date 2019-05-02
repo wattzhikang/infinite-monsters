@@ -318,7 +318,7 @@ public class DBAdapter implements DBInterface {
 			for (Tile tile : tiles) {
 				statement = connection.createStatement();
 
-				int tileIsWalkable = ((tile.isWalkable()) ? 0 : 1);
+				int tileIsWalkable = ((tile.isWalkable()) ? 1 : 0);
 				String tileTerrain = (tile.getTerrain() == null) ?
 					"" : tile.getTerrain()
 				;
