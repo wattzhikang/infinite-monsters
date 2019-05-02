@@ -81,4 +81,9 @@ public class SocketAdapterTCP implements SocketAdapter {
 			e.printStackTrace();
 		}
 	}
+
+	@Override
+	public String toString() {
+		return socket.getInetAddress().toString();
+	}
 }

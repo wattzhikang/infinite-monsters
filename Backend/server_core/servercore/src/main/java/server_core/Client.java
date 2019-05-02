@@ -128,5 +128,10 @@ public class Client extends Thread {
 				socket.close();
 			}
 		}
+
+		@Override
+		public String toString() {
+			return ((active) ? "active " : "inactive ") + "Client at " + socket.toString();
+		}
 	}
 }

@@ -17,5 +17,8 @@ public interface SocketAdapter {
 	public boolean isClosed();
 	
 	public void close();
+
+	@Override
+	public String toString();
 	
 }

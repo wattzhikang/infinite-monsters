@@ -60,6 +60,12 @@ public class ConnectionListener extends Thread{
 			Client newClient = new Client(new SocketAdapterTCP(newConnection), game);
 			clientList.add(newClient);
 			newClient.start();
+
+			System.out.println("New connection from: " + newConnection.getInetAddress().toString());
+			System.out.println("Here is a list of current clients");
+			for (Client client : clientList) {
+				System.out.println(client);
+			}
 			
 			//maybe go through list and cull
 		}
