@@ -5,6 +5,7 @@ stages:
   - wsdeploy
   - wabuild
   - wadeploy
+  - androidbuild
 
 server-core-maven-build:
   stage: scmaven
