@@ -16,7 +16,7 @@ public class DBDummy implements DBInterface {
 	private static final String grass = "greenGrass1";
 	private static final String barrier = "genericBarrier1";
 	
-	private RectangleBoundary bounds = new RectangleBoundary(new Position(0,0,0), new Position(3,2,0));
+	private RectangleBoundary bounds = new RectangleBoundary(new Position(0,0,0), new Position(10,10,0));
 	
 	private Map<Position, Tile> database;
 	
@@ -41,10 +41,10 @@ public class DBDummy implements DBInterface {
 		database.put(tmp, new Tile(tmp, false, grass, barrier, null));
 		
 		tmp = new Position(1,1,0);
-		database.put(tmp, new Tile(tmp, false, grass, null, "lance"));
+		database.put(tmp, new Tile(tmp, true, grass, null, "lance"));
 		
-		tmp = new Position(2,1,0);
-		database.put(tmp, new Tile(tmp, false, grass, null, null));
+		tmp = new Position(2,1,0); 
+		database.put(tmp, new Tile(tmp, true, grass, null, null));
 		
 		tmp = new Position(3,1,0);
 		database.put(tmp, new Tile(tmp, false, grass, barrier, null));

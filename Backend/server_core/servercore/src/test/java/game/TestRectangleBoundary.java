@@ -7,7 +7,7 @@ import java.util.Collection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class RectangleBoundaryTest {
+class TestRectangleBoundary {
 
 	RectangleBoundary bound1;
 	RectangleBoundary bound2;

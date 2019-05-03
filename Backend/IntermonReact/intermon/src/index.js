@@ -2,6 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
+import { reverse } from 'dns';
+
+const cellWidth = 49;
 
 //singleton that establishes a websocket connection to the server
 var connection = {
@@ -14,8 +17,8 @@ var connection = {
     //establishes a connection to the server
     instantiate: () => {
         if (connection.isOpen) {
-            //connection.socket = new WebSocket('ws://cs309-yt-1.misc.iastate.edu:8080/websocket/zjwatt');
             connection.socket = new WebSocket('ws://localhost:8080/websocket/zjwatt');
+            //connection.socket = new WebSocket('ws://localhost:8080/websocket/zjwatt');
 
             //this function handles messages from the server
             connection.socket.onmessage = function (event) {
@@ -193,6 +196,7 @@ class Login extends React.Component {
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.logOut = this.logOut.bind(this);
     }
 
     //When a different username is entered, the state of this object is changed
@@ -361,8 +365,8 @@ class Game extends React.Component {
             console.log("Moving left");
             let move = new ModMoveSubscription(
                 this.subscriptionID,
-                this.xAbsL - 1, //TODO move bounds as well
-                this.xAbsR - 1, //TODO move bounds as well
+                this.xAbsL, //TODO move bounds as well
+                this.xAbsR, //TODO move bounds as well
                 this.yAbsU, //TODO move bounds as well
                 this.yAbsL, //TODO move bounds as well
                 this.playerX,
@@ -381,8 +385,8 @@ class Game extends React.Component {
             console.log("Moving right");
             let move = new ModMoveSubscription(
                 this.subscriptionID,
-                this.xAbsL + 1, //TODO move bounds as well
-                this.xAbsR + 1, //TODO move bounds as well
+                this.xAbsL, //TODO move bounds as well
+                this.xAbsR, //TODO move bounds as well
                 this.yAbsU, //TODO move bounds as well
                 this.yAbsL, //TODO move bounds as well
                 this.playerX,
@@ -402,8 +406,8 @@ class Game extends React.Component {
                 this.subscriptionID,
                 this.xAbsL, //TODO move bounds as well
                 this.xAbsR, //TODO move bounds as well
-                this.yAbsU + 1, //TODO move bounds as well
-                this.yAbsL + 1, //TODO move bounds as well
+                this.yAbsU, //TODO move bounds as well
+                this.yAbsL, //TODO move bounds as well
                 this.playerX,
                 this.playerY,
                 this.playerX,
@@ -422,8 +426,8 @@ class Game extends React.Component {
                 this.subscriptionID,
                 this.xAbsL, //TODO move bounds as well
                 this.xAbsR, //TODO move bounds as well
-                this.yAbsU - 1, //TODO move bounds as well
-                this.yAbsL - 1, //TODO move bounds as well
+                this.yAbsU, //TODO move bounds as well
+                this.yAbsL, //TODO move bounds as well
                 this.playerX,
                 this.playerY,
                 this.playerX,
@@ -485,7 +489,7 @@ class Game extends React.Component {
             var x = event.clientX - rect.left;
             var y = event.clientY - rect.top;
             var cellLocX = Math.floor(x / 50);
-            var cellLocY = Math.floor(y / 50);
+            //var cellLocY = Math.floor(y / 50);
             let numReverseTiles = reverseDeltaFrameTiles.length;
             for (var i = 0; i < numReverseTiles; i++) {
                 if (cellLocX === 0) {
@@ -512,15 +516,17 @@ class Game extends React.Component {
             var x = event.clientX - rect.left;
             var y = event.clientY - rect.top;
             var cellLocX = Math.floor(x / 50);
-            var cellLocY = Math.floor(y / 50);
+            //var cellLocY = Math.floor(y / 50);
             let numReverseTiles = reverseDeltaFrameTiles.length;
             for (var i = 0; i < numReverseTiles; i++) {
                 if (cellLocX === 0) {
                     reverseDeltaFrameTiles[i].terrainType = "greenGrass1";
+                    reverseDeltaFrameTiles[i].object = null;
                     reverseDeltaFrameTiles[i].walkable = "true";
                 }
                 else if (cellLocX === 1) {
                     reverseDeltaFrameTiles[i].terrainType = "genericPath1";
+                    reverseDeltaFrameTiles[i].object = null;
                     reverseDeltaFrameTiles[i].walkable = "true";
                 }
             }
@@ -626,7 +632,7 @@ class Game extends React.Component {
             this.state.map.forEach(function (element) {
                 console.log(element);
                 //draw terrain
-                const cellWidth = 49;
+                
                 //TODO This should be a switch statement as well
                 if (element.terrainType === "greenGrass1") {
                     context.rect(element.x * cellWidth, element.y * cellWidth, cellWidth, cellWidth);
@@ -667,10 +673,13 @@ class Game extends React.Component {
         if (imgLoader.allLoaded) {
             var tileEditorContext = document.getElementById("objectTypes").getContext("2d");
             var tileEditorImages = imgLoader.getImages();
-            var numImages = imgLoader.getLength();
+            var numImages = imgLoader.getImages().length;
+            var i;
             for (var i = 0; i < numImages; i++) {
                 tileEditorContext.drawImage(imgLoader.getImage(tileEditorImages[i]), i * 50, 0);
             }
+            tileEditorContext.rect(i * cellWidth, 0, cellWidth, cellWidth);
+            console.log("Why isn't the rectangle being drawn?");
         }
     }
 
