@@ -610,12 +610,10 @@ class Game extends React.Component {
 
             const placeables = imgLoader.getImages().map( (image, i) => {
                     return (
-                        <div><input type="radio" name="placeable" value={image}/>{image}<br/></div>
+                        <div><input type="radio" name="placeable" value={image}/>{imgLoader.getImage(image)}<br/></div>
                     );
                 }
             );
-
-            var gender = document.querySelector('input[name = "walkable"]:checked').value;
 
             return (
                 <div>
