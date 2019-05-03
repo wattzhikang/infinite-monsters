@@ -24,7 +24,7 @@ server-core-autotest:
   tags:
     - shell
   script:
-    - cd Backend/server_core
+    - cd Backend/server_core/servercore
     - mvn test
 
 server-core-autodeploy:
