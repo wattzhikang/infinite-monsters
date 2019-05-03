@@ -12,12 +12,18 @@ body {
   border: 1px solid #000000;
 }
 
-#tileEditor, #testTileEditor {
+#objectTypes, #testObjectTypes {
   border: 1px solid #000000;
   position: fixed;
-  bottom: 0;
-  right: 0;
+  bottom: 1px;
+  right: 1px;
+}
 
+#terrainTypes, #testTerrainTypes {
+  border: 1px solid #000000;
+  position: fixed;
+  bottom: 160px;
+  right: 1px;
 }
 
 code {

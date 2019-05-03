@@ -14,7 +14,8 @@ var connection = {
     //establishes a connection to the server
     instantiate: () => {
         if (connection.isOpen) {
-            connection.socket = new WebSocket('ws://cs309-yt-1.misc.iastate.edu:8080/websocket/zjwatt');
+            //connection.socket = new WebSocket('ws://cs309-yt-1.misc.iastate.edu:8080/websocket/zjwatt');
+            connection.socket = new WebSocket('ws://localhost:8080/websocket/zjwatt');
 
             //this function handles messages from the server
             connection.socket.onmessage = function (event) {
@@ -32,6 +33,8 @@ var connection = {
                 } else if (object.loginSuccess !== undefined) {
                     if (object.loginSuccess) {
                         connection.login.handleLoginSuccess();
+                        connection.game.objectTypeRender();
+                        connection.game.terrainTypeRender();
                     } else {
                         connection.login.handleLoginFailure();
                     }
@@ -251,7 +254,7 @@ class Login extends React.Component {
 
     logOut() {
         connection.send(
-            JSON.stringify({requestType: "deauthentication"})
+            JSON.stringify({ requestType: "deauthentication" })
         );
         //TODO this is bad architecture
         document.getElementById("board").getContext("2d").clearRect(
@@ -358,8 +361,8 @@ class Game extends React.Component {
             console.log("Moving left");
             let move = new ModMoveSubscription(
                 this.subscriptionID,
-                this.xAbsL, //TODO move bounds as well
-                this.xAbsR, //TODO move bounds as well
+                this.xAbsL - 1, //TODO move bounds as well
+                this.xAbsR - 1, //TODO move bounds as well
                 this.yAbsU, //TODO move bounds as well
                 this.yAbsL, //TODO move bounds as well
                 this.playerX,
@@ -367,7 +370,8 @@ class Game extends React.Component {
                 this.playerX - 1,
                 this.playerY,
             );
-
+            console.log(move);
+            console.log(JSON.stringify(move));
             connection.send(JSON.stringify(
                 move
             ));
@@ -377,8 +381,8 @@ class Game extends React.Component {
             console.log("Moving right");
             let move = new ModMoveSubscription(
                 this.subscriptionID,
-                this.xAbsL, //TODO move bounds as well
-                this.xAbsR, //TODO move bounds as well
+                this.xAbsL + 1, //TODO move bounds as well
+                this.xAbsR + 1, //TODO move bounds as well
                 this.yAbsU, //TODO move bounds as well
                 this.yAbsL, //TODO move bounds as well
                 this.playerX,
@@ -389,7 +393,6 @@ class Game extends React.Component {
 
             console.log(move);
             console.log(JSON.stringify(move));
-
             connection.send(JSON.stringify(move));
         };
 
@@ -399,14 +402,15 @@ class Game extends React.Component {
                 this.subscriptionID,
                 this.xAbsL, //TODO move bounds as well
                 this.xAbsR, //TODO move bounds as well
-                this.yAbsU, //TODO move bounds as well
-                this.yAbsL, //TODO move bounds as well
+                this.yAbsU + 1, //TODO move bounds as well
+                this.yAbsL + 1, //TODO move bounds as well
                 this.playerX,
                 this.playerY,
                 this.playerX,
                 this.playerY - 1,
             );
-
+            console.log(move);
+            console.log(JSON.stringify(move));
             connection.send(JSON.stringify(
                 move
             ));
@@ -418,54 +422,122 @@ class Game extends React.Component {
                 this.subscriptionID,
                 this.xAbsL, //TODO move bounds as well
                 this.xAbsR, //TODO move bounds as well
-                this.yAbsU, //TODO move bounds as well
-                this.yAbsL, //TODO move bounds as well
+                this.yAbsU - 1, //TODO move bounds as well
+                this.yAbsL - 1, //TODO move bounds as well
                 this.playerX,
                 this.playerY,
                 this.playerX,
                 this.playerY + 1,
             );
-
+            console.log(move);
+            console.log(JSON.stringify(move));
             connection.send(JSON.stringify(
                 move
             ));
         };
 
         this.canvas = (event) => {
+            let canvasContext = this.getCanvasContext();
             let rect = document.getElementById("board").getBoundingClientRect();
             var x = event.clientX - rect.left;
             var y = event.clientY - rect.top;
-            console.log(x + ',' + y);
-            return x;
+            var canvasCellLocX = Math.floor(x / 50);
+            var canvasCellLocY = Math.floor(y / 50);
+            let mapSize = this.map.length;
+            let newTile = false;
+            for (var n = 0; n < mapSize; n++) {
+                if (canvasCellLocX === this.map[n].x && canvasCellLocY === this.map[n].y) {
+                    canvasContext.globalAlpha = '0.5';
+                    canvasContext.fillRect((canvasCellLocX * 49), (canvasCellLocY * 49), 49, 49);
+                    reverseDeltaFrameTiles.push(this.map[n]);
+                    newTile = true;
+                }
+            }
+            if (newTile === false) {
+                if (canvasCellLocX > this.map[mapSize - 1].x) {
+                    canvasContext.globalAlpha = '0.5';
+                    canvasContext.fillRect((canvasCellLocX * 49), (canvasCellLocY * 49), 49, 49);
+                    let tile = new Tile(canvasCellLocX, canvasCellLocY, (canvasCellLocX + this.map[0].xAbs), this.map[0].yAbs, false, null, null, null);
+                    reverseDeltaFrameTiles.push(tile);
+                    newTile = 1;
+                }
+                else if (canvasCellLocY > this.map[mapSize - 1].y) {
+                    canvasContext.globalAlpha = '0.5';
+                    canvasContext.fillRect((canvasCellLocX * 49), (canvasCellLocY * 49), 49, 49);
+                    let tile = new Tile(canvasCellLocX, canvasCellLocY, this.map[0].xAbs, (canvasCellLocY + this.map[0].yAbs), false, null, null, null);
+                    reverseDeltaFrameTiles.push(tile);
+                    newTile = 1;
+                }
+                else {
+                    canvasContext.globalAlpha = '0.5';
+                    canvasContext.fillRect((canvasCellLocX * 49), (canvasCellLocY * 49), 49, 49);
+                    let tile = new Tile(canvasCellLocX, canvasCellLocY, (canvasCellLocX + this.map[0].xAbs), (canvasCellLocY + this.map[0].yAbs), false, null, null, null);
+                    reverseDeltaFrameTiles.push(tile);
+                    newTile = 1;
+                }
+            }
         };
 
-        this.tileEditor = (event) => {
-            let tileEditorContext = document
-                .getElementById("tileEditor")
-                .getContext("2d")
-                ;
-            let rect = document.getElementById("tileEditor").getBoundingClientRect();
+        this.objectEditor = (event) => {
+            console.log("object editor");
+            let canvasContext = this.getCanvasContext();
+            let rect = document.getElementById("objectTypes").getBoundingClientRect();
             var x = event.clientX - rect.left;
             var y = event.clientY - rect.top;
             var cellLocX = Math.floor(x / 50);
             var cellLocY = Math.floor(y / 50);
-            console.log("pointer location: " + x + ',' + y);
-            var tileEditorImages = imgLoader.getImages();
-            var numImages = imgLoader.getLength();
-            for (var i = 0; i < numImages; i++) {
-                tileEditorContext.drawImage(imgLoader.getImage(tileEditorImages[i]), i * 50, 0);
-            }
-
-            for (var n = 0; n < numImages; n++) {
-                console.log("n: " + n + ", cellLocX: " + cellLocX);
-                if (cellLocX === n) {
-                    tileEditorContext.globalAlpha = '0.5';
-                    console.log("cell location: " + cellLocX + ',' + cellLocY)
-                    tileEditorContext.fillRect((cellLocX * 50), (cellLocY * 50), 50, 50);
+            let numReverseTiles = reverseDeltaFrameTiles.length;
+            for (var i = 0; i < numReverseTiles; i++) {
+                if (cellLocX === 0) {
+                    reverseDeltaFrameTiles[i].object = "genericBarrier1";
+                    reverseDeltaFrameTiles[i].walkable = "false";
+                }
+                if (cellLocX === 1) {
+                    reverseDeltaFrameTiles[i].character = "lance";
                 }
             }
-            connection.send(JSON.stringify(new ReverseDeltaFrame(0, reverseDeltaFrameTiles)));
+            for (i = 0; i < reverseDeltaFrameTiles.length; i++) {
+                console.log("reverseDeltaFrameX: " + reverseDeltaFrameTiles[i].x + ", reverseDeltaFrameY: " + reverseDeltaFrameTiles[i].y);
+                canvasContext.clearRect((reverseDeltaFrameTiles[i].x * 49), (reverseDeltaFrameTiles[i].y * 49), 47, 47);
+            }
+            let reverseDeltaFrame = new ReverseDeltaFrame(this.subscriptionID, reverseDeltaFrameTiles)
+            connection.send(JSON.stringify(reverseDeltaFrame));
+            reverseDeltaFrameTiles.length = 0;
         };
+
+        this.terrainEditor = (event) => {
+            console.log("terrain editor");
+            let canvasContext = this.getCanvasContext();
+            let rect = document.getElementById("terrainTypes").getBoundingClientRect();
+            var x = event.clientX - rect.left;
+            var y = event.clientY - rect.top;
+            var cellLocX = Math.floor(x / 50);
+            var cellLocY = Math.floor(y / 50);
+            let numReverseTiles = reverseDeltaFrameTiles.length;
+            for (var i = 0; i < numReverseTiles; i++) {
+                if (cellLocX === 0) {
+                    reverseDeltaFrameTiles[i].terrainType = "greenGrass1";
+                    reverseDeltaFrameTiles[i].walkable = "true";
+                }
+                else if (cellLocX === 1) {
+                    reverseDeltaFrameTiles[i].terrainType = "genericPath1";
+                    reverseDeltaFrameTiles[i].walkable = "true";
+                }
+            }
+
+            for (i = 0; i < reverseDeltaFrameTiles.length; i++) {
+                console.log("reverseDeltaFrameX: " + reverseDeltaFrameTiles[i].x + ", reverseDeltaFrameY: " + reverseDeltaFrameTiles[i].y);
+                canvasContext.clearRect((reverseDeltaFrameTiles[i].x * 49), (reverseDeltaFrameTiles[i].y * 49), 47, 47);
+            }
+            let reverseDeltaFrame = new ReverseDeltaFrame(this.subscriptionID, reverseDeltaFrameTiles)
+            connection.send(JSON.stringify(reverseDeltaFrame));
+            reverseDeltaFrameTiles.length = 0;
+        };
+    }
+
+    //returns the context for the game canvas used to select the tiles
+    getCanvasContext() {
+        return document.getElementById("board").getContext("2d");
     }
 
     //unpacks the delta frame and hashes tiles into an array
@@ -533,7 +605,6 @@ class Game extends React.Component {
         });
 
         this.canvasRender();
-        this.tileEditorRender();
     }
 
     //actually draws the map on the canvas
@@ -542,7 +613,7 @@ class Game extends React.Component {
             var context = document
                 .getElementById("board")
                 .getContext("2d")
-            ;
+                ;
 
             //clear the canvas before drawing every time
             context.clearRect(
@@ -559,7 +630,12 @@ class Game extends React.Component {
                 //TODO This should be a switch statement as well
                 if (element.terrainType === "greenGrass1") {
                     context.rect(element.x * cellWidth, element.y * cellWidth, cellWidth, cellWidth);
-                } else {
+                }
+                else if (element.terrainType === null) {
+                    context.fillStyle = "#000000";
+                    context.fillRect(element.x * cellWidth, element.y * cellWidth, cellWidth, cellWidth);
+                }
+                else {
                     context.arc(element.x * cellWidth, element.y * cellWidth, cellWidth, 2 * Math.PI);
                 }
                 context.stroke();
@@ -587,20 +663,24 @@ class Game extends React.Component {
     }
 
     //Displays all of the images of every game tile for the Game Designer
-    tileEditorRender() {
+    objectTypeRender() {
         if (imgLoader.allLoaded) {
-            console.log("tile editor");
-            var tileEditorContext = document
-                .getElementById("tileEditor")
-                .getContext("2d")
-                ;
-            let count = 0;
-            console.log(imgLoader.getImages);
-            for (let i in imgLoader.getImages) {
-                console.log(i);
-                tileEditorContext.drawImage(i, count * 50, count * 50);
-                count++;
+            var tileEditorContext = document.getElementById("objectTypes").getContext("2d");
+            var tileEditorImages = imgLoader.getImages();
+            var numImages = imgLoader.getLength();
+            for (var i = 0; i < numImages; i++) {
+                tileEditorContext.drawImage(imgLoader.getImage(tileEditorImages[i]), i * 50, 0);
             }
+        }
+    }
+
+    terrainTypeRender() {
+        if (imgLoader.allLoaded) {
+            var terrainTypesContext = document.getElementById("terrainTypes").getContext("2d");
+            terrainTypesContext.fillStyle = "#00FF00";
+            terrainTypesContext.fillRect(0, 0, 49, 49);
+            terrainTypesContext.fillStyle = "#795300";
+            terrainTypesContext.fillRect(50, 0, 49, 49);
         }
     }
 
@@ -608,33 +688,17 @@ class Game extends React.Component {
         //TODO this if statement is no longer necessary
         if (this.state.map !== null) {
 
-            const placeables = imgLoader.getImages().map( (image, i) => {
-                    return (
-                        <div><input type="radio" name="placeable" value={image}/>{imgLoader.getImage(image)}<br/></div>
-                    );
-                }
-            );
-
             return (
                 <div>
                     <div><canvas id="board" width="500" height="500" onClick={this.canvas}></canvas></div>
+                    <div><canvas id="objectTypes" width="500" height="150" onClick={this.objectEditor}></canvas></div>
+                    <div><canvas id="terrainTypes" width="500" height="150" onClick={this.terrainEditor}></canvas></div>
                     <div><button id="upButton" type="button" onClick={this.up}>Up</button></div>
                     <div>
                         <button id="leftButton" type="button" onClick={this.left}>Left</button>
                         <button id="rightButton" type="button" onClick={this.right}>Right</button>
                     </div>
                     <div><button id="downButton" type="button" onClick={this.down}>Down</button></div>
-                    <form>
-                        <h4>Placeables</h4>
-                        <div><input type="radio" name="placeable" value="greenGrass1"/>greenGrass1<br/></div>
-                        <div><input type="radio" name="placeable" value="dirtPath1"/>dirtPath1<br/></div>
-                        {placeables}
-                    </form>
-                    <form>
-                    <h4>Walkable</h4>
-                        <input type="radio" name="walkable" value="true"/>Walkable<br/>
-                        <input type="radio" name="walkable" value="false"/>Not Walkable<br/>
-                    </form>
                 </div>
             );
         } else {
