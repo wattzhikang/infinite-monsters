@@ -607,16 +607,29 @@ class Game extends React.Component {
     render() {
         //TODO this if statement is no longer necessary
         if (this.state.map !== null) {
+
+            const placeables = imgLoader.getImages().map( (image, i) => {
+                    return (
+                        <div><input type="radio" name="placeable" value={image}/>{image}<br/></div>
+                    );
+                }
+            );
+
             return (
                 <div>
                     <div><canvas id="board" width="500" height="500" onClick={this.canvas}></canvas></div>
-                    <div><canvas id="tileEditor" width="500" height="300" onClick={this.tileEditor}></canvas></div>
                     <div><button id="upButton" type="button" onClick={this.up}>Up</button></div>
                     <div>
                         <button id="leftButton" type="button" onClick={this.left}>Left</button>
                         <button id="rightButton" type="button" onClick={this.right}>Right</button>
                     </div>
                     <div><button id="downButton" type="button" onClick={this.down}>Down</button></div>
+                    <form>
+                        <h4>Placeables</h4>
+                        <div><input type="radio" name="placeable" value="greenGrass1"/>greenGrass1<br/></div>
+                        <div><input type="radio" name="placeable" value="dirtPath1"/>dirtPath1<br/></div>
+                        {placeables}
+                    </form>
                 </div>
             );
         } else {
