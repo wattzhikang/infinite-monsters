@@ -610,7 +610,7 @@ class Game extends React.Component {
 
             const placeables = imgLoader.getImages().map( (image, i) => {
                     return (
-                        <div><input type="radio" name="placeable" value={image}/>{image}<br/></div>
+                        <div><input type="radio" name="placeable" value={image}/>{imgLoader.getImage(image)}<br/></div>
                     );
                 }
             );
@@ -629,6 +629,11 @@ class Game extends React.Component {
                         <div><input type="radio" name="placeable" value="greenGrass1"/>greenGrass1<br/></div>
                         <div><input type="radio" name="placeable" value="dirtPath1"/>dirtPath1<br/></div>
                         {placeables}
+                    </form>
+                    <form>
+                    <h4>Walkable</h4>
+                        <input type="radio" name="walkable" value="true"/>Walkable<br/>
+                        <input type="radio" name="walkable" value="false"/>Not Walkable<br/>
                     </form>
                 </div>
             );
