@@ -1,5 +1,6 @@
 stages:
   - scmaven
+  - sctest
   - scdeploy
   - wsmaven
   - wsdeploy
@@ -17,6 +18,14 @@ server-core-maven-build:
   artifacts:
     paths:
       - Backend/server_core/servercore/
+
+server-core-autotest:
+  stage: sctest
+  tags:
+    - shell
+  script:
+    - cd Backend/server_core
+    - mvn test
 
 server-core-autodeploy:
     stage: scdeploy
