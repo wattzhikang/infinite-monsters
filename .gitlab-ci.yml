@@ -5,6 +5,7 @@ stages:
   - wsdeploy
   - wabuild
   - wadeploy
+  - androidbuild
 
 server-core-maven-build:
   stage: scmaven
@@ -70,3 +71,15 @@ web-application-deploy:
     - cd Backend/IntermonReact/intermon/
     - sudo rm -rf /var/www/html/intermon/*
     - sudo cp -r build/* /var/www/html/intermon/
+
+android-build:
+    image: javiersantos/android-ci:latest
+    stage: androidbuild
+    before_script:
+      - export GRADLE_USER_HOME=`pwd`/.gradle
+      - chmod +x ./Frontend/IntermonGame/gradlew
+    tags:
+      - android
+    script:
+      - cd Frontend/IntermonGame
+      - ./gradlew assemble
