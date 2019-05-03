@@ -615,6 +615,8 @@ class Game extends React.Component {
                 }
             );
 
+            var gender = document.querySelector('input[name = "walkable"]:checked').value;
+
             return (
                 <div>
                     <div><canvas id="board" width="500" height="500" onClick={this.canvas}></canvas></div>
@@ -629,6 +631,11 @@ class Game extends React.Component {
                         <div><input type="radio" name="placeable" value="greenGrass1"/>greenGrass1<br/></div>
                         <div><input type="radio" name="placeable" value="dirtPath1"/>dirtPath1<br/></div>
                         {placeables}
+                    </form>
+                    <form>
+                    <h4>Walkable</h4>
+                        <input type="radio" name="walkable" value="true"/>Walkable<br/>
+                        <input type="radio" name="walkable" value="false"/>Not Walkable<br/>
                     </form>
                 </div>
             );
